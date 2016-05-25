@@ -1,34 +1,34 @@
 package rpc
 
 type Config struct {
-	SteemitBlockInterval *Int `json:"STEEMIT_BLOCK_INTERVAL"`
+	SteemitBlockInterval uint `json:"STEEMIT_BLOCK_INTERVAL"`
 }
 
 type DynamicGlobalProperties struct {
-	Time                     *Time   `json:"time"`
-	TotalPow                 int     `json:"total_pow"`
-	NumPowWitnesses          int     `json:"num_pow_witnesses"`
-	ConfidentialSupply       string  `json:"confidential_supply"`
-	TotalVestingShares       string  `json:"total_vesting_shares"`
-	CurrentReserveRatio      float64 `json:"current_reserve_ratio"`
-	Id                       string  `json:"id"`
-	CurrentSupply            string  `json:"current_supply"`
-	MaximumBlockSize         int     `json:"maximum_block_size"`
-	RecentSlotsFilled        string  `json:"recent_slots_filled"`
-	CurrentWitness           string  `json:"current_witness"`
-	TotalRewardShares2       string  `json:"total_reward_shares2"`
-	AverageBlockSize         int     `json:"average_block_size"`
-	CurrentAslot             int     `json:"current_aslot"`
-	LastIrreversibleBlockNum int     `json:"last_irreversible_block_num"`
-	TotalVersingFundSteem    string  `json:"total_vesting_fund_steem"`
-	HeadBlockId              string  `json:"head_block_id"`
-	VirtualSupply            string  `json:"virtual_supply"`
-	CurrentSBDSupply         string  `json:"current_sbd_supply"`
-	ConfidentialSBDSupply    string  `json:"confidential_sbd_supply"`
-	TotalRewardFundSteem     string  `json:"total_reward_fund_steem"`
-	SBDInterestRate          float64 `json:"sbd_interest_rate"`
-	MaxVirtualBandwidth      string  `json:"max_virtual_bandwidth"`
-	HeadBlockNumber          int     `json:"head_block_number"`
+	Time                     *Time  `json:"time"`
+	TotalPow                 *Int   `json:"total_pow"`
+	NumPowWitnesses          *Int   `json:"num_pow_witnesses"`
+	ConfidentialSupply       string `json:"confidential_supply"`
+	TotalVestingShares       string `json:"total_vesting_shares"`
+	CurrentReserveRatio      *Int   `json:"current_reserve_ratio"`
+	Id                       *Int   `json:"id"`
+	CurrentSupply            string `json:"current_supply"`
+	MaximumBlockSize         *Int   `json:"maximum_block_size"`
+	RecentSlotsFilled        string `json:"recent_slots_filled"`
+	CurrentWitness           string `json:"current_witness"`
+	TotalRewardShares2       string `json:"total_reward_shares2"`
+	AverageBlockSize         *Int   `json:"average_block_size"`
+	CurrentAslot             *Int   `json:"current_aslot"`
+	LastIrreversibleBlockNum *Int   `json:"last_irreversible_block_num"`
+	TotalVersingFundSteem    string `json:"total_vesting_fund_steem"`
+	HeadBlockId              string `json:"head_block_id"`
+	VirtualSupply            string `json:"virtual_supply"`
+	CurrentSBDSupply         string `json:"current_sbd_supply"`
+	ConfidentialSBDSupply    string `json:"confidential_sbd_supply"`
+	TotalRewardFundSteem     string `json:"total_reward_fund_steem"`
+	SBDInterestRate          *Int   `json:"sbd_interest_rate"`
+	MaxVirtualBandwidth      string `json:"max_virtual_bandwidth"`
+	HeadBlockNumber          *Int   `json:"head_block_number"`
 }
 
 type Block struct {
@@ -42,8 +42,8 @@ type Block struct {
 }
 
 type Transaction struct {
-	RefBlockNum    int          `json:"ref_block_num"`
-	RefBlockPrefix int          `json:"ref_block_prefix"`
+	RefBlockNum    *Int         `json:"ref_block_num"`
+	RefBlockPrefix *Int         `json:"ref_block_prefix"`
 	Expiration     string       `json:"expiration"`
 	Operations     []*Operation `json:"operations"`
 }
@@ -97,7 +97,7 @@ type VoteOperation struct {
 	Voter    string `json:"voter"`
 	Author   string `json:"author"`
 	Permlink string `json:"permlink"`
-	Weight   int    `json:"weight"`
+	Weight   *Int   `json:"weight"`
 }
 
 // CommentOperation represents either a new post or a comment.
@@ -144,7 +144,7 @@ type Content struct {
 	Replies                 []map[string]interface{} `json:"replies"`
 	Permlink                string                   `json:"permlink"`
 	JsonMetadata            string                   `json:"json_metadata"`
-	Children                int                      `json:"children"`
+	Children                *Int                     `json:"children"`
 	NetRshares              *Int                     `json:"net_rshares"`
 	URL                     string                   `json:"url"`
 	ActiveVotes             []*Vote                  `json:"active_votes"`

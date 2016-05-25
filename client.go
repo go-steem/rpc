@@ -58,43 +58,35 @@ func (client *Client) GetBlockHeaderRaw(blockNum uint32) (*json.RawMessage, erro
 	return client.callRaw("get_block_header", []uint32{blockNum})
 }
 
-func (client *Client) GetRawBlockRaw(blockNum uint32) (*json.RawMessage, error) {
+func (client *Client) GetBlockRaw(blockNum uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_block", []uint32{blockNum})
+}
+
+func (client *Client) GetBlock(blockNum uint32) (*Block, error) {
+	var resp Block
+	if err := client.rpc.Call("get_block", []uint32{blockNum}, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (client *Client) GetStateRaw(path string) (*json.RawMessage, error) {
 	return client.callRaw("get_state", []string{path})
 }
 
-func (client *Client) GetTrendingCategoriesRaw(
-	after string,
-	limit uint32,
-) (*json.RawMessage, error) {
-
+func (client *Client) GetTrendingCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_trending_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetBestCategoriesRaw(
-	after string,
-	limit uint32,
-) (*json.RawMessage, error) {
-
+func (client *Client) GetBestCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_best_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetActiveCategoriesRaw(
-	after string,
-	limit uint32,
-) (*json.RawMessage, error) {
-
+func (client *Client) GetActiveCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_active_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetRecentCategoriesRaw(
-	after string,
-	limit uint32,
-) (*json.RawMessage, error) {
-
+func (client *Client) GetRecentCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_recent_categories", []interface{}{after, limit})
 }
 
@@ -156,11 +148,7 @@ func (client *Client) LookupAccountNamesRaw(accountNames []string) (*json.RawMes
 	return client.callRaw("lookup_account_names", [][]string{accountNames})
 }
 
-func (client *Client) LookupAccountsRaw(
-	lowerBoundName string,
-	limit uint32,
-) (*json.RawMessage, error) {
-
+func (client *Client) LookupAccountsRaw(lowerBoundName string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("lookup_accounts", []interface{}{lowerBoundName, limit})
 }
 
@@ -172,12 +160,7 @@ func (client *Client) GetConversionRequestsRaw(accountName string) (*json.RawMes
 	return client.callRaw("get_conversion_requests", []string{accountName})
 }
 
-func (client *Client) GetAccountHistoryRaw(
-	account string,
-	from uint64,
-	limit uint32,
-) (*json.RawMessage, error) {
-
+func (client *Client) GetAccountHistoryRaw(account string, from uint64, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_account_history", []interface{}{account, from, limit})
 }
 
@@ -221,6 +204,18 @@ func (client *Client) GetAccountHistoryRaw(
    (get_discussions_in_category_by_cashout_time)
 */
 
+func (client *Client) GetContentRaw(author, permlink string) (*json.RawMessage, error) {
+	return client.callRaw("get_content", []string{author, permlink})
+}
+
+func (client *Client) GetContent(author, permlink string) (*Content, error) {
+	var resp Content
+	if err := client.rpc.Call("get_content", []string{author, permlink}, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 /*
    // Witnesses
    (get_witnesses)
@@ -236,11 +231,7 @@ func (client *Client) GetAccountHistoryRaw(
  * Helpers
  */
 
-func (client *Client) callRaw(
-	method string,
-	params []interface{},
-) (*json.RawMessage, error) {
-
+func (client *Client) callRaw(method string, params []interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
 	if err := client.rpc.Call(method, params, &resp); err != nil {
 		return nil, err
