@@ -58,27 +58,27 @@ func (client *Client) GetBlockHeaderRaw(blockNum uint32) (*json.RawMessage, erro
 	return client.callRaw("get_block_header", []uint32{blockNum})
 }
 
-func (client *Client) GetBlockRaw(blockNum uint32) (*json.RawMessage, error) {
+func (client *Client) GetRawBlockRaw(blockNum uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_block", []uint32{blockNum})
 }
 
-func (client *Client) GetState(path string) (*json.RawMessage, error) {
+func (client *Client) GetStateRaw(path string) (*json.RawMessage, error) {
 	return client.callRaw("get_state", []string{path})
 }
 
-func (client *Client) GetTrendingCategories(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetTrendingCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_trending_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetBestCategories(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetBestCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_best_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetActiveCategories(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetActiveCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_active_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetRecentCategories(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetRecentCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return client.callRaw("get_recent_categories", []interface{}{after, limit})
 }
 
@@ -90,6 +90,26 @@ func (client *Client) GetRecentCategories(after string, limit uint32) (*json.Raw
    (get_feed_history)
    (get_current_median_history_price)
 */
+
+func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_config", emptyParams)
+}
+
+func (client *Client) GetDynamicGlobalPropertiesRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_dynamic_global_properties", emptyParams)
+}
+
+func (client *Client) GetChainPropertiesRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_chain_properties", emptyParams)
+}
+
+func (client *Client) GetFeedHistoryRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_feed_history", emptyParams)
+}
+
+func (client *Client) GetCurrentMedianHistoryPriceRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_current_median_history_price", emptyParams)
+}
 
 /*
    // Keys
