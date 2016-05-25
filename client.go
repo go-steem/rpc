@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tchap/rpc-codec/jsonrpc2"
+	"github.com/go-steem/rpc-codec/jsonrpc2"
 	"golang.org/x/net/websocket"
 )
 
