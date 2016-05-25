@@ -1,5 +1,11 @@
 package rpc
 
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+)
+
 type Config struct {
 	SteemitBlockInterval uint `json:"STEEMIT_BLOCK_INTERVAL"`
 }

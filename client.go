@@ -1,11 +1,7 @@
-package main
+package rpc
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
-	"strconv"
-	"time"
 
 	"github.com/go-steem/rpc-codec/jsonrpc2"
 	"golang.org/x/net/websocket"
@@ -231,10 +227,10 @@ func (client *Client) GetContent(author, permlink string) (*Content, error) {
  * Helpers
  */
 
-func (client *Client) callRaw(method string, params []interface{}) (*json.RawMessage, error) {
+func (client *Client) callRaw(method string, params interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
 	if err := client.rpc.Call(method, params, &resp); err != nil {
 		return nil, err
 	}
-	return &resp.nil
+	return &resp, nil
 }
