@@ -66,19 +66,35 @@ func (client *Client) GetStateRaw(path string) (*json.RawMessage, error) {
 	return client.callRaw("get_state", []string{path})
 }
 
-func (client *Client) GetTrendingCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetTrendingCategoriesRaw(
+	after string,
+	limit uint32,
+) (*json.RawMessage, error) {
+
 	return client.callRaw("get_trending_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetBestCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetBestCategoriesRaw(
+	after string,
+	limit uint32,
+) (*json.RawMessage, error) {
+
 	return client.callRaw("get_best_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetActiveCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetActiveCategoriesRaw(
+	after string,
+	limit uint32,
+) (*json.RawMessage, error) {
+
 	return client.callRaw("get_active_categories", []interface{}{after, limit})
 }
 
-func (client *Client) GetRecentCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
+func (client *Client) GetRecentCategoriesRaw(
+	after string,
+	limit uint32,
+) (*json.RawMessage, error) {
+
 	return client.callRaw("get_recent_categories", []interface{}{after, limit})
 }
 
@@ -126,6 +142,44 @@ func (client *Client) GetCurrentMedianHistoryPriceRaw() (*json.RawMessage, error
    (get_conversion_requests)
    (get_account_history)
 */
+
+func (client *Client) GetAccountsRaw(accountNames []string) (*json.RawMessage, error) {
+	return client.callRaw("get_accounts", [][]string{accountNames})
+}
+
+// XXX: Not sure about params.
+func (client *Client) GetAccountReferenceRaw(id string) (*json.RawMessage, error) {
+	return client.callRaw("get_account_reference", []string{id})
+}
+
+func (client *Client) LookupAccountNamesRaw(accountNames []string) (*json.RawMessage, error) {
+	return client.callRaw("lookup_account_names", [][]string{accountNames})
+}
+
+func (client *Client) LookupAccountsRaw(
+	lowerBoundName string,
+	limit uint32,
+) (*json.RawMessage, error) {
+
+	return client.callRaw("lookup_accounts", []interface{}{lowerBoundName, limit})
+}
+
+func (client *Client) GetAccountCountRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_account_count", emptyParams)
+}
+
+func (client *Client) GetConversionRequestsRaw(accountName string) (*json.RawMessage, error) {
+	return client.callRaw("get_conversion_requests", []string{accountName})
+}
+
+func (client *Client) GetAccountHistoryRaw(
+	account string,
+	from uint64,
+	limit uint32,
+) (*json.RawMessage, error) {
+
+	return client.callRaw("get_account_history", []interface{}{account, from, limit})
+}
 
 /*
    // Market
