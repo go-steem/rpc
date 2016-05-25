@@ -54,6 +54,34 @@ func (client *Client) Close() error {
    (get_recent_categories)
 */
 
+func (client *Client) GetBlockHeaderRaw(blockNum uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_block_header", []uint32{blockNum})
+}
+
+func (client *Client) GetBlockRaw(blockNum uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_block", []uint32{blockNum})
+}
+
+func (client *Client) GetState(path string) (*json.RawMessage, error) {
+	return client.callRaw("get_state", []string{path})
+}
+
+func (client *Client) GetTrendingCategories(after string, limit uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_trending_categories", []interface{}{after, limit})
+}
+
+func (client *Client) GetBestCategories(after string, limit uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_best_categories", []interface{}{after, limit})
+}
+
+func (client *Client) GetActiveCategories(after string, limit uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_active_categories", []interface{}{after, limit})
+}
+
+func (client *Client) GetRecentCategories(after string, limit uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_recent_categories", []interface{}{after, limit})
+}
+
 /*
    // Globals
    (get_config)
@@ -129,6 +157,10 @@ func (client *Client) Close() error {
    (get_active_witnesses)
    (get_miner_queue)
 */
+
+/*
+ * Helpers
+ */
 
 func (client *Client) callRaw(
 	method string,
