@@ -99,8 +99,24 @@ func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
 	return client.callRaw("get_config", emptyParams)
 }
 
+func (client *Client) GetConfig() (*Config, error) {
+	var resp Config
+	if err := client.rpc.Call("get_config", emptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 func (client *Client) GetDynamicGlobalPropertiesRaw() (*json.RawMessage, error) {
 	return client.callRaw("get_dynamic_global_properties", emptyParams)
+}
+
+func (client *Client) GetDynamicGlobalProperties() (*DynamicGlobalProperties, error) {
+	var resp DynamicGlobalProperties
+	if err := client.rpc.Call("get_dynamic_global_properties", emptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (client *Client) GetChainPropertiesRaw() (*json.RawMessage, error) {

@@ -25,7 +25,7 @@ type DynamicGlobalProperties struct {
 	TotalRewardShares2       string `json:"total_reward_shares2"`
 	AverageBlockSize         *Int   `json:"average_block_size"`
 	CurrentAslot             *Int   `json:"current_aslot"`
-	LastIrreversibleBlockNum *Int   `json:"last_irreversible_block_num"`
+	LastIrreversibleBlockNum uint32 `json:"last_irreversible_block_num"`
 	TotalVersingFundSteem    string `json:"total_vesting_fund_steem"`
 	HeadBlockId              string `json:"head_block_id"`
 	VirtualSupply            string `json:"virtual_supply"`
