@@ -17,7 +17,7 @@ type DynamicGlobalProperties struct {
 	ConfidentialSupply       string `json:"confidential_supply"`
 	TotalVestingShares       string `json:"total_vesting_shares"`
 	CurrentReserveRatio      *Int   `json:"current_reserve_ratio"`
-	Id                       *Int   `json:"id"`
+	Id                       string `json:"id"`
 	CurrentSupply            string `json:"current_supply"`
 	MaximumBlockSize         *Int   `json:"maximum_block_size"`
 	RecentSlotsFilled        string `json:"recent_slots_filled"`
