@@ -170,6 +170,32 @@ type ContentMetadata struct {
 	Image []string `json:"image"`
 }
 
+func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
+	if data[0] == '"' {
+		data = data[1:]
+		data = data[:len(data)-1]
+	}
+
+	// Infinite cycle
+	//return json.Unmarshal(data, metadata)
+	var temp map[string]interface{}
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+
+	if v, ok := temp["users"]; ok {
+		metadata.Users = v.([]string)
+	}
+	if v, ok := temp["tags"]; ok {
+		metadata.Tags = v.([]string)
+	}
+	if v, ok := temp["image"]; ok {
+		metadata.Image = v.([]string)
+	}
+
+	return nil
+}
+
 type Vote struct {
 	Voter  string `json:"voter"`
 	Weight *Int   `json:"weight"`
