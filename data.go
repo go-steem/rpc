@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -165,33 +167,31 @@ type Content struct {
 }
 
 type ContentMetadata struct {
+	Users []string
+	Tags  []string
+	Image []string
+}
+
+type ContentMetadataRaw struct {
 	Users []string `json:"users"`
 	Tags  []string `json:"tags"`
 	Image []string `json:"image"`
 }
 
 func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
-	if data[0] == '"' {
-		data = data[1:]
-		data = data[:len(data)-1]
-	}
-
-	// Infinite cycle
-	//return json.Unmarshal(data, metadata)
-	var temp map[string]interface{}
-	if err := json.Unmarshal(data, &temp); err != nil {
+	unquoted, err := strconv.Unquote(string(data))
+	if err != nil {
 		return err
 	}
 
-	if v, ok := temp["users"]; ok {
-		metadata.Users = v.([]string)
+	var raw ContentMetadataRaw
+	if err := json.NewDecoder(strings.NewReader(unquoted)).Decode(&raw); err != nil {
+		return err
 	}
-	if v, ok := temp["tags"]; ok {
-		metadata.Tags = v.([]string)
-	}
-	if v, ok := temp["image"]; ok {
-		metadata.Image = v.([]string)
-	}
+
+	metadata.Users = raw.Users
+	metadata.Tags = raw.Tags
+	metadata.Image = raw.Image
 
 	return nil
 }
