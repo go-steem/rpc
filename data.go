@@ -135,7 +135,7 @@ func (op *CommentOperation) Link() string {
 }
 
 type Content struct {
-	Id                      *Int                     `json:"id"`
+	Id                      string                   `json:"id"`
 	RootTitle               string                   `json:"root_title"`
 	Active                  *Time                    `json:"active"`
 	AbsRshares              *Int                     `json:"abs_rshares"`
@@ -149,7 +149,7 @@ type Content struct {
 	Created                 *Time                    `json:"created"`
 	Replies                 []map[string]interface{} `json:"replies"`
 	Permlink                string                   `json:"permlink"`
-	JsonMetadata            string                   `json:"json_metadata"`
+	JsonMetadata            *ContentMetadata         `json:"json_metadata"`
 	Children                *Int                     `json:"children"`
 	NetRshares              *Int                     `json:"net_rshares"`
 	URL                     string                   `json:"url"`
@@ -162,6 +162,12 @@ type Content struct {
 	Author                  string                   `json:"author"`
 	Depth                   *Int                     `json:"depth"`
 	TotalVoteWeight         *Int                     `json:"total_vote_weight"`
+}
+
+type ContentMetadata struct {
+	Users []string `json:"users"`
+	Tags  []string `json:"tags"`
+	Image []string `json:"image"`
 }
 
 type Vote struct {

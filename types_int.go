@@ -11,6 +11,8 @@ type Int struct {
 
 func (num *Int) UnmarshalJSON(data []byte) error {
 	if data[0] == '"' {
+		data = data[1:]
+		data = data[:len(data)-1]
 		var value big.Int
 		if err := json.Unmarshal(data, &value); err != nil {
 			return err
