@@ -184,6 +184,12 @@ func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	if len(unquoted) == 0 {
+		var value ContentMetadata
+		metadata = &value
+		return nil
+	}
+
 	var raw ContentMetadataRaw
 	if err := json.NewDecoder(strings.NewReader(unquoted)).Decode(&raw); err != nil {
 		return err
