@@ -101,7 +101,7 @@ func (client *Client) GetDiscussionsByHotRaw(query *DiscussionQuery) (*json.RawM
 }
 
 func (client *Client) GetRecommendedForRaw(user string, limit uint32) (*json.RawMessage, error) {
-	return client.callRaw("get_discussions_by_votes", query)
+	return client.callRaw("get_discussions_by_votes", []interface{}{user, limit})
 }
 
 /*
@@ -158,6 +158,9 @@ func (client *Client) GetRecentCategoriesRaw(after string, limit uint32) (*json.
    (get_chain_properties)
    (get_feed_history)
    (get_current_median_history_price)
+   (get_witness_schedule)
+   (get_hardfork_version)
+   (get_next_scheduled_hardfork)
 */
 
 func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
@@ -194,6 +197,18 @@ func (client *Client) GetFeedHistoryRaw() (*json.RawMessage, error) {
 
 func (client *Client) GetCurrentMedianHistoryPriceRaw() (*json.RawMessage, error) {
 	return client.callRaw("get_current_median_history_price", emptyParams)
+}
+
+func (client *Client) GetWitnessScheduleRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_witness_schedule", emptyParams)
+}
+
+func (client *Client) GetHardforkVersionRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_hardfork_version", emptyParams)
+}
+
+func (client *Client) GetNextScheduledHardforkRaw() (*json.RawMessage, error) {
+	return client.callRaw("get_next_scheduled_hardfork", emptyParams)
 }
 
 /*
