@@ -1,4 +1,4 @@
-# rpc
+# go-steem/rpc
 
 Golang RPC client library for [Steem](https://steem.io).
 
