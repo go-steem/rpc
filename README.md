@@ -42,7 +42,7 @@ for {
 						content, _ := client.GetContent(body.Author, body.Permlink)
 						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
 
-					// Vote operation
+					// Vote operation.
 					case *rpc.VoteOperation:
 						fmt.Printf("@%v voted for @%v/%v\n", body.Voter, body.Author, body.Permlink)
 
