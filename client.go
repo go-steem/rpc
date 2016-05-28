@@ -40,6 +40,71 @@ func (client *Client) Close() error {
 */
 
 /*
+   // Tags
+   (get_trending_tags)
+   (get_discussions_by_trending)
+   (get_discussions_by_created)
+   (get_discussions_by_active)
+   (get_discussions_by_cashout)
+   (get_discussions_by_payout)
+   (get_discussions_by_votes)
+   (get_discussions_by_children)
+   (get_discussions_by_hot)
+   (get_recommended_for)
+*/
+
+func (client *Client) GetTrendingTagsRaw(afterTag string, limit uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_trending_tags", []interface{}{afterTag, limit})
+}
+
+type DiscussionQuery struct {
+	Tag   string `json:"tag"`
+	Limit uint32 `json:"limit"`
+	// XXX: Not sure about the type here.
+	FilterTags     []string `json:"filter_tags"`
+	StartAuthor    string   `json:"start_author,omitempty"`
+	StartPermlink  string   `json:"start_permlink,omitempty"`
+	ParentAuthor   string   `json:"parent_author,omitempty"`
+	ParentPermlink string   `json:"parent_permlink"`
+}
+
+func (client *Client) GetDiscussionsByTrendingRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_trending", query)
+}
+
+func (client *Client) GetDiscussionsByCreatedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_created", query)
+}
+
+func (client *Client) GetDiscussionsByActiveRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_active", query)
+}
+
+func (client *Client) GetDiscussionsByCashoutRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_cashout", query)
+}
+
+func (client *Client) GetDiscussionsByPayoutRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_payout", query)
+}
+
+func (client *Client) GetDiscussionsByVotesRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_votes", query)
+}
+
+func (client *Client) GetDiscussionsByChildrenRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_children", query)
+}
+
+func (client *Client) GetDiscussionsByHotRaw(query *DiscussionQuery) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_hot", query)
+}
+
+func (client *Client) GetRecommendedForRaw(user string, limit uint32) (*json.RawMessage, error) {
+	return client.callRaw("get_discussions_by_votes", query)
+}
+
+/*
    // Blocks and transactions
    (get_block_header)
    (get_block)
