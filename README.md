@@ -35,15 +35,17 @@ for {
 
 		// Process the transactions.
 		for _, tx := range block.Transactions {
-			for _, ok := range tx.Operations {
+			for _, op := range tx.Operations {
 				switch body := op.Body.(type) {
 					// Comment operation.
 					case *rpc.CommentOperations:
 						content, _ := client.GetContent(body.Author, body.Permlink)
 						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
+
 					// Vote operation
 					case *rpc.VoteOperation:
 						fmt.Printf("@%v voted for @%v/%v\n", body.Voter, body.Author, body.Permlink)
+
 					// You can add more cases, it depends on what
 					// operations you actually need to process.
 				}
