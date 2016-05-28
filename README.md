@@ -7,34 +7,34 @@ Golang RPC client library for [Steem](https://steem.io).
 This is just a code snippet. Please check the `examples` directory
 for more complete and ready to use examples.
 
-```golang
-    client, _ := rpc.Dial("ws://localhost:8090")
-    defer client.Close()
+```go
+client, _ := rpc.Dial("ws://localhost:8090")
+defer client.Close()
 
-    // Get config.
-    config, _ := client.GetConfig()
+// Get config.
+config, _ := client.GetConfig()
 
-    // Start processing blocks.
-	lastBlock := 1800000
-    for {
-        props, _ := client.GetDynamicGlobalProperties()
+// Start processing blocks.
+lastBlock := 1800000
+for {
+	props, _ := client.GetDynamicGlobalProperties()
 
-        for props.LastIrreversibleBlockNum-lastBlock > 0 {
-            block, _ := client.GetBlock(lastBlock)
+	for props.LastIrreversibleBlockNum-lastBlock > 0 {
+		block, _ := client.GetBlock(lastBlock)
 
-			for _, tx := range block.Transactions {
-				for _, ok := range tx.Operations {
-					switch body := op.Body.(type) {
-						case *rpc.CommentOperations:
-							content, _ := client.GetContent(body.Author, body.Permlink)
-							fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
-						case *rpc.VoteOperation:
-							fmt.Printf("@%v voted for @%v/%v\n", body.Voter, body.Author, body.Permlink)
-					}
+		for _, tx := range block.Transactions {
+			for _, ok := range tx.Operations {
+				switch body := op.Body.(type) {
+					case *rpc.CommentOperations:
+						content, _ := client.GetContent(body.Author, body.Permlink)
+						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
+					case *rpc.VoteOperation:
+						fmt.Printf("@%v voted for @%v/%v\n", body.Voter, body.Author, body.Permlink)
 				}
 			}
 		}
 	}
+}
 ```
 
 ## Package Organisation
