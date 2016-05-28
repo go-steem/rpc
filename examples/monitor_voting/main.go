@@ -40,7 +40,7 @@ func run() error {
 	}
 
 	// Loop.
-	nextBlock := *flagNextBlock
+	nextBlock := uint32(*flagNextBlock)
 	log.Printf("---> Entering the block processing loop (starting with block %v)\n", nextBlock)
 	for {
 		log.Println("---> GetDynamicGlobalProperties")
@@ -73,5 +73,6 @@ func run() error {
 			nextBlock++
 		}
 
+		time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
 	}
 }

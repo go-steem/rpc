@@ -54,6 +54,8 @@ for {
 
 		lastBlock++
 	}
+
+	time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
 }
 ```
 
