@@ -59,7 +59,7 @@ for {
 
 ## Package Organisation
 
-Once you create a `Client` object, you can start calling its methods,
+Once you create a `Client` object by using `Dial`, you can start calling its methods,
 which correspond to the methods exported via `steemd`'s RPC endpoint.
 
 There are two versions for every method. The regular method and the raw method.
@@ -71,7 +71,7 @@ methods are specified properly yet.
 ## Status
 
 This package is still under rapid development and it is by no means complete.
-There is no promise considering API stability yet.
+There is no promise considering API stability.
 
 For now there are raw methods specified for most of the RPC methods available,
 but not much has been tested really. Please report any bugs you find. Feel free
