@@ -2,33 +2,50 @@ package rpc
 
 import (
 	"encoding/json"
+	"errors"
+	"net/url"
 
-	"github.com/go-steem/rpc-codec/jsonrpc2"
-	"golang.org/x/net/websocket"
+	"github.com/go-steem/rpc/transports/websocket"
 )
 
 var emptyParams = []string{}
 
-type Client struct {
-	rpc *jsonrpc2.Client
+type Transport interface {
+	Call(method string, params interface{}, response interface{}) error
+	Close() error
 }
 
-func Dial(addr string) (*Client, error) {
-	// Connect to the given WebSocket URL.
-	conn, err := websocket.Dial(addr, "", "http://localhost")
+type Dialer interface {
+	Dial(address string) Transport
+}
+
+type Client struct {
+	t Transport
+}
+
+func Dial(address string) (*Client, error) {
+	// Parse the address URL.
+	u, err := url.Parse(address)
 	if err != nil {
 		return nil, err
 	}
 
-	// Instantiate a JSON-RPC client.
-	client := jsonrpc2.NewClient(conn)
-
-	// Return a new Client instance.
-	return &Client{client}, nil
+	// Instantiate the transport according to the URL.
+	var t Transport
+	switch u.Scheme {
+	case "ws":
+		t, err = websocket.Dial(address)
+	default:
+		return nil, errors.New("no transport registered for URL scheme: " + u.Scheme)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &Client{t}, nil
 }
 
 func (client *Client) Close() error {
-	return client.rpc.Close()
+	return client.t.Close()
 }
 
 /*
@@ -125,7 +142,7 @@ func (client *Client) GetBlockRaw(blockNum uint32) (*json.RawMessage, error) {
 
 func (client *Client) GetBlock(blockNum uint32) (*Block, error) {
 	var resp Block
-	if err := client.rpc.Call("get_block", []uint32{blockNum}, &resp); err != nil {
+	if err := client.t.Call("get_block", []uint32{blockNum}, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -169,7 +186,7 @@ func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
 
 func (client *Client) GetConfig() (*Config, error) {
 	var resp Config
-	if err := client.rpc.Call("get_config", emptyParams, &resp); err != nil {
+	if err := client.t.Call("get_config", emptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -181,7 +198,7 @@ func (client *Client) GetDynamicGlobalPropertiesRaw() (*json.RawMessage, error) 
 
 func (client *Client) GetDynamicGlobalProperties() (*DynamicGlobalProperties, error) {
 	var resp DynamicGlobalProperties
-	if err := client.rpc.Call("get_dynamic_global_properties", emptyParams, &resp); err != nil {
+	if err := client.t.Call("get_dynamic_global_properties", emptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -302,7 +319,7 @@ func (client *Client) GetContentRaw(author, permlink string) (*json.RawMessage, 
 
 func (client *Client) GetContent(author, permlink string) (*Content, error) {
 	var resp Content
-	if err := client.rpc.Call("get_content", []string{author, permlink}, &resp); err != nil {
+	if err := client.t.Call("get_content", []string{author, permlink}, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -325,7 +342,7 @@ func (client *Client) GetContent(author, permlink string) (*Content, error) {
 
 func (client *Client) callRaw(method string, params interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
-	if err := client.rpc.Call(method, params, &resp); err != nil {
+	if err := client.t.Call(method, params, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
