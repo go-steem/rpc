@@ -11,7 +11,7 @@ import (
 var emptyParams = []string{}
 
 type Transport interface {
-	Call(method string, params interface{}, response interface{}) error
+	Call(method string, params, response interface{}) error
 	Close() error
 }
 
@@ -306,23 +306,20 @@ func (client *Client) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
    (get_account_votes)
 */
 
+func (client *Client) GetActiveVotesRaw(author, permlink string) (*json.RawMessage, error) {
+	return client.callRaw("get_active_votes", []string{author, permlink})
+}
+
+func (client *Client) GetAccountVotesRaw(voter string) (*json.RawMessage, error) {
+	return client.callRaw("get_account_votes", []string{voter})
+}
+
 /*
    // Content
    (get_content)
    (get_content_replies)
-   (get_discussions_by_total_pending_payout)
-   (get_discussions_in_category_by_total_pending_payout)
-   (get_discussions_by_last_update)
-   (get_discussions_by_last_active)
-   (get_discussions_by_votes)
-   (get_discussions_by_created)
-   (get_discussions_in_category_by_last_update)
-   (get_discussions_in_category_by_last_active)
-   (get_discussions_in_category_by_votes)
-   (get_discussions_in_category_by_created)
-   (get_discussions_by_author_before_date)
-   (get_discussions_by_cashout_time)
-   (get_discussions_in_category_by_cashout_time)
+   (get_discussions_by_author_before_date) - MISSING
+   (get_replies_by_last_update)
 */
 
 func (client *Client) GetContentRaw(author, permlink string) (*json.RawMessage, error) {
@@ -335,6 +332,19 @@ func (client *Client) GetContent(author, permlink string) (*Content, error) {
 		return nil, err
 	}
 	return &resp, nil
+}
+
+func (client *Client) GetContentRepliesRaw(parent, parentPermlink string) (*json.RawMessage, error) {
+	return client.callRaw("get_content_replies", []string{parent, parentPermlink})
+}
+
+func (client *Client) GetRepliesByLastUpdateRaw(
+	startAuthor string,
+	startPermlink string,
+	limit uint32,
+) (*json.RawMessage, error) {
+
+	return client.callRaw("get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit})
 }
 
 /*
