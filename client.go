@@ -233,6 +233,11 @@ func (client *Client) GetNextScheduledHardforkRaw() (*json.RawMessage, error) {
    (get_key_references)
 */
 
+// XXX: Not sure about params.
+func (client *Client) GetKeyReferencesRaw(key []string) (*json.RawMessage, error) {
+	return client.callRaw("get_key_references", [][]string{key})
+}
+
 /*
    // Accounts
    (get_accounts)
@@ -277,6 +282,13 @@ func (client *Client) GetAccountHistoryRaw(account string, from uint64, limit ui
    // Market
    (get_order_book)
 */
+
+func (client *Client) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	return client.callRaw("get_order_book", []interface{}{limit})
+}
 
 /*
    // Authority / validation
