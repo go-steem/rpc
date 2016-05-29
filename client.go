@@ -5,22 +5,26 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/go-steem/rpc/transports/websocket"
+	"github.com/go-steem/rpc/transport"
+	"github.com/go-steem/rpc/transport/websocket"
 )
 
 var emptyParams = []string{}
 
-type Transport interface {
-	Call(method string, params, response interface{}) error
-	Close() error
+type TransportConstructor func(address string) (transport.Transport, error)
+
+var availableTransports = map[string]TransportConstructor{}
+
+func RegisterTransport(scheme string, constructor TransportConstructor) {
+	availableTransports[scheme] = constructor
 }
 
-type Dialer interface {
-	Dial(address string) Transport
+func init() {
+	RegisterTransport("ws", websocket.Dial)
 }
 
 type Client struct {
-	t Transport
+	t transport.Transport
 }
 
 func Dial(address string) (*Client, error) {
