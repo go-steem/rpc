@@ -80,7 +80,7 @@ func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
 }
 ```
 
-As we can see, the difference is that the raw version returns`*json.RawMessage`,
+As we can see, the difference is that the raw version returns `*json.RawMessage`,
  so it is not trying to unmarshall the response into a properly typed response.
 
 There are two reasons for this:
@@ -88,6 +88,9 @@ There are two reasons for this:
 1. To be able to see raw data.
 2. To be able to call most of the remote methods even though the response
    object is not yet known or specified.
+
+It is already benefitial to just have the raw version because at least
+the method parameters are statically typed.
 
 ## Status
 
