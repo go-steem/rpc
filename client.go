@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/url"
-
-	"github.com/go-steem/rpc/transports/websocket"
 )
 
 var emptyParams = []string{}
@@ -21,18 +19,20 @@ func Dial(address string) (*Client, error) {
 		return nil, err
 	}
 
-	// Instantiate the transport according to the URL.
-	var t Transport
-	switch u.Scheme {
-	case "ws":
-		t, err = websocket.Dial(address)
-	default:
+	// Look for the constructor associated with the given URL scheme.
+	constructor, ok := registeredTransportConstructors[u.Scheme]
+	if !ok {
 		return nil, errors.New("no transport registered for URL scheme: " + u.Scheme)
 	}
+
+	// Use the constructor to get a Transport.
+	transport, err := constructor(address)
 	if err != nil {
 		return nil, err
 	}
-	return &Client{t}, nil
+
+	// Return the new Client, at last.
+	return &Client{transport}, nil
 }
 
 func (client *Client) Close() error {

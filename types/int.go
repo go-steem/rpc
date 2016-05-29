@@ -1,4 +1,4 @@
-package rpc
+package types
 
 import (
 	"encoding/json"
@@ -17,7 +17,6 @@ func (num *Int) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(data, &value); err != nil {
 			return err
 		}
-
 		num.Int = &value
 		return nil
 	}
@@ -26,7 +25,6 @@ func (num *Int) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-
 	num.Int = big.NewInt(value)
 	return nil
 }
