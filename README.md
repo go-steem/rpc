@@ -149,27 +149,27 @@ The following sections document the API completion.
 
 ### Keys
 
-```
-   (get_key_references)
-```
+| Method Name       | Raw Version   | Full Version   |
+| ----------------- |:-------------:|:--------------:|
+| get_key_reference |               |                |
 
 ### Accounts
 
-```
-   (get_accounts)
-   (get_account_references)
-   (lookup_account_names)
-   (lookup_accounts)
-   (get_account_count)
-   (get_conversion_requests)
-   (get_account_history)
-```
+| Method Name               | Raw Version   | Full Version   |
+| ------------------------- |:-------------:|:--------------:|
+| get_accounts              | DONE          |                |
+| get_account_refenreces    |               |                |
+| lookup_account_names      | DONE          |                |
+| lookup_accounts           | DONE          |                |
+| get_account_count         | DONE          |                |
+| get_conversation_requests | DONE          |                |
+| get_account_history       | DONE          |                |
 
 ### Market
 
-```
-   (get_order_book)
-```
+| Method Name    | Raw Version   | Full Version   |
+| -------------- |:-------------:|:--------------:|
+| get_order_book |               |                |
 
 ### Authority / Validation
 
