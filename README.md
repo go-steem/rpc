@@ -43,7 +43,9 @@ There are two reasons for this:
 ## Status
 
 This package is still under rapid development and it is by no means complete.
-For now there is no promise considering API stability.
+For now there is no promise considering API stability. Some response objects
+maybe be typed incorrectly. The package is already usable, though. See the
+`examples` directory.
 
 The following table documents the API completion:
 
