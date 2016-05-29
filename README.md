@@ -99,9 +99,12 @@ For now there is no promise considering API stability. Some response objects
 maybe be typed incorrectly. The package is already usable, though. See the
 `examples` directory.
 
-The following sections document the API completion.
+The following subsections document the API completion.
 
 ### Subscriptions
+
+TODO: Is this actually callable over the RPC endpoint?
+It is a bit confusing to see `set_` prefix. Needs research.
 
 ```
    (set_subscribe_callback)
