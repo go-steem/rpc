@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/go-steem/rpc/types"
 )
 
 type Config struct {
@@ -13,34 +15,34 @@ type Config struct {
 }
 
 type DynamicGlobalProperties struct {
-	Time                     *Time  `json:"time"`
-	TotalPow                 *Int   `json:"total_pow"`
-	NumPowWitnesses          *Int   `json:"num_pow_witnesses"`
-	ConfidentialSupply       string `json:"confidential_supply"`
-	TotalVestingShares       string `json:"total_vesting_shares"`
-	CurrentReserveRatio      *Int   `json:"current_reserve_ratio"`
-	Id                       string `json:"id"`
-	CurrentSupply            string `json:"current_supply"`
-	MaximumBlockSize         *Int   `json:"maximum_block_size"`
-	RecentSlotsFilled        string `json:"recent_slots_filled"`
-	CurrentWitness           string `json:"current_witness"`
-	TotalRewardShares2       string `json:"total_reward_shares2"`
-	AverageBlockSize         *Int   `json:"average_block_size"`
-	CurrentAslot             *Int   `json:"current_aslot"`
-	LastIrreversibleBlockNum uint32 `json:"last_irreversible_block_num"`
-	TotalVersingFundSteem    string `json:"total_vesting_fund_steem"`
-	HeadBlockId              string `json:"head_block_id"`
-	VirtualSupply            string `json:"virtual_supply"`
-	CurrentSBDSupply         string `json:"current_sbd_supply"`
-	ConfidentialSBDSupply    string `json:"confidential_sbd_supply"`
-	TotalRewardFundSteem     string `json:"total_reward_fund_steem"`
-	SBDInterestRate          *Int   `json:"sbd_interest_rate"`
-	MaxVirtualBandwidth      string `json:"max_virtual_bandwidth"`
-	HeadBlockNumber          *Int   `json:"head_block_number"`
+	Time                     *types.Time `json:"time"`
+	TotalPow                 *types.Int  `json:"total_pow"`
+	NumPowWitnesses          *types.Int  `json:"num_pow_witnesses"`
+	ConfidentialSupply       string      `json:"confidential_supply"`
+	TotalVestingShares       string      `json:"total_vesting_shares"`
+	CurrentReserveRatio      *types.Int  `json:"current_reserve_ratio"`
+	Id                       *types.ID   `json:"id"`
+	CurrentSupply            string      `json:"current_supply"`
+	MaximumBlockSize         *types.Int  `json:"maximum_block_size"`
+	RecentSlotsFilled        string      `json:"recent_slots_filled"`
+	CurrentWitness           string      `json:"current_witness"`
+	TotalRewardShares2       string      `json:"total_reward_shares2"`
+	AverageBlockSize         *types.Int  `json:"average_block_size"`
+	CurrentAslot             *types.Int  `json:"current_aslot"`
+	LastIrreversibleBlockNum uint32      `json:"last_irreversible_block_num"`
+	TotalVersingFundSteem    string      `json:"total_vesting_fund_steem"`
+	HeadBlockId              string      `json:"head_block_id"`
+	VirtualSupply            string      `json:"virtual_supply"`
+	CurrentSBDSupply         string      `json:"current_sbd_supply"`
+	ConfidentialSBDSupply    string      `json:"confidential_sbd_supply"`
+	TotalRewardFundSteem     string      `json:"total_reward_fund_steem"`
+	SBDInterestRate          *types.Int  `json:"sbd_interest_rate"`
+	MaxVirtualBandwidth      string      `json:"max_virtual_bandwidth"`
+	HeadBlockNumber          *types.Int  `json:"head_block_number"`
 }
 
 type Block struct {
-	Timestamp             Time                     `json:"timestamp"`
+	Timestamp             *types.Time              `json:"timestamp"`
 	Witness               string                   `json:"witness"`
 	WitnessSignature      string                   `json:"witness_signature"`
 	TransactionMerkleRoot string                   `json:"transaction_merkle_root"`
@@ -50,8 +52,8 @@ type Block struct {
 }
 
 type Transaction struct {
-	RefBlockNum    *Int         `json:"ref_block_num"`
-	RefBlockPrefix *Int         `json:"ref_block_prefix"`
+	RefBlockNum    *types.Int   `json:"ref_block_num"`
+	RefBlockPrefix *types.Int   `json:"ref_block_prefix"`
 	Expiration     string       `json:"expiration"`
 	Operations     []*Operation `json:"operations"`
 }
@@ -102,10 +104,10 @@ func (op *Operation) UnmarshalJSON(data []byte) error {
 }
 
 type VoteOperation struct {
-	Voter    string `json:"voter"`
-	Author   string `json:"author"`
-	Permlink string `json:"permlink"`
-	Weight   *Int   `json:"weight"`
+	Voter    string     `json:"voter"`
+	Author   string     `json:"author"`
+	Permlink string     `json:"permlink"`
+	Weight   *types.Int `json:"weight"`
 }
 
 // CommentOperation represents either a new post or a comment.
@@ -137,33 +139,33 @@ func (op *CommentOperation) Link() string {
 }
 
 type Content struct {
-	Id                      string                   `json:"id"`
+	Id                      *types.ID                `json:"id"`
 	RootTitle               string                   `json:"root_title"`
-	Active                  *Time                    `json:"active"`
-	AbsRshares              *Int                     `json:"abs_rshares"`
+	Active                  *types.Time              `json:"active"`
+	AbsRshares              *types.Int               `json:"abs_rshares"`
 	PendingPayoutValue      string                   `json:"pending_payout_value"`
 	TotalPendingPayoutValue string                   `json:"total_pending_payout_value"`
 	Category                string                   `json:"category"`
 	Title                   string                   `json:"title"`
-	LastUpdate              *Time                    `json:"last_update"`
+	LastUpdate              *types.Time              `json:"last_update"`
 	Stats                   string                   `json:"stats"`
 	Body                    string                   `json:"body"`
-	Created                 *Time                    `json:"created"`
+	Created                 *types.Time              `json:"created"`
 	Replies                 []map[string]interface{} `json:"replies"`
 	Permlink                string                   `json:"permlink"`
 	JsonMetadata            *ContentMetadata         `json:"json_metadata"`
-	Children                *Int                     `json:"children"`
-	NetRshares              *Int                     `json:"net_rshares"`
+	Children                *types.Int               `json:"children"`
+	NetRshares              *types.Int               `json:"net_rshares"`
 	URL                     string                   `json:"url"`
 	ActiveVotes             []*Vote                  `json:"active_votes"`
 	ParentPermlink          string                   `json:"parent_permlink"`
-	CashoutTime             *Time                    `json:"cashout_time"`
+	CashoutTime             *types.Time              `json:"cashout_time"`
 	TotalPayoutValue        string                   `json:"total_payout_value"`
 	ParentAuthor            string                   `json:"parent_author"`
-	ChildrenRshares2        *Int                     `json:"children_rshares2"`
+	ChildrenRshares2        *types.Int               `json:"children_rshares2"`
 	Author                  string                   `json:"author"`
-	Depth                   *Int                     `json:"depth"`
-	TotalVoteWeight         *Int                     `json:"total_vote_weight"`
+	Depth                   *types.Int               `json:"depth"`
+	TotalVoteWeight         *types.Int               `json:"total_vote_weight"`
 }
 
 type ContentMetadata struct {
@@ -203,6 +205,6 @@ func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
 }
 
 type Vote struct {
-	Voter  string `json:"voter"`
-	Weight *Int   `json:"weight"`
+	Voter  string     `json:"voter"`
+	Weight *types.Int `json:"weight"`
 }

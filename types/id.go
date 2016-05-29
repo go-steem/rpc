@@ -3,7 +3,6 @@ package types
 import (
 	"bytes"
 	"encoding/json"
-	"math/big"
 )
 
 type ID struct {
