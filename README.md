@@ -22,11 +22,11 @@ method exported via the RPC endpoint. The regular version and the raw version.
 Let's see an example for `get_config`:
 
 ```go
-func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
+func (client *Client) GetConfig() (*Config, error) {
 	...
 }
 
-func (client *Client) GetConfig() (*Config, error) {
+func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
 	...
 }
 ```
