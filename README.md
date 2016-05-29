@@ -99,7 +99,10 @@ For now there is no promise considering API stability. Some response objects
 maybe be typed incorrectly. The package is already usable, though. See the
 `examples` directory.
 
-The following subsections document the API completion.
+The following subsections document the API completion. The method names
+are taken from `database_api.hpp` in `steemit/steem`.
+
+TODO: Verify that these are actually the methods available over RPC :D
 
 ### Subscriptions
 
@@ -115,94 +118,94 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 ### Tags
 
-| Method Name                 | Raw Version   | Full Version |
-| --------------------------- |:-------------:|:------------:|
-| get_trending_tags           | DONE          |              |
-| get_discussions_by_trending | DONE          |              |
-| get_discussions_by_created  | DONE          |              |
-| get_discussions_by_active   | DONE          |              |
-| get_discussions_by_cashout  | DONE          |              |
-| get_discussions_by_payout   | DONE          |              |
-| get_discussions_by_votes    | DONE          |              |
-| get_discussions_by_children | DONE          |              |
-| get_discussions_by_hot      | DONE          |              |
-| get_recommended_for         | DONE          |              |
+| Method Name                 | Raw Version | Full Version |
+| --------------------------- |:-----------:|:------------:|
+| get_trending_tags           | DONE        |              |
+| get_discussions_by_trending | DONE        |              |
+| get_discussions_by_created  | DONE        |              |
+| get_discussions_by_active   | DONE        |              |
+| get_discussions_by_cashout  | DONE        |              |
+| get_discussions_by_payout   | DONE        |              |
+| get_discussions_by_votes    | DONE        |              |
+| get_discussions_by_children | DONE        |              |
+| get_discussions_by_hot      | DONE        |              |
+| get_recommended_for         | DONE        |              |
 
 ### Blocks and Transactions
 
-| Method Name             | Raw Version   | Full Version   |
-| ----------------------- |:-------------:|:--------------:|
-| get_block_header        | DONE          |                |
-| get_block               | DONE          | PARTIALLY DONE |
-| get_state               | DONE          |                |
-| get_trending_categories | DONE          |                |
-| get_best_categories     | DONE          |                |
-| get_active_categories   | DONE          |                |
-| get_recent_categories   | DONE          |                |
+| Method Name             | Raw Version | Full Version   |
+| ----------------------- |:-----------:|:--------------:|
+| get_block_header        | DONE        |                |
+| get_block               | DONE        | PARTIALLY DONE |
+| get_state               | DONE        |                |
+| get_trending_categories | DONE        |                |
+| get_best_categories     | DONE        |                |
+| get_active_categories   | DONE        |                |
+| get_recent_categories   | DONE        |                |
 
 ### Globals
 
-| Method Name                      | Raw Version   | Full Version   |
-| -------------------------------- |:-------------:|:--------------:|
-| get_config                       | DONE          | PARTIALLY DONE |
-| get_dynamic_global_properties    | DONE          | DONE           |
-| get_chain_properties             | DONE          |                |
-| get_feed_history                 | DONE          |                |
-| get_current_median_history_price | DONE          |                |
-| get_witness_schedule             | DONE          |                |
-| get hardfork_version             | DONE          |                |
-| get_next_scheduled_hardfork      | DONE          |                |
+| Method Name                      | Raw Version | Full Version   |
+| -------------------------------- |:-----------:|:--------------:|
+| get_config                       | DONE        | PARTIALLY DONE |
+| get_dynamic_global_properties    | DONE        | DONE           |
+| get_chain_properties             | DONE        |                |
+| get_feed_history                 | DONE        |                |
+| get_current_median_history_price | DONE        |                |
+| get_witness_schedule             | DONE        |                |
+| get hardfork_version             | DONE        |                |
+| get_next_scheduled_hardfork      | DONE        |                |
 
 ### Keys
 
-| Method Name       | Raw Version   | Full Version   |
-| ----------------- |:-------------:|:--------------:|
-| get_key_reference |               |                |
+| Method Name       | Raw Version | Full Version |
+| ----------------- |:-----------:|:------------:|
+| get_key_reference |             |              |
 
 ### Accounts
 
-| Method Name               | Raw Version   | Full Version   |
-| ------------------------- |:-------------:|:--------------:|
-| get_accounts              | DONE          |                |
-| get_account_refenreces    |               |                |
-| lookup_account_names      | DONE          |                |
-| lookup_accounts           | DONE          |                |
-| get_account_count         | DONE          |                |
-| get_conversation_requests | DONE          |                |
-| get_account_history       | DONE          |                |
+| Method Name               | Raw Version | Full Version |
+| ------------------------- |:-----------:|:------------:|
+| get_accounts              | DONE        |              |
+| get_account_refenreces    |             |              |
+| lookup_account_names      | DONE        |              |
+| lookup_accounts           | DONE        |              |
+| get_account_count         | DONE        |              |
+| get_conversation_requests | DONE        |              |
+| get_account_history       | DONE        |              |
 
 ### Market
 
-| Method Name    | Raw Version   | Full Version   |
-| -------------- |:-------------:|:--------------:|
-| get_order_book |               |                |
+| Method Name    | Raw Version | Full Version |
+| -------------- |:-----------:|:------------:|
+| get_order_book |             |              |
 
 ### Authority / Validation
 
-```
-   (get_transaction_hex)
-   (get_transaction)
-   (get_required_signatures)
-   (get_potential_signatures)
-   (verify_authority)
-   (verify_account_authority)
-```
+| Method Name              | Raw Version | Full Version |
+| ------------------------ |:-----------:|:------------:|
+| get_transaction_hex      |             |              |
+| get_transaction          |             |              |
+| get_required_signatures  |             |              |
+| get_potential_signatures |             |              |
+| verify_authority         |             |              |
+| verity_account_authority |             |              |
 
 ### Votes
 
-```
-   (get_active_votes)
-   (get_account_votes)
-```
+| Method Name       | Raw Version | Full Version |
+| ----------------- |:-----------:|:------------:|
+| get_active_votes  | DONE        |              |
+| get_account_votes | DONE        |              |
 
 ### Cotent
 
-```
-   (get_content)
-   (get_content_replies)
-   (get_discussions_by_author_before_date)
-   (get_replies_by_last_update)
-```
+| Method Name                           | Raw Version | Full Version   |
+| ------------------------------------- |:-----------:|:--------------:|
+| get_content                           | DONE        | PARTIALLY DONE |
+| get_content_replies                   | DONE        |                |
+| get_discussions_by_author_before_date |             |                |
+| get_replies_by_last_update            | DONE        |                |
 
 ### Witnesses
 
