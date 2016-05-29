@@ -1,8 +1,8 @@
-# Monitoring Voting
+# Voting Monitor
 
 The executable built from this package will connect to `steemd`
-and it will keep printing information on vote operations as they
-are happening until interrupted.
+and it will start printing information on vote operations as they
+are happening and it will keep doing so forever. Well, until interrupted.
 
 ```
 $ ./monitor_voting -rpc_endpoint="ws://$(docker-machine ip default):8090"
