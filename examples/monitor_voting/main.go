@@ -37,6 +37,7 @@ func run() error {
 	}
 
 	// Use the last irreversible block number as the initial last block number.
+	log.Println("---> GetDynamicGlobalProperties()")
 	props, err := client.GetDynamicGlobalProperties()
 	if err != nil {
 		return err
