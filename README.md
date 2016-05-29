@@ -2,11 +2,51 @@
 
 Golang RPC client library for [Steem](https://steem.io).
 
+## Compatibility
+
+`steemd 0.5.0`
+
 ## Usage
 
 1. `import "github.com/go-steem/rpc"`
-2. Use `rpc.Dial` to get an RPC client.
+2. Use `rpc.Dial` to get the RPC client.
 3. PROFIT!
+
+## Package Organisation
+
+Once you create a `Client` object, you can start calling the methods exported
+via `steemd`'s RPC endpoint by invoking associated methods on the client object.
+
+There are two methods implemented for the `Client` object for every
+method exported via the RPC endpoint. The regular version and the raw version.
+Let's see an example for `get_config`:
+
+```go
+func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
+	...
+}
+
+func (client *Client) GetConfig() (*Config, error) {
+	...
+}
+```
+
+As we can see, the difference is that the raw version returns`*json.RawMessage`,
+ so it is not trying to unmarshall the response into a properly typed response.
+
+There are two reasons for this:
+
+1. To be able to see raw data.
+2. To be able to call most of the remote methods even though the response
+   object is not yet known or specified.
+
+## Status
+
+This package is still under rapid development and it is by no means complete.
+For now there is no promise considering API stability.
+
+The following table documents the API completion:
+
 
 ## Example
 
@@ -56,26 +96,6 @@ for {
 	time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
 }
 ```
-
-## Package Organisation
-
-Once you create a `Client` object by using `Dial`, you can start calling its methods,
-which correspond to the methods exported via `steemd`'s RPC endpoint.
-
-There are two versions for every method. The regular method and the raw method.
-The difference is that the raw method returns `*json.RawMessage`, so it is not
-trying to unmarshall the response into the right object. The reason for this
-distinction is to be able to start using the `rpc` package even though not all
-methods are specified properly yet.
-
-## Status
-
-This package is still under rapid development and it is by no means complete.
-There is no promise considering API stability.
-
-For now there are raw methods specified for most of the RPC methods available,
-but not much has been tested really. Please report any bugs you find. Feel free
-to send a pull request as well.
 
 ## License
 
