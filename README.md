@@ -109,8 +109,8 @@ The following sections document the API completion.
 
 ### Tags
 
-| Method Name                 | Raw Version   | Full version |
-| --------------------------- |:-------------:| ------------:|
+| Method Name                 | Raw Version   | Full Version |
+| --------------------------- |:-------------:|:------------:|
 | get_trending_tags           | DONE          |              |
 | get_discussions_by_trending | DONE          |              |
 | get_discussions_by_created  | DONE          |              |
@@ -124,8 +124,8 @@ The following sections document the API completion.
 
 ### Blocks and Transactions
 
-| Method Name             | Raw Version   | Full version   |
-| ----------------------- |:-------------:| --------------:|
+| Method Name             | Raw Version   | Full Version   |
+| ----------------------- |:-------------:|:--------------:|
 | get_block_header        | DONE          |                |
 | get_block               | DONE          | PARTIALLY DONE |
 | get_state               | DONE          |                |
