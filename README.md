@@ -78,13 +78,13 @@ for {
 			for _, op := range tx.Operations {
 				switch body := op.Body.(type) {
 					// Comment operation.
-					case *rpc.CommentOperations:
+					case *rpc.CommentOperation:
 						content, _ := client.GetContent(body.Author, body.Permlink)
 						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
 
 					// Vote operation.
 					case *rpc.VoteOperation:
-						fmt.Printf("@%v voted for @%v/%v\n", body.Voter, body.Author, body.Permlink)
+						fmt.Printf("VOTE @%v @%v/%v\n", body.Voter, body.Author, body.Permlink)
 
 					// You can add more cases, it depends on what
 					// operations you actually need to process.
