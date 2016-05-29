@@ -4,10 +4,7 @@ Golang RPC client library for [Steem](https://steem.io).
 
 ## Usage
 
-```go
-import "github.com/go-steem/rpc"
-```
-
+1. `import "github.com/go-steem/rpc"`
 2. Use `rpc.Dial` to get an RPC client.
 3. PROFIT!
 
