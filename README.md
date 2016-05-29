@@ -12,44 +12,6 @@ Golang RPC client library for [Steem](https://steem.io).
 2. Use `rpc.Dial` to get the RPC client.
 3. PROFIT!
 
-## Package Organisation
-
-Once you create a `Client` object, you can start calling the methods exported
-via `steemd`'s RPC endpoint by invoking associated methods on the client object.
-
-There are two methods implemented for the `Client` object for every
-method exported via the RPC endpoint. The regular version and the raw version.
-Let's see an example for `get_config`:
-
-```go
-func (client *Client) GetConfig() (*Config, error) {
-	...
-}
-
-func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
-	...
-}
-```
-
-As we can see, the difference is that the raw version returns`*json.RawMessage`,
- so it is not trying to unmarshall the response into a properly typed response.
-
-There are two reasons for this:
-
-1. To be able to see raw data.
-2. To be able to call most of the remote methods even though the response
-   object is not yet known or specified.
-
-## Status
-
-This package is still under rapid development and it is by no means complete.
-For now there is no promise considering API stability. Some response objects
-maybe be typed incorrectly. The package is already usable, though. See the
-`examples` directory.
-
-The following table documents the API completion:
-
-
 ## Example
 
 This is just a code snippet. Please check the `examples` directory
@@ -97,6 +59,155 @@ for {
 
 	time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
 }
+```
+
+## Package Organisation
+
+Once you create a `Client` object, you can start calling the methods exported
+via `steemd`'s RPC endpoint by invoking associated methods on the client object.
+
+There are two methods implemented for the `Client` object for every
+method exported via the RPC endpoint. The regular version and the raw version.
+Let's see an example for `get_config`:
+
+```go
+func (client *Client) GetConfig() (*Config, error) {
+	...
+}
+
+func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
+	...
+}
+```
+
+As we can see, the difference is that the raw version returns`*json.RawMessage`,
+ so it is not trying to unmarshall the response into a properly typed response.
+
+There are two reasons for this:
+
+1. To be able to see raw data.
+2. To be able to call most of the remote methods even though the response
+   object is not yet known or specified.
+
+## Status
+
+This package is still under rapid development and it is by no means complete.
+For now there is no promise considering API stability. Some response objects
+maybe be typed incorrectly. The package is already usable, though. See the
+`examples` directory.
+
+The following sections document the API completion.
+
+### Subscriptions
+
+```
+   (set_subscribe_callback)
+   (set_pending_transaction_callback)
+   (set_block_applied_callback)
+   (cancel_all_subscriptions)
+```
+
+### Tags
+
+| Method                      | Raw Version   | Full version |
+| --------------------------- |:-------------:| ------------:|
+| get_trending_tags           | DONE          |              |
+| get_discussions_by_trending | DONE          |              |
+| get_discussions_by_created  | DONE          |              |
+| get_discussions_by_active   | DONE          |              |
+| get_discussions_by_cashout  | DONE          |              |
+| get_discussions_by_payout   | DONE          |              |
+| get_discussions_by_votes    | DONE          |              |
+| get_discussions_by_children | DONE          |              |
+| get_discussions_by_hot      | DONE          |              |
+| get_recommended_for         | DONE          |              |
+
+### Blocks and Transactions
+
+```
+   (get_block_header)
+   (get_block)
+   (get_state)
+   (get_trending_categories)
+   (get_best_categories)
+   (get_active_categories)
+   (get_recent_categories)
+```
+
+### Globals
+
+```
+   (get_config)
+   (get_dynamic_global_properties)
+   (get_chain_properties)
+   (get_feed_history)
+   (get_current_median_history_price)
+   (get_witness_schedule)
+   (get_hardfork_version)
+   (get_next_scheduled_hardfork)
+```
+
+### Keys
+
+```
+   (get_key_references)
+```
+
+### Accounts
+
+```
+   (get_accounts)
+   (get_account_references)
+   (lookup_account_names)
+   (lookup_accounts)
+   (get_account_count)
+   (get_conversion_requests)
+   (get_account_history)
+```
+
+### Market
+
+```
+   (get_order_book)
+```
+
+### Authority / Validation
+
+```
+   (get_transaction_hex)
+   (get_transaction)
+   (get_required_signatures)
+   (get_potential_signatures)
+   (verify_authority)
+   (verify_account_authority)
+```
+
+### Votes
+
+```
+   (get_active_votes)
+   (get_account_votes)
+```
+
+### Cotent
+
+```
+   (get_content)
+   (get_content_replies)
+   (get_discussions_by_author_before_date)
+   (get_replies_by_last_update)
+```
+
+### Witnesses
+
+```
+   (get_witnesses)
+   (get_witness_by_account)
+   (get_witnesses_by_vote)
+   (lookup_witness_accounts)
+   (get_witness_count)
+   (get_active_witnesses)
+   (get_miner_queue)
 ```
 
 ## License
