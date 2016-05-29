@@ -37,7 +37,6 @@ func run() error {
 	}
 
 	// Use the last irreversible block number as the initial last block number.
-	log.Println("---> GetDynamicGlobalProperties()")
 	props, err := client.GetDynamicGlobalProperties()
 	if err != nil {
 		return err
@@ -48,7 +47,6 @@ func run() error {
 	log.Printf("---> Entering the block processing loop (last block = %v)\n", lastBlock)
 	for {
 		// Get current properties.
-		log.Println("---> GetDynamicGlobalProperties()")
 		props, err := client.GetDynamicGlobalProperties()
 		if err != nil {
 			return err
@@ -56,7 +54,6 @@ func run() error {
 
 		// Process new blocks.
 		for props.LastIrreversibleBlockNum-lastBlock > 0 {
-			log.Printf("---> GetBlock(%v)\n", lastBlock)
 			block, err := client.GetBlock(lastBlock)
 			if err != nil {
 				return err
