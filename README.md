@@ -65,6 +65,8 @@ for {
 
 Once you create a `Client` object, you can start calling the methods exported
 via `steemd`'s RPC endpoint by invoking associated methods on the client object.
+It is enough to just turn the method names into CamelCase, e.g. `get_config`
+becomes `Client.GetConfig`.
 
 There are two methods implemented for the `Client` object for every
 method exported via the RPC endpoint. The regular version and the raw version.
@@ -209,14 +211,15 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 ### Witnesses
 
-```
-   (get_witnesses)
-   (get_witness_by_account)
-   (get_witnesses_by_vote)
-   (lookup_witness_accounts)
-   (get_witness_count)
-   (get_active_witnesses)
-   (get_miner_queue)
+| Method Name             | Raw Version | Full Version |
+| ----------------------- |:-----------:|:------------:|
+| get_witnesses           |             |              |
+| get_witness_by_account  |             |              |
+| get_witnesses_by_vote   |             |              |
+| lookup_witness_accounts |             |              |
+| get_witness_count       |             |              |
+| get_active_witnesses    |             |              |
+| get_miner_queue         |             |              |
 ```
 
 ## License
