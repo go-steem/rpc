@@ -1,8 +1,8 @@
 # Voting Monitor
 
-The executable built from this package will connect to `steemd`
-and it will start printing information on vote operations as they
-are happening and it will keep doing so forever. Well, until interrupted.
+In this example we connect to `steemd` and watch operations as they
+are happening. Every time we see a `vote` operation, we print a message
+into the console.
 
 ```
 $ ./monitor_voting -rpc_endpoint="ws://$(docker-machine ip default):8090"
@@ -13,4 +13,5 @@ $ ./monitor_voting -rpc_endpoint="ws://$(docker-machine ip default):8090"
 @easteagle13 voted for @easteagle13/to-your-loss-of-a-friend-my-condolences-and-other-thoughts
 @yefet voted for @alexgr/planning-for-long-term-success-of-steemit-identifying-areas-of-improvement
 @dke voted for @steemrollin/steem-meme
+...
 ```
