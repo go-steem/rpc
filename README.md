@@ -109,7 +109,7 @@ The following sections document the API completion.
 
 ### Tags
 
-| Method                      | Raw Version   | Full version |
+| Method Name                 | Raw Version   | Full version |
 | --------------------------- |:-------------:| ------------:|
 | get_trending_tags           | DONE          |              |
 | get_discussions_by_trending | DONE          |              |
@@ -124,15 +124,15 @@ The following sections document the API completion.
 
 ### Blocks and Transactions
 
-```
-   (get_block_header)
-   (get_block)
-   (get_state)
-   (get_trending_categories)
-   (get_best_categories)
-   (get_active_categories)
-   (get_recent_categories)
-```
+| Method Name             | Raw Version   | Full version   |
+| ----------------------- |:-------------:| --------------:|
+| get_block_header        | DONE          |                |
+| get_block               | DONE          | PARTIALLY DONE |
+| get_state               | DONE          |                |
+| get_trending_categories | DONE          |                |
+| get_best_categories     | DONE          |                |
+| get_active_categories   | DONE          |                |
+| get_recent_categories   | DONE          |                |
 
 ### Globals
 
