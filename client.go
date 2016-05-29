@@ -225,9 +225,9 @@ func (client *Client) GetNextScheduledHardforkRaw() (*json.RawMessage, error) {
 */
 
 // XXX: Not sure about params.
-func (client *Client) GetKeyReferencesRaw(key []string) (*json.RawMessage, error) {
-	return client.callRaw("get_key_references", [][]string{key})
-}
+//func (client *Client) GetKeyReferencesRaw(key []string) (*json.RawMessage, error) {
+//	return client.callRaw("get_key_references", [][]string{key})
+//}
 
 /*
    // Accounts
@@ -245,9 +245,9 @@ func (client *Client) GetAccountsRaw(accountNames []string) (*json.RawMessage, e
 }
 
 // XXX: Not sure about params.
-func (client *Client) GetAccountReferenceRaw(id string) (*json.RawMessage, error) {
-	return client.callRaw("get_account_reference", []string{id})
-}
+//func (client *Client) GetAccountReferenceRaw(id string) (*json.RawMessage, error) {
+//	return client.callRaw("get_account_reference", []string{id})
+//}
 
 func (client *Client) LookupAccountNamesRaw(accountNames []string) (*json.RawMessage, error) {
 	return client.callRaw("lookup_account_names", [][]string{accountNames})

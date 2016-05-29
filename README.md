@@ -136,16 +136,16 @@ The following sections document the API completion.
 
 ### Globals
 
-```
-   (get_config)
-   (get_dynamic_global_properties)
-   (get_chain_properties)
-   (get_feed_history)
-   (get_current_median_history_price)
-   (get_witness_schedule)
-   (get_hardfork_version)
-   (get_next_scheduled_hardfork)
-```
+| Method Name                      | Raw Version   | Full Version   |
+| -------------------------------- |:-------------:|:--------------:|
+| get_config                       | DONE          | PARTIALLY DONE |
+| get_dynamic_global_properties    | DONE          | DONE           |
+| get_chain_properties             | DONE          |                |
+| get_feed_history                 | DONE          |                |
+| get_current_median_history_price | DONE          |                |
+| get_witness_schedule             | DONE          |                |
+| get hardfork_version             | DONE          |                |
+| get_next_scheduled_hardfork      | DONE          |                |
 
 ### Keys
 
