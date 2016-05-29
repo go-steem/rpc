@@ -104,11 +104,11 @@ maybe be typed incorrectly. The package is already usable, though. See the
 The following subsections document the API completion. The method names
 are taken from `database_api.hpp` in `steemit/steem`.
 
-TODO: Verify that these are actually the methods available over RPC :D
+**TODO:** Verify that these are actually the methods available over RPC :D
 
 ### Subscriptions
 
-TODO: Is this actually callable over the RPC endpoint?
+**TODO:** Is this actually callable over the RPC endpoint?
 It is a bit confusing to see `set_` prefix. Needs research.
 
 ```
@@ -220,7 +220,6 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | get_witness_count       |             |              |
 | get_active_witnesses    |             |              |
 | get_miner_queue         |             |              |
-```
 
 ## License
 
