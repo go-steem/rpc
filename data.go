@@ -3,7 +3,6 @@ package rpc
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -126,16 +125,8 @@ type CommentOperation struct {
 	Body           string `json:"body"`
 }
 
-func (op *CommentOperation) IsNewStory() bool {
+func (op *CommentOperation) IsStoryOperation() bool {
 	return op.ParentAuthor == ""
-}
-
-func (op *CommentOperation) Link() string {
-	if op.IsNewStory() {
-		return fmt.Sprintf("https://steemit.com/%v/@%v/%v", op.ParentPermlink, op.Author, op.Permlink)
-	}
-
-	return ""
 }
 
 type Content struct {
