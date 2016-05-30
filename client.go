@@ -136,6 +136,7 @@ func (client *Client) GetBlock(blockNum uint32) (*Block, error) {
 	if err := client.t.Call("get_block", []uint32{blockNum}, &resp); err != nil {
 		return nil, err
 	}
+	resp.Number = blockNum
 	return &resp, nil
 }
 

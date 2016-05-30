@@ -41,6 +41,7 @@ type DynamicGlobalProperties struct {
 }
 
 type Block struct {
+	Number                uint32                   `json:"-"`
 	Timestamp             *types.Time              `json:"timestamp"`
 	Witness               string                   `json:"witness"`
 	WitnessSignature      string                   `json:"witness_signature"`
