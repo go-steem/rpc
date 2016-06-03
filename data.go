@@ -160,6 +160,10 @@ type Content struct {
 	TotalVoteWeight         *types.Int               `json:"total_vote_weight"`
 }
 
+func (content *Content) IsStory() bool {
+	return content.ParentAuthor == ""
+}
+
 type ContentMetadata struct {
 	Users []string
 	Tags  []string
