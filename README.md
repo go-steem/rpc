@@ -157,7 +157,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | get_feed_history                 | DONE        |                |
 | get_current_median_history_price | DONE        |                |
 | get_witness_schedule             | DONE        |                |
-| get hardfork_version             | DONE        |                |
+| get_hardfork_version             | DONE        | DONE           |
 | get_next_scheduled_hardfork      | DONE        |                |
 
 ### Keys

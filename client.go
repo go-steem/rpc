@@ -216,6 +216,14 @@ func (client *Client) GetHardforkVersionRaw() (*json.RawMessage, error) {
 	return client.callRaw("get_hardfork_version", emptyParams)
 }
 
+func (client *Client) GetHardforkVersion() (string, error) {
+	var resp string
+	if err := client.t.Call("get_hardfork_version", emptyParams, &resp); err != nil {
+		return "", err
+	}
+	return resp, nil
+}
+
 func (client *Client) GetNextScheduledHardforkRaw() (*json.RawMessage, error) {
 	return client.callRaw("get_next_scheduled_hardfork", emptyParams)
 }
