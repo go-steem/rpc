@@ -10,8 +10,7 @@ import (
 )
 
 type Config struct {
-	SteemitBlockchainVersion string `json:"STEEMIT_BLOCKCHAIN_VERSION"`
-	SteemitBlockInterval     uint   `json:"STEEMIT_BLOCK_INTERVAL"`
+	SteemitBlockInterval uint `json:"STEEMIT_BLOCK_INTERVAL"`
 }
 
 type DynamicGlobalProperties struct {
