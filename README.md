@@ -6,7 +6,7 @@ Golang RPC client library for [Steem](https://steem.io).
 
 ## Compatibility
 
-`steemd 0.5.0`
+`steemd 0.8.0`
 
 ## Usage
 
@@ -171,7 +171,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | Method Name               | Raw Version | Full Version |
 | ------------------------- |:-----------:|:------------:|
 | get_accounts              | DONE        |              |
-| get_account_refenreces    |             |              |
+| get_account_references    |             |              |
 | lookup_account_names      | DONE        |              |
 | lookup_accounts           | DONE        |              |
 | get_account_count         | DONE        |              |
@@ -180,9 +180,10 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 ### Market
 
-| Method Name    | Raw Version | Full Version |
-| -------------- |:-----------:|:------------:|
-| get_order_book |             |              |
+| Method Name     | Raw Version | Full Version |
+| --------------- |:-----------:|:------------:|
+| get_order_book  |             |              |
+| get_open_orders |             |              |
 
 ### Authority / Validation
 
