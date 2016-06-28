@@ -334,8 +334,17 @@ func (client *Client) GetContent(author, permlink string) (*Content, error) {
 	return &resp, nil
 }
 
-func (client *Client) GetContentRepliesRaw(parent, parentPermlink string) (*json.RawMessage, error) {
-	return client.callRaw("get_content_replies", []string{parent, parentPermlink})
+func (client *Client) GetContentRepliesRaw(parentAuthor, parentPermlink string) (*json.RawMessage, error) {
+	return client.callRaw("get_content_replies", []string{parentAuthor, parentPermlink})
+}
+
+func (client *Client) GetContentReplies(parentAuthor, parentPermlink string) ([]*Content, error) {
+	var resp []*Content
+	err := client.t.Call("get_content_replies", []string{parentAuthor, parentPermlink}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func (client *Client) GetRepliesByLastUpdateRaw(

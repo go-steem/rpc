@@ -208,7 +208,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | Method Name                           | Raw Version | Full Version   |
 | ------------------------------------- |:-----------:|:--------------:|
 | get_content                           | DONE        | PARTIALLY DONE |
-| get_content_replies                   | DONE        |                |
+| get_content_replies                   | DONE        | PARTIALLY DONE |
 | get_discussions_by_author_before_date |             |                |
 | get_replies_by_last_update            | DONE        |                |
 
