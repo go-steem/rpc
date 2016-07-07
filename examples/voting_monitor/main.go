@@ -4,40 +4,89 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-steem/rpc"
+	"github.com/go-steem/rpc/apis/database"
+	"github.com/go-steem/rpc/transports/websocket"
 )
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Error:", err)
 	}
 }
 
-func run() error {
+func run() (err error) {
 	// Process flags.
 	flagAddress := flag.String("rpc_endpoint", "ws://localhost:8090", "steemd RPC endpoint address")
+	flagReconnect := flag.Bool("reconnect", false, "enable auto-reconnect mode")
 	flag.Parse()
 
-	// Connect to the RPC endpoint.
-	addr := *flagAddress
-	log.Printf("---> Dial(\"%v\")\n", addr)
-	client, err := rpc.Dial(addr)
+	var (
+		url       = *flagAddress
+		reconnect = *flagReconnect
+	)
+
+	// Start catching signals.
+	var interrupted bool
+	signalCh := make(chan os.Signal, 1)
+	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
+
+	// Drop the error in case it is a request being interrupted.
+	defer func() {
+		if err == websocket.ErrClosing && interrupted {
+			err = nil
+		}
+	}()
+
+	// Start the connection monitor.
+	monitorChan := make(chan interface{}, 1)
+	if reconnect {
+		go func() {
+			for {
+				e := <-monitorChan
+				log.Println(e)
+			}
+		}()
+	}
+
+	// Instantiate the WebSocket transport.
+	log.Printf("---> Dial(\"%v\")\n", url)
+	t, err := websocket.NewTransport(url,
+		websocket.SetAutoReconnectEnabled(reconnect),
+		websocket.SetAutoReconnectMaxDelay(30*time.Second),
+		websocket.SetMonitor(monitorChan))
 	if err != nil {
 		return err
 	}
+
+	// Use the transport to get an RPC client.
+	client := rpc.NewClient(t)
 	defer client.Close()
+
+	// Start processing signals.
+	go func() {
+		<-signalCh
+		fmt.Println()
+		log.Println("Signal received, exiting...")
+		signal.Stop(signalCh)
+		interrupted = true
+		client.Close()
+	}()
 
 	// Get config.
 	log.Println("---> GetConfig()")
-	config, err := client.GetConfig()
+	config, err := client.Database.GetConfig()
 	if err != nil {
 		return err
 	}
 
 	// Use the last irreversible block number as the initial last block number.
-	props, err := client.GetDynamicGlobalProperties()
+	props, err := client.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		return err
 	}
@@ -47,27 +96,27 @@ func run() error {
 	log.Printf("---> Entering the block processing loop (last block = %v)\n", lastBlock)
 	for {
 		// Get current properties.
-		props, err := client.GetDynamicGlobalProperties()
+		props, err := client.Database.GetDynamicGlobalProperties()
 		if err != nil {
 			return err
 		}
 
 		// Process new blocks.
 		for props.LastIrreversibleBlockNum-lastBlock > 0 {
-			block, err := client.GetBlock(lastBlock)
+			block, err := client.Database.GetBlock(lastBlock)
 			if err != nil {
 				return err
 			}
 
 			// Process the transactions.
 			for _, tx := range block.Transactions {
-				for _, op := range tx.Operations {
-					switch body := op.Body.(type) {
-					case *rpc.VoteOperation:
-						fmt.Printf("@%v voted for @%v/%v\n", body.Voter, body.Author, body.Permlink)
+				for _, operation := range tx.Operations {
+					switch op := operation.Body.(type) {
+					case *database.VoteOperation:
+						fmt.Printf("@%v voted for @%v/%v\n", op.Voter, op.Author, op.Permlink)
 
-						// You can add more cases here, it depends on what
-						// operations you actually need to process.
+						// You can add more cases here, it depends on
+						// what operations you actually need to process.
 					}
 				}
 			}

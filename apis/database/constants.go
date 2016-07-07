@@ -1,4 +1,4 @@
-package rpc
+package database
 
 const (
 	OpTypeVote                 = "vote"

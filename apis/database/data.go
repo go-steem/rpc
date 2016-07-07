@@ -1,4 +1,4 @@
-package rpc
+package database
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-steem/rpc/types"
+	"github.com/go-steem/rpc/apis/types"
 )
 
 type Config struct {
