@@ -2,7 +2,6 @@ package database
 
 import (
 	"encoding/json"
-	"errors"
 	"strconv"
 	"strings"
 
@@ -58,78 +57,6 @@ type Transaction struct {
 	RefBlockPrefix *types.Int   `json:"ref_block_prefix"`
 	Expiration     string       `json:"expiration"`
 	Operations     []*Operation `json:"operations"`
-}
-
-type Operation struct {
-	Type string
-	Body interface{}
-}
-
-func (op *Operation) UnmarshalJSON(data []byte) error {
-	raw := make([]json.RawMessage, 2)
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-
-	if len(raw) != 2 {
-		return errors.New("invalid transaction object")
-	}
-
-	var operationType string
-	if err := json.Unmarshal(raw[0], &operationType); err != nil {
-		return err
-	}
-
-	switch operationType {
-	case OpTypeVote:
-		var body VoteOperation
-		if err := json.Unmarshal(raw[1], &body); err != nil {
-			return err
-		}
-		op.Body = &body
-	case OpTypeComment:
-		var body CommentOperation
-		if err := json.Unmarshal(raw[1], &body); err != nil {
-			return err
-		}
-		op.Body = &body
-	default:
-		var body map[string]interface{}
-		if err := json.Unmarshal(raw[1], &body); err != nil {
-			return err
-		}
-		op.Body = body
-	}
-
-	op.Type = operationType
-	return nil
-}
-
-type VoteOperation struct {
-	Voter    string     `json:"voter"`
-	Author   string     `json:"author"`
-	Permlink string     `json:"permlink"`
-	Weight   *types.Int `json:"weight"`
-}
-
-// CommentOperation represents either a new post or a comment.
-//
-// In case Title is filled in and ParentAuthor is empty, it is a new post.
-// The post category can be read from ParentPermlink.
-//
-// In case the author is just updating an existing post,
-// Body contains only the diff against the original content.
-type CommentOperation struct {
-	Author         string `json:"author"`
-	Title          string `json:"title"`
-	Permlink       string `json:"permlink"`
-	ParentAuthor   string `json:"parent_author"`
-	ParentPermlink string `json:"parent_permlink"`
-	Body           string `json:"body"`
-}
-
-func (op *CommentOperation) IsStoryOperation() bool {
-	return op.ParentAuthor == ""
 }
 
 type Content struct {
