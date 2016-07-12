@@ -6,13 +6,15 @@ Golang RPC client library for [Steem](https://steem.io).
 
 ## Compatibility
 
-`steemd 0.8.0`
+`steemd 0.8.4`
 
 ## Usage
 
-1. `import "github.com/go-steem/rpc"`
-2. Use `rpc.Dial` to get the RPC client.
-3. PROFIT!
+```go
+import "github.com/go-steem/rpc"
+```
+
+This package is still very much in development, so `gopkg.in` is not yet usable.
 
 ## Example
 
@@ -20,34 +22,37 @@ This is just a code snippet. Please check the `examples` directory
 for more complete and ready to use examples.
 
 ```go
-// Instantiate a new client.
-client, _ := rpc.Dial("ws://localhost:8090")
+// Instantiate the WebSocket transport.
+t, _ := websocket.NewTransport("ws://localhost:8090")
+
+// Use the transport to create an RPC client.
+client := rpc.NewClient(t)
 defer client.Close()
 
 // Call "get_config".
-config, _ := client.GetConfig()
+config, _ := client.Database.GetConfig()
 
 // Start processing blocks.
 lastBlock := 1800000
 for {
 	// Call "get_dynamic_global_properties".
-	props, _ := client.GetDynamicGlobalProperties()
+	props, _ := client.Database.GetDynamicGlobalProperties()
 
 	for props.LastIrreversibleBlockNum-lastBlock > 0 {
 		// Call "get_block".
-		block, _ := client.GetBlock(lastBlock)
+		block, _ := client.Database.GetBlock(lastBlock)
 
 		// Process the transactions.
 		for _, tx := range block.Transactions {
 			for _, op := range tx.Operations {
 				switch body := op.Body.(type) {
 					// Comment operation.
-					case *rpc.CommentOperation:
-						content, _ := client.GetContent(body.Author, body.Permlink)
+					case *database.CommentOperation:
+						content, _ := client.Database.GetContent(body.Author, body.Permlink)
 						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
 
 					// Vote operation.
-					case *rpc.VoteOperation:
+					case *database.VoteOperation:
 						fmt.Printf("VOTE @%v @%v/%v\n", body.Voter, body.Author, body.Permlink)
 
 					// You can add more cases, it depends on what
@@ -65,14 +70,25 @@ for {
 
 ## Package Organisation
 
+You need to create a `Client` object to be able to do anything. To be able to
+instantiate a `Client`, you first need to create a transport to be used to
+execute RPC calls. The WebSocket transport is available in `transports/websocket`.
+Then you just need to call `NewClient(transport)`.
+
 Once you create a `Client` object, you can start calling the methods exported
 via `steemd`'s RPC endpoint by invoking associated methods on the client object.
-It is enough to just turn the method names into CamelCase, e.g. `get_config`
-becomes `Client.GetConfig`.
+There are multiple APIs that can be exported, e.g. `database_api` and `login_api`,
+so the methods on the Client object are also namespaced accoding to these APIs.
+For example, to call `get_block` from `database_api`, you need to use
+`Client.Database.GetBlock` method.
 
-There are two methods implemented for the `Client` object for every
-method exported via the RPC endpoint. The regular version and the raw version.
-Let's see an example for `get_config`:
+When looking for a method to call, all you need is to turn the method name into
+CamelCase, e.g. `get_config` becomes `Client.Database.GetConfig`.
+
+### Raw and Full Methods
+
+There are two methods implemented for every method exported via the RPC endpoint.
+The regular version and the raw version. Let's see an example for `get_config`:
 
 ```go
 func (client *Client) GetConfig() (*Config, error) {
@@ -85,7 +101,7 @@ func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
 ```
 
 As we can see, the difference is that the raw version returns `*json.RawMessage`,
- so it is not trying to unmarshall the response into a properly typed response.
+so it is not trying to unmarshall the response into a properly typed response.
 
 There are two reasons for this:
 
