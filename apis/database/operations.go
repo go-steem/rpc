@@ -13,6 +13,8 @@ const (
 	OpTypeConvert             = "convert"
 	OpTypeFeedPublish         = "feed_publish"
 	OpTypePow                 = "pow"
+	OpTypeAccountCreate       = "account_create"
+	OpTypeAccountUpdate       = "account_update"
 	OpTypeTransfer            = "transfer"
 	OpTypeTransferToVesting   = "transfer_to_vesting"
 	OpTypeWithdrawVesting     = "withdraw_vesting"
@@ -31,6 +33,8 @@ var opBodyObjects = map[string]interface{}{
 	OpTypeConvert:             &ConvertOperation{},
 	OpTypeFeedPublish:         &FeedPublishOperation{},
 	OpTypePow:                 &PowOperation{},
+	OpTypeAccountCreate:       &AccountCreateOperation{},
+	OpTypeAccountUpdate:       &AccountUpdateOperation{},
 	OpTypeTransfer:            &TransferOperation{},
 	OpTypeTransferToVesting:   &TransferToVestingOperation{},
 	OpTypeWithdrawVesting:     &WithdrawVestingOperation{},
@@ -126,6 +130,17 @@ type PowOperation struct {
 //             (memo_key)
 //             (json_metadata) )
 
+type AccountCreateOperation struct {
+	Fee            string     `json:"fee"`
+	Creator        string     `json:"creator"`
+	NewAccountName string     `json:"new_account_name"`
+	Owner          *Authority `json:"owner"`
+	Active         *Authority `json:"active"`
+	Posting        *Authority `json:"posting"`
+	MemoKey        string     `json:"memo_key"`
+	JsonMetadata   string     `json:"json_metadata"`
+}
+
 // FC_REFLECT( steemit::chain::account_update_operation,
 //             (account)
 //             (owner)
@@ -133,6 +148,15 @@ type PowOperation struct {
 //             (posting)
 //             (memo_key)
 //             (json_metadata) )
+
+type AccountUpdateOperation struct {
+	Account      string     `json:"account"`
+	Owner        *Authority `json:"owner"`
+	Active       *Authority `json:"active"`
+	Posting      *Authority `json:"posting"`
+	MemoKey      string     `json:"memo_key"`
+	JsonMetadata string     `json:"json_metadata"`
+}
 
 // FC_REFLECT( steemit::chain::transfer_operation,
 //             (from)
@@ -337,7 +361,7 @@ func (op *Operation) UnmarshalJSON(data []byte) error {
 	// Unmarshal opType.
 	var opType string
 	if err := json.Unmarshal(raw[0], &opType); err != nil {
-		return err
+		return errors.Wrapf(err, "failed to unmarshal Operation.Type: %v", string(raw[0]))
 	}
 
 	// Unmarshal opBody.
@@ -347,11 +371,52 @@ func (op *Operation) UnmarshalJSON(data []byte) error {
 	}
 	opBody := reflect.New(reflect.Indirect(reflect.ValueOf(bodyTemplate)).Type()).Interface()
 	if err := json.Unmarshal(raw[1], opBody); err != nil {
-		return err
+		return errors.Wrapf(err, "failed to unmarshal Operation.Body: %v", string(raw[1]))
 	}
 
 	// Update fields.
 	op.Type = opType
 	op.Body = opBody
 	return nil
+}
+
+type Authority struct {
+	AccountAuths    []*Auth `json:"account_auths"`
+	KeyAuths        []*Auth `json:"key_auths"`
+	WeightThreshold uint32  `json:"weight_threshold"`
+}
+
+// XXX: Not sure about the struct field names.
+type Auth struct {
+	Key   string
+	Check uint32
+}
+
+func (auth *Auth) UnmarshalJSON(data []byte) error {
+	// The auth object is [key, check].
+	raw := make([]json.RawMessage, 2)
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	if len(raw) != 2 {
+		return errors.Errorf("invalid auth object: %v", string(data))
+	}
+
+	// Unmarshal Key.
+	var key string
+	if err := json.Unmarshal(raw[0], &key); err != nil {
+		return errors.Wrapf(err, "failed to unmarshal Auth.Key: %v", string(raw[0]))
+	}
+
+	// Unmarshal Check.
+	var check uint32
+	if err := json.Unmarshal(raw[1], &check); err != nil {
+		return errors.Wrapf(err, "failed to unmarshal Auth.Check: %v", string(raw[1]))
+	}
+
+	// Update fields.
+	auth.Key = key
+	auth.Check = check
+	return nil
+
 }
