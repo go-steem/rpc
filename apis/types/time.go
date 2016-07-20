@@ -9,7 +9,7 @@ type Time struct {
 }
 
 func (t *Time) UnmarshalJSON(data []byte) error {
-	parsed, err := time.Parse(`"2006-01-02T15:04:05"`, string(data))
+	parsed, err := time.ParseInLocation(`"2006-01-02T15:04:05"`, string(data), time.UTC)
 	if err != nil {
 		return err
 	}
