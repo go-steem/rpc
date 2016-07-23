@@ -94,6 +94,7 @@ func (content *Content) IsStory() bool {
 }
 
 type ContentMetadata struct {
+	Flag  bool
 	Users []string
 	Tags  []string
 	Image []string
@@ -109,6 +110,15 @@ func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
 	unquoted, err := strconv.Unquote(string(data))
 	if err != nil {
 		return err
+	}
+
+	switch unquoted {
+	case "true":
+		metadata.Flag = true
+		return nil
+	case "false":
+		metadata.Flag = false
+		return nil
 	}
 
 	if len(unquoted) == 0 {
