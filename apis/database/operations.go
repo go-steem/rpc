@@ -115,7 +115,7 @@ type ChainProperties struct {
 type PowOperation struct {
 	WorkerAccount string           `json:"worker_account"`
 	BlockID       string           `json:"block_id"`
-	Nonce         uint64           `json:"nonce"`
+	Nonce         *types.Int       `json:"nonce"`
 	Work          *Pow             `json:"work"`
 	Props         *ChainProperties `json:"props"`
 }
