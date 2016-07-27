@@ -78,7 +78,7 @@ type Content struct {
 	Children                *types.Int       `json:"children"`
 	NetRshares              *types.Int       `json:"net_rshares"`
 	URL                     string           `json:"url"`
-	ActiveVotes             []*Vote          `json:"active_votes"`
+	ActiveVotes             []*VoteState     `json:"active_votes"`
 	ParentPermlink          string           `json:"parent_permlink"`
 	CashoutTime             *types.Time      `json:"cashout_time"`
 	TotalPayoutValue        string           `json:"total_payout_value"`
@@ -139,7 +139,10 @@ func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type Vote struct {
-	Voter  string     `json:"voter"`
-	Weight *types.Int `json:"weight"`
+type VoteState struct {
+	Voter   string      `json:"voter"`
+	Weight  *types.Int  `json:"weight"`
+	Rshares *types.Int  `json:"rshares"`
+	Percent *types.Int  `json:"percent"`
+	Time    *types.Time `json:"time"`
 }

@@ -289,6 +289,14 @@ func (api *API) GetActiveVotesRaw(author, permlink string) (*json.RawMessage, er
 	return call.Raw(api.caller, "get_active_votes", []string{author, permlink})
 }
 
+func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
+	var resp []*VoteState
+	if err := api.caller.Call("get_active_votes", []string{author, permlink}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func (api *API) GetAccountVotesRaw(voter string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_account_votes", []string{voter})
 }

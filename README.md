@@ -216,7 +216,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 | Method Name       | Raw Version | Full Version |
 | ----------------- |:-----------:|:------------:|
-| get_active_votes  | DONE        |              |
+| get_active_votes  | DONE        | DONE         |
 | get_account_votes | DONE        |              |
 
 ### Cotent
