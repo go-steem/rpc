@@ -101,9 +101,9 @@ type ContentMetadata struct {
 }
 
 type ContentMetadataRaw struct {
-	Users []string `json:"users"`
-	Tags  []string `json:"tags"`
-	Image []string `json:"image"`
+	Users types.StringSlice `json:"users"`
+	Tags  types.StringSlice `json:"tags"`
+	Image types.StringSlice `json:"image"`
 }
 
 func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
