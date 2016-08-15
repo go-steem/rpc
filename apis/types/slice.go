@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -24,7 +25,7 @@ func (ss *StringSlice) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(data, &v); err != nil {
 			return errors.Wrap(err, "failed to unmarshal string slice")
 		}
-		*ss = []string{v}
+		*ss = strings.Split(v, " ")
 	}
 	return nil
 }
