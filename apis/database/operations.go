@@ -13,6 +13,7 @@ const (
 	OpTypeConvert             = "convert"
 	OpTypeFeedPublish         = "feed_publish"
 	OpTypePow                 = "pow"
+	OpTypeCustomJSON          = "custom_json"
 	OpTypeAccountCreate       = "account_create"
 	OpTypeAccountUpdate       = "account_update"
 	OpTypeTransfer            = "transfer"
@@ -33,6 +34,7 @@ var opBodyObjects = map[string]interface{}{
 	OpTypeConvert:             &ConvertOperation{},
 	OpTypeFeedPublish:         &FeedPublishOperation{},
 	OpTypePow:                 &PowOperation{},
+	OpTypeCustomJSON:          &CustomJSONOperation{},
 	OpTypeAccountCreate:       &AccountCreateOperation{},
 	OpTypeAccountUpdate:       &AccountUpdateOperation{},
 	OpTypeTransfer:            &TransferOperation{},
@@ -266,12 +268,6 @@ type VoteOperation struct {
 //             (required_auths)
 //             (id)
 //             (data) )
-
-// FC_REFLECT( steemit::chain::custom_json_operation,
-//             (required_auths)
-//             (required_posting_auths)
-//             (id)
-//             (json) )
 
 // FC_REFLECT( steemit::chain::limit_order_create_operation,
 //             (owner)
