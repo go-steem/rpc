@@ -3,6 +3,7 @@ package rpc
 import (
 	// RPC
 	"github.com/go-steem/rpc/apis/database"
+	"github.com/go-steem/rpc/apis/login"
 	"github.com/go-steem/rpc/interfaces"
 )
 
@@ -13,6 +14,9 @@ import (
 type Client struct {
 	cc interfaces.CallCloser
 
+	// Login represents login_api.
+	Login *login.API
+
 	// Database represents database_api.
 	Database *database.API
 }
@@ -20,6 +24,7 @@ type Client struct {
 // NewClient creates a new RPC client that use the given CallCloser internally.
 func NewClient(cc interfaces.CallCloser) *Client {
 	client := &Client{cc: cc}
+	client.Login = login.NewAPI(client.cc)
 	client.Database = database.NewAPI(client.cc)
 	return client
 }
