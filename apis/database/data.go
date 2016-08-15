@@ -18,26 +18,28 @@ type DynamicGlobalProperties struct {
 	Time                     *types.Time `json:"time"`
 	TotalPow                 *types.Int  `json:"total_pow"`
 	NumPowWitnesses          *types.Int  `json:"num_pow_witnesses"`
-	ConfidentialSupply       string      `json:"confidential_supply"`
-	TotalVestingShares       string      `json:"total_vesting_shares"`
 	CurrentReserveRatio      *types.Int  `json:"current_reserve_ratio"`
 	Id                       *types.ID   `json:"id"`
 	CurrentSupply            string      `json:"current_supply"`
+	CurrentSBDSupply         string      `json:"current_sbd_supply"`
 	MaximumBlockSize         *types.Int  `json:"maximum_block_size"`
-	RecentSlotsFilled        string      `json:"recent_slots_filled"`
+	RecentSlotsFilled        *types.Int  `json:"recent_slots_filled"`
 	CurrentWitness           string      `json:"current_witness"`
-	TotalRewardShares2       string      `json:"total_reward_shares2"`
+	TotalRewardShares2       *types.Int  `json:"total_reward_shares2"`
 	AverageBlockSize         *types.Int  `json:"average_block_size"`
 	CurrentAslot             *types.Int  `json:"current_aslot"`
 	LastIrreversibleBlockNum uint32      `json:"last_irreversible_block_num"`
+	TotalVestingShares       string      `json:"total_vesting_shares"`
 	TotalVersingFundSteem    string      `json:"total_vesting_fund_steem"`
 	HeadBlockId              string      `json:"head_block_id"`
 	VirtualSupply            string      `json:"virtual_supply"`
-	CurrentSBDSupply         string      `json:"current_sbd_supply"`
+	ConfidentialSupply       string      `json:"confidential_supply"`
 	ConfidentialSBDSupply    string      `json:"confidential_sbd_supply"`
 	TotalRewardFundSteem     string      `json:"total_reward_fund_steem"`
+	TotalActivityFundSteem   string      `json:"total_activity_fund_steem"`
+	TotalActivityFundShares  *types.Int  `json:"total_activity_fund_shares"`
 	SBDInterestRate          *types.Int  `json:"sbd_interest_rate"`
-	MaxVirtualBandwidth      string      `json:"max_virtual_bandwidth"`
+	MaxVirtualBandwidth      *types.Int  `json:"max_virtual_bandwidth"`
 	HeadBlockNumber          *types.Int  `json:"head_block_number"`
 }
 
