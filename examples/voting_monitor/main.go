@@ -48,8 +48,10 @@ func run() (err error) {
 	if reconnect {
 		go func() {
 			for {
-				e := <-monitorChan
-				log.Println(e)
+				event, ok := <-monitorChan
+				if ok {
+					log.Println(event)
+				}
 			}
 		}()
 	}
@@ -66,7 +68,11 @@ func run() (err error) {
 
 	// Use the transport to get an RPC client.
 	client := rpc.NewClient(t)
-	defer client.Close()
+	defer func() {
+		if !interrupted {
+			client.Close()
+		}
+	}()
 
 	// Start processing signals.
 	go func() {
