@@ -40,9 +40,19 @@ func (op *CustomJSONOperation) UnmarshalBody() (interface{}, error) {
 	// Clone the template.
 	body := reflect.New(reflect.Indirect(reflect.ValueOf(bodyTemplate)).Type()).Interface()
 
+	// Prepare the whole operation tuple.
+	rawTuple := make([]json.RawMessage, 2)
+	if err := json.NewDecoder(strings.NewReader(op.JSON)).Decode(&rawTuple); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
+	}
+	if rawTuple[1] == nil {
+		return nil, errors.Errorf("invalid CustomJSONOperation.JSON: \n%v", op.JSON)
+	}
+	data := []byte(rawTuple[1])
+
 	// Unmarshal into the new object instance.
-	if err := json.NewDecoder(strings.NewReader(op.JSON)).Decode(body); err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal CustomJSONOperation.JSON")
+	if err := json.Unmarshal(data, body); err != nil {
+		return nil, errors.Wrapf(err, "failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
 	}
 
 	return body, nil
