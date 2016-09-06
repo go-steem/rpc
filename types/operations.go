@@ -1,55 +1,15 @@
-package database
+package types
 
 import (
+	// Stdlib
 	"encoding/json"
-	"reflect"
 
-	"github.com/go-steem/rpc/apis/types"
+	// RPC
+	"github.com/go-steem/rpc/encoding/transaction"
 
+	// Vendor
 	"github.com/pkg/errors"
 )
-
-const (
-	OpTypeConvert             = "convert"
-	OpTypeFeedPublish         = "feed_publish"
-	OpTypePow                 = "pow"
-	OpTypeCustomJSON          = "custom_json"
-	OpTypeAccountCreate       = "account_create"
-	OpTypeAccountUpdate       = "account_update"
-	OpTypeTransfer            = "transfer"
-	OpTypeTransferToVesting   = "transfer_to_vesting"
-	OpTypeWithdrawVesting     = "withdraw_vesting"
-	OpTypeAccountWitnessVote  = "account_witness_vote"
-	OpTypeAccountWitnessProxy = "account_witness_proxy"
-	OpTypeComment             = "comment"
-	OpTypeVote                = "vote"
-	OpTypeLimitOrderCreate    = "limit_order_create"
-	OpTypeFillOrder           = "fill_order"
-	OpTypeLimitOrderCancel    = "limit_order_cancel"
-	OpTypeDeleteComment       = "delete_comment"
-	OpTypeCommentOptions      = "comment_options"
-)
-
-var opBodyObjects = map[string]interface{}{
-	OpTypeConvert:             &ConvertOperation{},
-	OpTypeFeedPublish:         &FeedPublishOperation{},
-	OpTypePow:                 &PowOperation{},
-	OpTypeCustomJSON:          &CustomJSONOperation{},
-	OpTypeAccountCreate:       &AccountCreateOperation{},
-	OpTypeAccountUpdate:       &AccountUpdateOperation{},
-	OpTypeTransfer:            &TransferOperation{},
-	OpTypeTransferToVesting:   &TransferToVestingOperation{},
-	OpTypeWithdrawVesting:     &WithdrawVestingOperation{},
-	OpTypeAccountWitnessVote:  &AccountWitnessVoteOperation{},
-	OpTypeAccountWitnessProxy: &AccountWitnessProxyOperation{},
-	OpTypeComment:             &CommentOperation{},
-	OpTypeVote:                &VoteOperation{},
-	OpTypeLimitOrderCreate:    &LimitOrderCreateOperation{},
-	OpTypeFillOrder:           &FillOrderOperation{},
-	OpTypeLimitOrderCancel:    &LimitOrderCancelOperation{},
-	OpTypeDeleteComment:       &DeleteCommentOperation{},
-	OpTypeCommentOptions:      &CommentOptionsOperation{},
-}
 
 // FC_REFLECT( steemit::chain::report_over_production_operation,
 //             (reporter)
@@ -58,6 +18,14 @@ var opBodyObjects = map[string]interface{}{
 
 type ReportOverProductionOperation struct {
 	Reporter string `json:"reporter"`
+}
+
+func (op *ReportOverProductionOperation) Type() OpType {
+	return TypeReportOverProduction
+}
+
+func (op *ReportOverProductionOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::convert_operation,
@@ -69,6 +37,14 @@ type ConvertOperation struct {
 	Owner     string `json:"owner"`
 	RequestID uint32 `json:"requestid"`
 	Amount    string `json:"amount"`
+}
+
+func (op *ConvertOperation) Type() OpType {
+	return TypeConvert
+}
+
+func (op *ConvertOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::feed_publish_operation,
@@ -83,13 +59,21 @@ type FeedPublishOperation struct {
 	} `json:"exchange_rate"`
 }
 
+func (op *FeedPublishOperation) Type() OpType {
+	return TypeFeedPublish
+}
+
+func (op *FeedPublishOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::pow,
 //             (worker)
 //             (input)
 //             (signature)
 //             (work) )
 
-type Pow struct {
+type POW struct {
 	Worker    string `json:"worker"`
 	Input     string `json:"input"`
 	Signature string `json:"signature"`
@@ -114,12 +98,20 @@ type ChainProperties struct {
 //             (work)
 //             (props) )
 
-type PowOperation struct {
+type POWOperation struct {
 	WorkerAccount string           `json:"worker_account"`
 	BlockID       string           `json:"block_id"`
-	Nonce         *types.Int       `json:"nonce"`
-	Work          *Pow             `json:"work"`
+	Nonce         *Int             `json:"nonce"`
+	Work          *POW             `json:"work"`
 	Props         *ChainProperties `json:"props"`
+}
+
+func (op *POWOperation) Type() OpType {
+	return TypePOW
+}
+
+func (op *POWOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::account_create_operation,
@@ -143,6 +135,14 @@ type AccountCreateOperation struct {
 	JsonMetadata   string     `json:"json_metadata"`
 }
 
+func (op *AccountCreateOperation) Type() OpType {
+	return TypeAccountCreate
+}
+
+func (op *AccountCreateOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::account_update_operation,
 //             (account)
 //             (owner)
@@ -160,6 +160,14 @@ type AccountUpdateOperation struct {
 	JsonMetadata string     `json:"json_metadata"`
 }
 
+func (op *AccountUpdateOperation) Type() OpType {
+	return TypeAccountUpdate
+}
+
+func (op *AccountUpdateOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::transfer_operation,
 //             (from)
 //             (to)
@@ -173,6 +181,14 @@ type TransferOperation struct {
 	Memo   string `json:"memo"`
 }
 
+func (op *TransferOperation) Type() OpType {
+	return TypeTransfer
+}
+
+func (op *TransferOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::transfer_to_vesting_operation,
 //             (from)
 //             (to)
@@ -184,6 +200,14 @@ type TransferToVestingOperation struct {
 	Amount string `json:"amount"`
 }
 
+func (op *TransferToVestingOperation) Type() OpType {
+	return TypeTransferToVesting
+}
+
+func (op *TransferToVestingOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::withdraw_vesting_operation,
 //             (account)
 //             (vesting_shares) )
@@ -191,6 +215,14 @@ type TransferToVestingOperation struct {
 type WithdrawVestingOperation struct {
 	Account       string `json:"account"`
 	VestingShares string `json:"vesting_shares"`
+}
+
+func (op *WithdrawVestingOperation) Type() OpType {
+	return TypeWithdrawVesting
+}
+
+func (op *WithdrawVestingOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::set_withdraw_vesting_route_operation,
@@ -216,6 +248,14 @@ type AccountWitnessVoteOperation struct {
 	Approve bool   `json:"approve"`
 }
 
+func (op *AccountWitnessVoteOperation) Type() OpType {
+	return TypeAccountWitnessVote
+}
+
+func (op *AccountWitnessVoteOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::account_witness_proxy_operation,
 //             (account)
 //             (proxy) )
@@ -223,6 +263,14 @@ type AccountWitnessVoteOperation struct {
 type AccountWitnessProxyOperation struct {
 	Account string `json:"account"`
 	Proxy   string `json:"proxy"`
+}
+
+func (op *AccountWitnessProxyOperation) Type() OpType {
+	return TypeAccountWitnessProxy
+}
+
+func (op *AccountWitnessProxyOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::comment_operation,
@@ -247,6 +295,14 @@ type CommentOperation struct {
 	Body           string `json:"body"`
 }
 
+func (op *CommentOperation) Type() OpType {
+	return TypeComment
+}
+
+func (op *CommentOperation) Data() interface{} {
+	return op
+}
+
 func (op *CommentOperation) IsStoryOperation() bool {
 	return op.ParentAuthor == ""
 }
@@ -258,10 +314,28 @@ func (op *CommentOperation) IsStoryOperation() bool {
 //             (weight) )
 
 type VoteOperation struct {
-	Voter    string     `json:"voter"`
-	Author   string     `json:"author"`
-	Permlink string     `json:"permlink"`
-	Weight   *types.Int `json:"weight"`
+	Voter    string `json:"voter"`
+	Author   string `json:"author"`
+	Permlink string `json:"permlink"`
+	Weight   Int16  `json:"weight"`
+}
+
+func (op *VoteOperation) Type() OpType {
+	return TypeVote
+}
+
+func (op *VoteOperation) Data() interface{} {
+	return op
+}
+
+func (op *VoteOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeVote.Code()))
+	enc.Encode(op.Voter)
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	enc.Encode(op.Weight)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::custom_operation,
@@ -278,25 +352,20 @@ type VoteOperation struct {
 //             (expiration) )
 
 type LimitOrderCreateOperation struct {
-	Owner        string      `json:"owner"`
-	OrderID      uint32      `json:"orderid"`
-	AmountToSell string      `json:"amount_to_sell"`
-	MinToReceive string      `json:"min_to_receive"`
-	FillOrKill   bool        `json:"fill_or_kill"`
-	Expiration   *types.Time `json:"expiration"`
+	Owner        string `json:"owner"`
+	OrderID      uint32 `json:"orderid"`
+	AmountToSell string `json:"amount_to_sell"`
+	MinToReceive string `json:"min_to_receive"`
+	FillOrKill   bool   `json:"fill_or_kill"`
+	Expiration   *Time  `json:"expiration"`
 }
 
-// FC_REFLECT( steemit::chain::fill_order_operation,
-//             (owner)
-//             (orderid)
-//             (pays)
-//             (receives) );
+func (op *LimitOrderCreateOperation) Type() OpType {
+	return TypeLimitOrderCreate
+}
 
-type FillOrderOperation struct {
-	Owner    string `json:"owner"`
-	OrderID  string `json:"orderid"`
-	Pays     string `json:"pays"`
-	Receives string `json:"receives"`
+func (op *LimitOrderCreateOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::limit_order_cancel_operation,
@@ -308,6 +377,14 @@ type LimitOrderCancelOperation struct {
 	OrderID uint32 `json:"orderid"`
 }
 
+func (op *LimitOrderCancelOperation) Type() OpType {
+	return TypeLimitOrderCancel
+}
+
+func (op *LimitOrderCancelOperation) Data() interface{} {
+	return op
+}
+
 // FC_REFLECT( steemit::chain::delete_comment_operation,
 //             (author)
 //             (permlink) )
@@ -315,6 +392,14 @@ type LimitOrderCancelOperation struct {
 type DeleteCommentOperation struct {
 	Author   string `json:"author"`
 	Permlink string `json:"permlink"`
+}
+
+func (op *DeleteCommentOperation) Type() OpType {
+	return TypeDeleteComment
+}
+
+func (op *DeleteCommentOperation) Data() interface{} {
+	return op
 }
 
 // FC_REFLECT( steemit::chain::comment_options_operation,
@@ -336,44 +421,12 @@ type CommentOptionsOperation struct {
 	Extensions           []interface{} `json:"extensions"`
 }
 
-// Operation represents an operation stored in a transaction.
-type Operation struct {
-	// Type contains the string representation of the operation.
-	Type string
-	// Body contains one of the operation objects depending on the type.
-	Body interface{}
+func (op *CommentOptionsOperation) Type() OpType {
+	return TypeCommentOptions
 }
 
-func (op *Operation) UnmarshalJSON(data []byte) error {
-	// The operation object is [opType, opBody].
-	raw := make([]json.RawMessage, 2)
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	if len(raw) != 2 {
-		return errors.Errorf("invalid operation object: %v\n", string(data))
-	}
-
-	// Unmarshal opType.
-	var opType string
-	if err := json.Unmarshal(raw[0], &opType); err != nil {
-		return errors.Wrapf(err, "failed to unmarshal Operation.Type: %v", string(raw[0]))
-	}
-
-	// Unmarshal opBody.
-	bodyTemplate, ok := opBodyObjects[opType]
-	if !ok {
-		bodyTemplate = map[string]interface{}{}
-	}
-	opBody := reflect.New(reflect.Indirect(reflect.ValueOf(bodyTemplate)).Type()).Interface()
-	if err := json.Unmarshal(raw[1], opBody); err != nil {
-		return errors.Wrapf(err, "failed to unmarshal Operation.Body: %v", string(raw[1]))
-	}
-
-	// Update fields.
-	op.Type = opType
-	op.Body = opBody
-	return nil
+func (op *CommentOptionsOperation) Data() interface{} {
+	return op
 }
 
 type Authority struct {
@@ -414,5 +467,17 @@ func (auth *Auth) UnmarshalJSON(data []byte) error {
 	auth.Key = key
 	auth.Check = check
 	return nil
+}
 
+type UnknownOperation struct {
+	kind OpType
+	data *json.RawMessage
+}
+
+func (op *UnknownOperation) Type() OpType {
+	return op.kind
+}
+
+func (op *UnknownOperation) Data() interface{} {
+	return op.data
 }

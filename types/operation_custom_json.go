@@ -1,21 +1,23 @@
-package database
+package types
 
 import (
+	// Stdlib
 	"bytes"
 	"encoding/json"
 	"io"
 	"reflect"
 	"strings"
 
+	// Vendor
 	"github.com/pkg/errors"
 )
 
 const (
-	CustomJSONOperationIDFollow = "follow"
+	TypeFollow = "follow"
 )
 
-var customJSONOpBodyObjects = map[string]interface{}{
-	CustomJSONOperationIDFollow: &FollowOperation{},
+var customJSONDataObjects = map[string]interface{}{
+	TypeFollow: &FollowOperation{},
 }
 
 // FC_REFLECT( steemit::chain::custom_json_operation,
@@ -24,6 +26,7 @@ var customJSONOpBodyObjects = map[string]interface{}{
 //             (id)
 //             (json) )
 
+// CustomJSONOperation represents custom_json operation data.
 type CustomJSONOperation struct {
 	RequiredAuths        []string `json:"required_auths"`
 	RequiredPostingAuths []string `json:"required_posting_auths"`
@@ -31,16 +34,24 @@ type CustomJSONOperation struct {
 	JSON                 string   `json:"json"`
 }
 
-func (op *CustomJSONOperation) UnmarshalBody() (interface{}, error) {
-	// Get the corresponding operation object template.
-	bodyTemplate, ok := customJSONOpBodyObjects[op.ID]
+func (op *CustomJSONOperation) Type() OpType {
+	return TypeCustomJSON
+}
+
+func (op *CustomJSONOperation) Data() interface{} {
+	return op
+}
+
+func (op *CustomJSONOperation) UnmarshalData() (interface{}, error) {
+	// Get the corresponding data object template.
+	template, ok := customJSONDataObjects[op.ID]
 	if !ok {
-		// In case there is no corresponding template, return unquoted data.
-		return op.JSON, nil
+		// In case there is no corresponding template, return nil.
+		return nil, nil
 	}
 
 	// Clone the template.
-	body := reflect.New(reflect.Indirect(reflect.ValueOf(bodyTemplate)).Type()).Interface()
+	opData := reflect.New(reflect.Indirect(reflect.ValueOf(template)).Type()).Interface()
 
 	// Prepare the whole operation tuple.
 	var bodyReader io.Reader
@@ -59,16 +70,10 @@ func (op *CustomJSONOperation) UnmarshalBody() (interface{}, error) {
 	}
 
 	// Unmarshal into the new object instance.
-	if err := json.NewDecoder(bodyReader).Decode(body); err != nil {
+	if err := json.NewDecoder(bodyReader).Decode(opData); err != nil {
 		return nil, errors.Wrapf(err,
 			"failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
 	}
 
-	return body, nil
-}
-
-type FollowOperation struct {
-	Follower  string   `json:"follower"`
-	Following string   `json:"following"`
-	What      []string `json:"what"`
+	return opData, nil
 }

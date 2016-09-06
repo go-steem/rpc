@@ -1,11 +1,13 @@
 package database
 
 import (
+	// Stdlib
 	"encoding/json"
 	"strconv"
 	"strings"
 
-	"github.com/go-steem/rpc/apis/types"
+	// RPC
+	"github.com/go-steem/rpc/types"
 )
 
 type Config struct {
@@ -15,50 +17,43 @@ type Config struct {
 }
 
 type DynamicGlobalProperties struct {
-	Time                     *types.Time `json:"time"`
-	TotalPow                 *types.Int  `json:"total_pow"`
-	NumPowWitnesses          *types.Int  `json:"num_pow_witnesses"`
-	CurrentReserveRatio      *types.Int  `json:"current_reserve_ratio"`
-	Id                       *types.ID   `json:"id"`
-	CurrentSupply            string      `json:"current_supply"`
-	CurrentSBDSupply         string      `json:"current_sbd_supply"`
-	MaximumBlockSize         *types.Int  `json:"maximum_block_size"`
-	RecentSlotsFilled        *types.Int  `json:"recent_slots_filled"`
-	CurrentWitness           string      `json:"current_witness"`
-	TotalRewardShares2       *types.Int  `json:"total_reward_shares2"`
-	AverageBlockSize         *types.Int  `json:"average_block_size"`
-	CurrentAslot             *types.Int  `json:"current_aslot"`
-	LastIrreversibleBlockNum uint32      `json:"last_irreversible_block_num"`
-	TotalVestingShares       string      `json:"total_vesting_shares"`
-	TotalVersingFundSteem    string      `json:"total_vesting_fund_steem"`
-	HeadBlockId              string      `json:"head_block_id"`
-	VirtualSupply            string      `json:"virtual_supply"`
-	ConfidentialSupply       string      `json:"confidential_supply"`
-	ConfidentialSBDSupply    string      `json:"confidential_sbd_supply"`
-	TotalRewardFundSteem     string      `json:"total_reward_fund_steem"`
-	TotalActivityFundSteem   string      `json:"total_activity_fund_steem"`
-	TotalActivityFundShares  *types.Int  `json:"total_activity_fund_shares"`
-	SBDInterestRate          *types.Int  `json:"sbd_interest_rate"`
-	MaxVirtualBandwidth      *types.Int  `json:"max_virtual_bandwidth"`
-	HeadBlockNumber          *types.Int  `json:"head_block_number"`
+	Time                     *types.Time  `json:"time"`
+	TotalPow                 *types.Int   `json:"total_pow"`
+	NumPowWitnesses          *types.Int   `json:"num_pow_witnesses"`
+	CurrentReserveRatio      *types.Int   `json:"current_reserve_ratio"`
+	ID                       *types.ID    `json:"id"`
+	CurrentSupply            string       `json:"current_supply"`
+	CurrentSBDSupply         string       `json:"current_sbd_supply"`
+	MaximumBlockSize         *types.Int   `json:"maximum_block_size"`
+	RecentSlotsFilled        *types.Int   `json:"recent_slots_filled"`
+	CurrentWitness           string       `json:"current_witness"`
+	TotalRewardShares2       *types.Int   `json:"total_reward_shares2"`
+	AverageBlockSize         *types.Int   `json:"average_block_size"`
+	CurrentAslot             *types.Int   `json:"current_aslot"`
+	LastIrreversibleBlockNum uint32       `json:"last_irreversible_block_num"`
+	TotalVestingShares       string       `json:"total_vesting_shares"`
+	TotalVersingFundSteem    string       `json:"total_vesting_fund_steem"`
+	HeadBlockID              string       `json:"head_block_id"`
+	HeadBlockNumber          types.UInt32 `json:"head_block_number"`
+	VirtualSupply            string       `json:"virtual_supply"`
+	ConfidentialSupply       string       `json:"confidential_supply"`
+	ConfidentialSBDSupply    string       `json:"confidential_sbd_supply"`
+	TotalRewardFundSteem     string       `json:"total_reward_fund_steem"`
+	TotalActivityFundSteem   string       `json:"total_activity_fund_steem"`
+	TotalActivityFundShares  *types.Int   `json:"total_activity_fund_shares"`
+	SBDInterestRate          *types.Int   `json:"sbd_interest_rate"`
+	MaxVirtualBandwidth      *types.Int   `json:"max_virtual_bandwidth"`
 }
 
 type Block struct {
-	Number                uint32          `json:"-"`
-	Timestamp             *types.Time     `json:"timestamp"`
-	Witness               string          `json:"witness"`
-	WitnessSignature      string          `json:"witness_signature"`
-	TransactionMerkleRoot string          `json:"transaction_merkle_root"`
-	Previous              string          `json:"previous"`
-	Extensions            [][]interface{} `json:"extensions"`
-	Transactions          []*Transaction  `json:"transactions"`
-}
-
-type Transaction struct {
-	RefBlockNum    *types.Int   `json:"ref_block_num"`
-	RefBlockPrefix *types.Int   `json:"ref_block_prefix"`
-	Expiration     string       `json:"expiration"`
-	Operations     []*Operation `json:"operations"`
+	Number                uint32               `json:"-"`
+	Timestamp             *types.Time          `json:"timestamp"`
+	Witness               string               `json:"witness"`
+	WitnessSignature      string               `json:"witness_signature"`
+	TransactionMerkleRoot string               `json:"transaction_merkle_root"`
+	Previous              string               `json:"previous"`
+	Extensions            [][]interface{}      `json:"extensions"`
+	Transactions          []*types.Transaction `json:"transactions"`
 }
 
 type Content struct {
