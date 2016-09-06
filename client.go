@@ -5,6 +5,7 @@ import (
 	"github.com/go-steem/rpc/apis/database"
 	"github.com/go-steem/rpc/apis/follow"
 	"github.com/go-steem/rpc/apis/login"
+	"github.com/go-steem/rpc/apis/networkbroadcast"
 	"github.com/go-steem/rpc/interfaces"
 )
 
@@ -23,15 +24,30 @@ type Client struct {
 
 	// Follow represents follow_api.
 	Follow *follow.API
+
+	// NetworkBroadcast represents network_broadcast_api.
+	NetworkBroadcast *networkbroadcast.API
 }
 
 // NewClient creates a new RPC client that use the given CallCloser internally.
-func NewClient(cc interfaces.CallCloser) *Client {
+func NewClient(cc interfaces.CallCloser) (*Client, error) {
 	client := &Client{cc: cc}
 	client.Login = login.NewAPI(client.cc)
 	client.Database = database.NewAPI(client.cc)
-	client.Follow = follow.NewAPI(client.cc)
-	return client
+
+	followAPI, err := follow.NewAPI(client.cc)
+	if err != nil {
+		return nil, err
+	}
+	client.Follow = followAPI
+
+	networkBroadcastAPI, err := networkbroadcast.NewAPI(client.cc)
+	if err != nil {
+		return nil, err
+	}
+	client.NetworkBroadcast = networkBroadcastAPI
+
+	return client, nil
 }
 
 // Close should be used to close the client when no longer needed.

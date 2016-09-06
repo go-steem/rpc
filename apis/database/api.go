@@ -10,6 +10,11 @@ import (
 	"github.com/go-steem/rpc/internal/call"
 )
 
+const (
+	APIID         = "database_api"
+	NumbericAPIID = 0
+)
+
 type API struct {
 	caller interfaces.Caller
 }

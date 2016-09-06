@@ -11,6 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	APIID         = "login_api"
+	NumbericAPIID = 1
+)
+
 type API struct {
 	caller interfaces.Caller
 }
@@ -20,7 +25,7 @@ func NewAPI(caller interfaces.Caller) *API {
 }
 
 func (api *API) call(method string, params, resp interface{}) error {
-	return api.caller.Call("call", []interface{}{"login_api", method, params}, resp)
+	return api.caller.Call("call", []interface{}{NumbericAPIID, method, params}, resp)
 }
 
 func (api *API) LoginRaw(username, password string) (*json.RawMessage, error) {

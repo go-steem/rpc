@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/go-steem/rpc"
-	"github.com/go-steem/rpc/apis/database"
 	"github.com/go-steem/rpc/transports/websocket"
+	"github.com/go-steem/rpc/types"
 )
 
 func main() {
@@ -67,7 +67,10 @@ func run() (err error) {
 	}
 
 	// Use the transport to get an RPC client.
-	client := rpc.NewClient(t)
+	client, err := rpc.NewClient(t)
+	if err != nil {
+		return err
+	}
 	defer func() {
 		if !interrupted {
 			client.Close()
@@ -117,8 +120,8 @@ func run() (err error) {
 			// Process the transactions.
 			for _, tx := range block.Transactions {
 				for _, operation := range tx.Operations {
-					switch op := operation.Body.(type) {
-					case *database.VoteOperation:
+					switch op := operation.Data().(type) {
+					case *types.VoteOperation:
 						fmt.Printf("@%v voted for @%v/%v\n", op.Voter, op.Author, op.Permlink)
 
 						// You can add more cases here, it depends on

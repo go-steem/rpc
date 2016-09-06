@@ -6,17 +6,25 @@ import (
 
 	// RPC
 	"github.com/go-steem/rpc/interfaces"
+	"github.com/go-steem/rpc/internal/rpc"
 
 	// Vendor
 	"github.com/pkg/errors"
 )
 
+const APIID = "follow_api"
+
 type API struct {
+	id     int
 	caller interfaces.Caller
 }
 
-func NewAPI(caller interfaces.Caller) *API {
-	return &API{caller}
+func NewAPI(caller interfaces.Caller) (*API, error) {
+	id, err := rpc.GetNumericAPIID(caller, APIID)
+	if err != nil {
+		return nil, err
+	}
+	return &API{id, caller}, nil
 }
 
 func (api *API) call(method string, params, resp interface{}) error {
