@@ -6,7 +6,7 @@ Golang RPC client library for [Steem](https://steem.io).
 
 ## Compatibility
 
-`steemd 0.8.4`
+`steemd 0.13.0`
 
 ## Usage
 
@@ -14,7 +14,21 @@ Golang RPC client library for [Steem](https://steem.io).
 import "github.com/go-steem/rpc"
 ```
 
-This package is still very much in development, so `gopkg.in` is not yet usable.
+This package is still very much in development, so `gopkg.in` is not yet available.
+
+## Installation
+
+This package calls [bitcoin-core/secp256k1](https://github.com/bitcoin-core/secp256k1)
+using CGO to implement signed transactions, so you need to install `secp256k1` first.
+Then it will be possible to build `go-steem/rpc`.
+
+In case you don't need signed transactions, i.e. you don't need to use
+`network_broadcast_api`, it is possible to build the package with `nosigning`
+tag to exclude the functionality:
+
+```bash
+$ go build -tags nosigning
+```
 
 ## Example
 
@@ -26,7 +40,7 @@ for more complete and ready to use examples.
 t, _ := websocket.NewTransport("ws://localhost:8090")
 
 // Use the transport to create an RPC client.
-client := rpc.NewClient(t)
+client, _ := rpc.NewClient(t)
 defer client.Close()
 
 // Call "get_config".
@@ -45,14 +59,14 @@ for {
 		// Process the transactions.
 		for _, tx := range block.Transactions {
 			for _, op := range tx.Operations {
-				switch body := op.Body.(type) {
+				switch body := op.Data().(type) {
 					// Comment operation.
-					case *database.CommentOperation:
+					case *types.CommentOperation:
 						content, _ := client.Database.GetContent(body.Author, body.Permlink)
 						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
 
 					// Vote operation.
-					case *database.VoteOperation:
+					case *types.VoteOperation:
 						fmt.Printf("VOTE @%v @%v/%v\n", body.Voter, body.Author, body.Permlink)
 
 					// You can add more cases, it depends on what
@@ -119,126 +133,8 @@ For now there is no promise considering API stability. Some response objects
 maybe be typed incorrectly. The package is already usable, though. See the
 `examples` directory.
 
-The following subsections document the API completion. The method names
-are taken from `database_api.hpp` in `steemit/steem`.
-
-**TODO:** Verify that these are actually the methods available over RPC :D
-
-### Subscriptions
-
-**TODO:** Is this actually callable over the RPC endpoint?
-It is a bit confusing to see `set_` prefix. Needs research.
-
-```
-   (set_subscribe_callback)
-   (set_pending_transaction_callback)
-   (set_block_applied_callback)
-   (cancel_all_subscriptions)
-```
-
-### Tags
-
-| Method Name                 | Raw Version | Full Version |
-| --------------------------- |:-----------:|:------------:|
-| get_trending_tags           | DONE        |              |
-| get_discussions_by_trending | DONE        |              |
-| get_discussions_by_created  | DONE        |              |
-| get_discussions_by_active   | DONE        |              |
-| get_discussions_by_cashout  | DONE        |              |
-| get_discussions_by_payout   | DONE        |              |
-| get_discussions_by_votes    | DONE        |              |
-| get_discussions_by_children | DONE        |              |
-| get_discussions_by_hot      | DONE        |              |
-| get_recommended_for         | DONE        |              |
-
-### Blocks and Transactions
-
-| Method Name             | Raw Version | Full Version   |
-| ----------------------- |:-----------:|:--------------:|
-| get_block_header        | DONE        |                |
-| get_block               | DONE        | PARTIALLY DONE |
-| get_state               | DONE        |                |
-| get_trending_categories | DONE        |                |
-| get_best_categories     | DONE        |                |
-| get_active_categories   | DONE        |                |
-| get_recent_categories   | DONE        |                |
-
-### Globals
-
-| Method Name                      | Raw Version | Full Version   |
-| -------------------------------- |:-----------:|:--------------:|
-| get_config                       | DONE        | PARTIALLY DONE |
-| get_dynamic_global_properties    | DONE        | DONE           |
-| get_chain_properties             | DONE        |                |
-| get_feed_history                 | DONE        |                |
-| get_current_median_history_price | DONE        |                |
-| get_witness_schedule             | DONE        |                |
-| get_hardfork_version             | DONE        | DONE           |
-| get_next_scheduled_hardfork      | DONE        |                |
-
-### Keys
-
-| Method Name       | Raw Version | Full Version |
-| ----------------- |:-----------:|:------------:|
-| get_key_reference |             |              |
-
-### Accounts
-
-| Method Name               | Raw Version | Full Version |
-| ------------------------- |:-----------:|:------------:|
-| get_accounts              | DONE        |              |
-| get_account_references    |             |              |
-| lookup_account_names      | DONE        |              |
-| lookup_accounts           | DONE        |              |
-| get_account_count         | DONE        |              |
-| get_conversation_requests | DONE        |              |
-| get_account_history       | DONE        |              |
-
-### Market
-
-| Method Name     | Raw Version | Full Version |
-| --------------- |:-----------:|:------------:|
-| get_order_book  |             |              |
-| get_open_orders |             |              |
-
-### Authority / Validation
-
-| Method Name              | Raw Version | Full Version |
-| ------------------------ |:-----------:|:------------:|
-| get_transaction_hex      |             |              |
-| get_transaction          |             |              |
-| get_required_signatures  |             |              |
-| get_potential_signatures |             |              |
-| verify_authority         |             |              |
-| verity_account_authority |             |              |
-
-### Votes
-
-| Method Name       | Raw Version | Full Version |
-| ----------------- |:-----------:|:------------:|
-| get_active_votes  | DONE        | DONE         |
-| get_account_votes | DONE        |              |
-
-### Cotent
-
-| Method Name                           | Raw Version | Full Version   |
-| ------------------------------------- |:-----------:|:--------------:|
-| get_content                           | DONE        | PARTIALLY DONE |
-| get_content_replies                   | DONE        | PARTIALLY DONE |
-| get_discussions_by_author_before_date |             |                |
-| get_replies_by_last_update            | DONE        |                |
-
-### Witnesses
-
-| Method Name             | Raw Version | Full Version |
-| ----------------------- |:-----------:|:------------:|
-| get_witnesses           |             |              |
-| get_witness_by_account  |             |              |
-| get_witnesses_by_vote   |             |              |
-| lookup_witness_accounts |             |              |
-| get_witness_count       |             |              |
-| get_active_witnesses    |             |              |
-| get_miner_queue         |             |              |
+To check the API coverate, please check the README files in the relevat API
+package in the `apis` subdirectory.
 
 ## License
 
