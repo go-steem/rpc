@@ -4,11 +4,7 @@ Simply upvote whatever you like.
 
 ## Usage
 
-Create a file called `wif.txt` in the current working directory
-and place the WIF for signing the transaction there.
-
-Now you can do the voting part using voter `me`, author `someauthor`
-and permlink `somepermlink`:
+To vote for a post made by `somebody`, post permlink `somepermlink` as user `me`, execute:
 
 ```bash
 $ ./upvote somebody somepermlink me
