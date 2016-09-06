@@ -123,19 +123,11 @@ func run() (err error) {
 	}
 
 	// Broadcast.
-
-	raw, err := client.NetworkBroadcast.BroadcastTransactionSynchronousRaw(tx.Transaction)
+	resp, err := client.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 	if err != nil {
 		return err
 	}
-	fmt.Println("RESPONSE:", string(*raw))
-
-	/*
-		if err := client.NetworkBroadcast.BroadcastTransaction(tx.Transaction); err != nil {
-			return err
-		}
-		fmt.Println("UPVOTED!")
-	*/
+	fmt.Printf("%+v\n", *resp)
 
 	// Success!
 	return nil
