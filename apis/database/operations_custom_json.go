@@ -1,7 +1,9 @@
 package database
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"reflect"
 	"strings"
 
@@ -41,18 +43,25 @@ func (op *CustomJSONOperation) UnmarshalBody() (interface{}, error) {
 	body := reflect.New(reflect.Indirect(reflect.ValueOf(bodyTemplate)).Type()).Interface()
 
 	// Prepare the whole operation tuple.
-	rawTuple := make([]json.RawMessage, 2)
-	if err := json.NewDecoder(strings.NewReader(op.JSON)).Decode(&rawTuple); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
+	var bodyReader io.Reader
+	if op.JSON[0] == '[' {
+		rawTuple := make([]json.RawMessage, 2)
+		if err := json.NewDecoder(strings.NewReader(op.JSON)).Decode(&rawTuple); err != nil {
+			return nil, errors.Wrapf(err,
+				"failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
+		}
+		if rawTuple[1] == nil {
+			return nil, errors.Errorf("invalid CustomJSONOperation.JSON: \n%v", op.JSON)
+		}
+		bodyReader = bytes.NewReader([]byte(rawTuple[1]))
+	} else {
+		bodyReader = strings.NewReader(op.JSON)
 	}
-	if rawTuple[1] == nil {
-		return nil, errors.Errorf("invalid CustomJSONOperation.JSON: \n%v", op.JSON)
-	}
-	data := []byte(rawTuple[1])
 
 	// Unmarshal into the new object instance.
-	if err := json.Unmarshal(data, body); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
+	if err := json.NewDecoder(bodyReader).Decode(body); err != nil {
+		return nil, errors.Wrapf(err,
+			"failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
 	}
 
 	return body, nil
