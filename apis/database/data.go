@@ -46,14 +46,23 @@ type DynamicGlobalProperties struct {
 }
 
 type Block struct {
-	Number                uint32               `json:"-"`
-	Timestamp             *types.Time          `json:"timestamp"`
-	Witness               string               `json:"witness"`
-	WitnessSignature      string               `json:"witness_signature"`
-	TransactionMerkleRoot string               `json:"transaction_merkle_root"`
-	Previous              string               `json:"previous"`
-	Extensions            [][]interface{}      `json:"extensions"`
-	Transactions          []*types.Transaction `json:"transactions"`
+	ID     int `json:"id"`
+	Result struct {
+		Extensions            []interface{} `json:"extensions"`
+		Previous              string        `json:"previous"`
+		Timestamp             string        `json:"timestamp"`
+		TransactionMerkleRoot string        `json:"transaction_merkle_root"`
+		Transactions          []struct {
+			Expiration     string          `json:"expiration"`
+			Extensions     []interface{}   `json:"extensions"`
+			Operations     [][]interface{} `json:"operations"`
+			RefBlockNum    int             `json:"ref_block_num"`
+			RefBlockPrefix int             `json:"ref_block_prefix"`
+			Signatures     []string        `json:"signatures"`
+		} `json:"transactions"`
+		Witness          string `json:"witness"`
+		WitnessSignature string `json:"witness_signature"`
+	} `json:"result"`
 }
 
 type Content struct {
