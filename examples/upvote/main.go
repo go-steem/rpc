@@ -10,11 +10,11 @@ import (
 	"syscall"
 
 	// RPC
-	"github.com/go-steem/rpc"
-	"github.com/go-steem/rpc/encoding/wif"
-	"github.com/go-steem/rpc/transactions"
-	"github.com/go-steem/rpc/transports/websocket"
-	"github.com/go-steem/rpc/types"
+	"github.com/baabeetaa/rpc"
+	"github.com/baabeetaa/rpc/encoding/wif"
+	"github.com/baabeetaa/rpc/transactions"
+	"github.com/baabeetaa/rpc/transports/websocket"
+	"github.com/baabeetaa/rpc/types"
 
 	// Vendor
 	"github.com/pkg/errors"
@@ -29,7 +29,8 @@ func main() {
 
 func run() (err error) {
 	// Process flags.
-	flagAddress := flag.String("rpc_endpoint", "ws://localhost:8090", "steemd RPC endpoint address")
+	// ws://localhost:8090 wss://steemit.com/wspa wss://node.steem.ws wss://steemd.steemit.com
+	flagAddress := flag.String("rpc_endpoint", "wss://steemd.steemit.com", "steemd RPC endpoint address")
 	flag.Parse()
 
 	url := *flagAddress
