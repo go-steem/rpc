@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 
 	// RPC
-	"github.com/go-steem/rpc/interfaces"
-	"github.com/go-steem/rpc/internal/rpc"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/golos-go/interfaces"
+	"github.com/asuleymanov/golos-go/internal/rpc"
+	"github.com/asuleymanov/golos-go/types"
 
 	// Vendor
 	"github.com/pkg/errors"

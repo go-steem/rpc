@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-steem/rpc"
-	"github.com/go-steem/rpc/transports/websocket"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/golos-go"
+	"github.com/asuleymanov/golos-go/transports/websocket"
+	"github.com/asuleymanov/golos-go/types"
 )
 
 func main() {

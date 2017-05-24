@@ -1,26 +1,25 @@
-# go-steem/rpc
+# asuleymanov/golos-go
 
-[![GoDoc](https://godoc.org/github.com/go-steem/rpc?status.svg)](https://godoc.org/github.com/go-steem/rpc)
+[![GoDoc](https://godoc.org/github.com/asuleymanov/golos-go?status.svg)](https://godoc.org/github.com/asuleymanov/golos-go)
 
-Golang RPC client library for [Steem](https://steem.io).
+Golang RPC client library for [Golos](https://golos.io).
 
 ## Compatibility
 
-`steemd 0.13.0`
+`golosd 0.16.0`
 
 ## Usage
 
 ```go
-import "github.com/go-steem/rpc"
+import "github.com/asuleymanov/golos-go"
 ```
 
-This package is still very much in development, so `gopkg.in` is not yet available.
 
 ## Installation
 
 This package calls [bitcoin-core/secp256k1](https://github.com/bitcoin-core/secp256k1)
 using CGO to implement signed transactions, so you need to install `secp256k1` first.
-Then it will be possible to build `go-steem/rpc`.
+Then it will be possible to build `asuleymanov/golos-go`.
 
 In case you don't need signed transactions, i.e. you don't need to use
 `network_broadcast_api`, it is possible to build the package with `nosigning`
@@ -37,7 +36,7 @@ for more complete and ready to use examples.
 
 ```go
 // Instantiate the WebSocket transport.
-t, _ := websocket.NewTransport("ws://localhost:8090")
+t, _ := websocket.NewTransport("wss://localhost:8090")
 
 // Use the transport to create an RPC client.
 client, _ := rpc.NewClient(t)
