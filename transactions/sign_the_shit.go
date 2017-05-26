@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 	secp256k1 "github.com/btcsuite/btcd/btcec"
-	"github.com/codahale/rfc6979"
+	"github.com/asuleymanov/golos-go/rfc6979"
 	"github.com/tendermint/go-crypto"
 	"log"
 	"math/big"
