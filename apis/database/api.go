@@ -3,11 +3,13 @@ package database
 import (
 	// Stdlib
 	"encoding/json"
-	"errors"
 
 	// RPC
 	"github.com/asuleymanov/golos-go/interfaces"
 	"github.com/asuleymanov/golos-go/internal/call"
+
+	// Vendor
+	"github.com/pkg/errors"
 )
 
 const (
