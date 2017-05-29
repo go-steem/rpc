@@ -9,10 +9,6 @@ import (
 	"fmt"
 	"github.com/asuleymanov/golos-go/rfc6979"
 	secp256k1 "github.com/btcsuite/btcd/btcec"
-<<<<<<< HEAD
-=======
-	"github.com/asuleymanov/golos-go/rfc6979"
->>>>>>> b0a9e044d7b00b86c48800d60f10856850bc8c79
 	"github.com/tendermint/go-crypto"
 	"log"
 	"math/big"
