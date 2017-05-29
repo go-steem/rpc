@@ -50,7 +50,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 | Method Name                      | Raw Version | Full Version   |
 | -------------------------------- |:-----------:|:--------------:|
-| get_config                       | DONE        | PARTIALLY DONE |
+| get_config                       | DONE        | DONE           |
 | get_dynamic_global_properties    | DONE        | DONE           |
 | get_chain_properties             | DONE        |                |
 | get_feed_history                 | DONE        |                |
