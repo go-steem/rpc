@@ -81,8 +81,8 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 | Method Name     | Raw Version | Full Version |
 | --------------- |:-----------:|:------------:|
-| get_order_book  |             |              |
-| get_open_orders |             |              |
+| get_order_book  | DONE        | DONE         |
+| get_open_orders | DONE        | DONE         |
 
 ### Authority / Validation
 

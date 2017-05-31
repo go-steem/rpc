@@ -325,6 +325,29 @@ func (api *API) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_order_book", []interface{}{limit})
 }
 
+func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	var resp *OrderBook
+	if err := api.caller.Call("get_order_book", []interface{}{limit}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (api *API) GetOpenOrdersRaw(accountName string) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_open_orders", []string{accountName})
+}
+
+func (api *API) GetOpenOrders(accountName string) ([]*OpenOrders, error) {
+	var resp []*OpenOrders
+	if err := api.caller.Call("get_open_orders", []string{accountName}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 /*
    // Authority / validation
    (get_transaction_hex)

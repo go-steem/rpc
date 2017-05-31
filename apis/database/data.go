@@ -288,3 +288,33 @@ type BlockHeader struct {
 	TransactionMerkleRoot string        `json:"transaction_merkle_root"`
 	Extensions            []interface{} `json:"extensions"`
 }
+
+type OrderBook struct {
+	Ask []*OrderBookAB `json:"asks"`
+	Bid []*OrderBookAB `json:"bids"`
+}
+
+type OrderBookAB struct {
+	OrderPrice *OrderPrice `json:"order_price"`
+	RealPrice  string      `json:"real_price"`
+	Steem      *types.Int  `json:"steem"`
+	Sbd        *types.Int  `json:"sbd"`
+	Created    string      `json:"created"`
+}
+
+type OrderPrice struct {
+	Base  string `json:"base"`
+	Quote string `json:"quote"`
+}
+
+type OpenOrders struct {
+	ID         *types.ID   `json:"id"`
+	Created    types.Time  `json:"created"`
+	Expiration types.Time  `json:"expiration"`
+	Seller     string      `json:"seller"`
+	Orderid    *types.Int  `json:"orderid"`
+	ForSale    *types.Int  `json:"for_sale"`
+	SellPrice  *OrderPrice `json:"sell_price"`
+	RealPrice  string      `json:"real_price"`
+	Rewarded   bool        `json:"rewarded"`
+}
