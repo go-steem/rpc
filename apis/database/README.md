@@ -38,7 +38,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 | Method Name             | Raw Version | Full Version   |
 | ----------------------- |:-----------:|:--------------:|
-| get_block_header        | DONE        |                |
+| get_block_header        | DONE        | DONE           |
 | get_block               | DONE        | PARTIALLY DONE |
 | get_state               | DONE        |                |
 | get_trending_categories | DONE        |                |
@@ -52,12 +52,12 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | -------------------------------- |:-----------:|:--------------:|
 | get_config                       | DONE        | DONE           |
 | get_dynamic_global_properties    | DONE        | DONE           |
-| get_chain_properties             | DONE        |                |
+| get_chain_properties             | DONE        | DONE           |
 | get_feed_history                 | DONE        |                |
-| get_current_median_history_price | DONE        |                |
+| get_current_median_history_price | DONE        | DONE           |
 | get_witness_schedule             | DONE        |                |
 | get_hardfork_version             | DONE        | DONE           |
-| get_next_scheduled_hardfork      | DONE        |                |
+| get_next_scheduled_hardfork      | DONE        | DONE           |
 
 ### Keys
 
@@ -73,8 +73,8 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | get_account_references    |             |              |
 | lookup_account_names      | DONE        |              |
 | lookup_accounts           | DONE        |              |
-| get_account_count         | DONE        |              |
-| get_conversation_requests | DONE        |              |
+| get_account_count         | DONE        | DONE         |
+| get_conversation_requests | DONE        | DONE         |
 | get_account_history       | DONE        |              |
 
 ### Market
@@ -100,7 +100,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | Method Name       | Raw Version | Full Version |
 | ----------------- |:-----------:|:------------:|
 | get_active_votes  | DONE        | DONE         |
-| get_account_votes | DONE        |              |
+| get_account_votes | DONE        | DONE         |
 
 ### Cotent
 

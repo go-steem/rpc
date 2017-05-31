@@ -113,6 +113,15 @@ func (api *API) GetBlockHeaderRaw(blockNum uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_block_header", []uint32{blockNum})
 }
 
+func (api *API) GetBlockHeader(blockNum uint32) (*BlockHeader, error) {
+	var resp BlockHeader
+	if err := api.caller.Call("get_block", []uint32{blockNum}, &resp); err != nil {
+		return nil, err
+	}
+	resp.Number = blockNum
+	return &resp, nil
+}
+
 func (api *API) GetBlockRaw(blockNum uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_block", []uint32{blockNum})
 }
@@ -186,12 +195,28 @@ func (api *API) GetChainPropertiesRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_chain_properties", call.EmptyParams)
 }
 
+func (api *API) GetChainProperties() (*ChainProperties, error) {
+	var resp ChainProperties
+	if err := api.caller.Call("get_chain_properties", call.EmptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 func (api *API) GetFeedHistoryRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_feed_history", call.EmptyParams)
 }
 
 func (api *API) GetCurrentMedianHistoryPriceRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_current_median_history_price", call.EmptyParams)
+}
+
+func (api *API) GetCurrentMedianHistoryPrice() (*CurrentMedianHistoryPrice, error) {
+	var resp CurrentMedianHistoryPrice
+	if err := api.caller.Call("get_current_median_history_price", call.EmptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (api *API) GetWitnessScheduleRaw() (*json.RawMessage, error) {
@@ -212,6 +237,14 @@ func (api *API) GetHardforkVersion() (string, error) {
 
 func (api *API) GetNextScheduledHardforkRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_next_scheduled_hardfork", call.EmptyParams)
+}
+
+func (api *API) GetNextScheduledHardfork() (*NextScheduledHardfork, error) {
+	var resp NextScheduledHardfork
+	if err := api.caller.Call("get_next_scheduled_hardfork", call.EmptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 /*
@@ -256,8 +289,24 @@ func (api *API) GetAccountCountRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_account_count", call.EmptyParams)
 }
 
+func (api *API) GetAccountCount() (uint32, error) {
+	var resp uint32
+	if err := api.caller.Call("get_account_count", call.EmptyParams, &resp); err != nil {
+		return 0, err
+	}
+	return resp, nil
+}
+
 func (api *API) GetConversionRequestsRaw(accountName string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_conversion_requests", []string{accountName})
+}
+
+func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests, error) {
+	var resp []*ConversionRequests
+	if err := api.caller.Call("get_conversion_requests", []string{accountName}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func (api *API) GetAccountHistoryRaw(account string, from uint64, limit uint32) (*json.RawMessage, error) {
@@ -306,6 +355,14 @@ func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
 
 func (api *API) GetAccountVotesRaw(voter string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_account_votes", []string{voter})
+}
+
+func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
+	var resp []*Votes
+	if err := api.caller.Call("get_account_votes", []string{author}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 /*
