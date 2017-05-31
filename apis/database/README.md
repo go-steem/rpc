@@ -67,15 +67,15 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 ### Accounts
 
-| Method Name               | Raw Version | Full Version |
-| ------------------------- |:-----------:|:------------:|
-| get_accounts              | DONE        |              |
-| get_account_references    |             |              |
-| lookup_account_names      | DONE        |              |
-| lookup_accounts           | DONE        |              |
-| get_account_count         | DONE        | DONE         |
-| get_conversation_requests | DONE        | DONE         |
-| get_account_history       | DONE        |              |
+| Method Name               | Raw Version | Full Version   |
+| ------------------------- |:-----------:|:--------------:|
+| get_accounts              | DONE        | PARTIALLY DONE |
+| get_account_references    |             |                |
+| lookup_account_names      | DONE        |                |
+| lookup_accounts           | DONE        |                |
+| get_account_count         | DONE        | DONE           |
+| get_conversation_requests | DONE        | DONE           |
+| get_account_history       | DONE        |                |
 
 ### Market
 

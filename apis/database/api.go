@@ -272,6 +272,14 @@ func (api *API) GetAccountsRaw(accountNames []string) (*json.RawMessage, error) 
 	return call.Raw(api.caller, "get_accounts", [][]string{accountNames})
 }
 
+func (api *API) GetAccounts(accountNames []string) ([]*Account, error) {
+	var resp []*Account
+	if err := api.caller.Call("get_accounts", [][]string{accountNames}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 // XXX: Not sure about params.
 //func (api *API) GetAccountReferenceRaw(id string) (*json.RawMessage, error) {
 //	return call.Raw(api.caller, "get_account_reference", []string{id})
