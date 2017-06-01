@@ -116,12 +116,12 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | Method Name             | Raw Version | Full Version |
 | ----------------------- |:-----------:|:------------:|
 | get_witnesses           |             |              |
-| get_witness_by_account  |             |              |
-| get_witnesses_by_vote   |             |              |
+| get_witness_by_account  | DONE        | DONE         |
+| get_witnesses_by_vote   | DONE        | DONE         |
 | lookup_witness_accounts |             |              |
-| get_witness_count       |             |              |
-| get_active_witnesses    |             |              |
-| get_miner_queue         |             |              |
+| get_witness_count       | DONE        | DONE         |
+| get_active_witnesses    | DONE        | DONE         |
+| get_miner_queue         | DONE        | DONE         |
 
 ## License
 

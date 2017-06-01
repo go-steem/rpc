@@ -400,8 +400,8 @@ func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
 	return resp, nil
 }
 
-func (api *API) GetAccountVotesRaw(voter string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_account_votes", []string{voter})
+func (api *API) GetAccountVotesRaw(author string) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_account_votes", []string{author})
 }
 
 func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
@@ -465,3 +465,69 @@ func (api *API) GetRepliesByLastUpdateRaw(
    (get_active_witnesses)
    (get_miner_queue)
 */
+
+func (api *API) GetWitnessByAccountRaw(author string) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_witness_by_account", []string{author})
+}
+
+func (api *API) GetWitnessByAccount(author string) (*WitnessByAccount_and_ByVote, error) {
+	var resp WitnessByAccount_and_ByVote
+	if err := api.caller.Call("get_witness_by_account", []string{author}, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func (api *API) GetWitnessByVoteRaw(author string, limit uint) (*json.RawMessage, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	return call.Raw(api.caller, "get_witnesses_by_vote", []interface{}{author, limit})
+}
+
+func (api *API) GetWitnessByVote(author string, limit uint) ([]*WitnessByAccount_and_ByVote, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	var resp []*WitnessByAccount_and_ByVote
+	if err := api.caller.Call("get_witnesses_by_vote", []interface{}{author, limit}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+func (api *API) GetActiveWitnessesRaw() (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_active_witnesses", call.EmptyParams)
+}
+
+func (api *API) GetActiveWitnesses() ([]string, error) {
+	var resp []string
+	if err := api.caller.Call("get_active_witnesses", call.EmptyParams, &resp); err != nil {
+		return []string{""}, err
+	}
+	return resp, nil
+}
+
+func (api *API) GetMinerQueueRaw() (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_miner_queue", call.EmptyParams)
+}
+
+func (api *API) GetMinerQueue() ([]string, error) {
+	var resp []string
+	if err := api.caller.Call("get_miner_queue", call.EmptyParams, &resp); err != nil {
+		return []string{""}, err
+	}
+	return resp, nil
+}
+
+func (api *API) GetWitnessCountRaw() (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_witness_count", call.EmptyParams)
+}
+
+func (api *API) GetWitnessCount() (uint32, error) {
+	var resp uint32
+	if err := api.caller.Call("get_witness_count", call.EmptyParams, &resp); err != nil {
+		return 0, err
+	}
+	return resp, nil
+}
