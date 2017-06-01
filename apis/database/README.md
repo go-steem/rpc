@@ -53,9 +53,9 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | get_config                       | DONE        | DONE           |
 | get_dynamic_global_properties    | DONE        | DONE           |
 | get_chain_properties             | DONE        | DONE           |
-| get_feed_history                 | DONE        |                |
+| get_feed_history                 | DONE        | DONE           |
 | get_current_median_history_price | DONE        | DONE           |
-| get_witness_schedule             | DONE        |                |
+| get_witness_schedule             | DONE        | DONE           |
 | get_hardfork_version             | DONE        | DONE           |
 | get_next_scheduled_hardfork      | DONE        | DONE           |
 

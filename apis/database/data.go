@@ -411,3 +411,23 @@ type Account struct {
 	GuestBloggers                 []interface{} `json:"guest_bloggers"`
 	BlogCategory                  interface{}   `json:"blog_category"`
 }
+
+type WitnessSchedule struct {
+	ID                            *types.Int       `json:"id"`
+	CurrentVirtualTime            string           `json:"current_virtual_time"`
+	NextShuffleBlockNum           *types.Int       `json:"next_shuffle_block_num"`
+	CurrentShuffledWitnesses      string           `json:"current_shuffled_witnesses"`
+	NumScheduledWitnesses         *types.Int       `json:"num_scheduled_witnesses"`
+	Top19Weight                   *types.Int       `json:"top19_weight"`
+	TimeshareWeight               *types.Int       `json:"timeshare_weight"`
+	MinerWeight                   *types.Int       `json:"miner_weight"`
+	WitnessPayNormalizationFactor *types.Int       `json:"witness_pay_normalization_factor"`
+	MedianProps                   *ChainProperties `json:"median_props"`
+	MajorityVersion               string           `json:"majority_version"`
+}
+
+type FeedHistory struct {
+	ID                   *types.Int                   `json:"id"`
+	CurrentMedianHistory *CurrentMedianHistoryPrice   `json:"current_median_history"`
+	PriceHistory         []*CurrentMedianHistoryPrice `json:"price_history"`
+}

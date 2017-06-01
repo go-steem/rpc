@@ -207,6 +207,14 @@ func (api *API) GetFeedHistoryRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_feed_history", call.EmptyParams)
 }
 
+func (api *API) GetFeedHistory() (*FeedHistory, error) {
+	var resp FeedHistory
+	if err := api.caller.Call("get_feed_history", call.EmptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 func (api *API) GetCurrentMedianHistoryPriceRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_current_median_history_price", call.EmptyParams)
 }
@@ -221,6 +229,14 @@ func (api *API) GetCurrentMedianHistoryPrice() (*CurrentMedianHistoryPrice, erro
 
 func (api *API) GetWitnessScheduleRaw() (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_witness_schedule", call.EmptyParams)
+}
+
+func (api *API) GetWitnessSchedule() (*WitnessSchedule, error) {
+	var resp WitnessSchedule
+	if err := api.caller.Call("get_witness_schedule", call.EmptyParams, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (api *API) GetHardforkVersionRaw() (*json.RawMessage, error) {
