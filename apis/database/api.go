@@ -7,6 +7,7 @@ import (
 	// RPC
 	"github.com/asuleymanov/golos-go/interfaces"
 	"github.com/asuleymanov/golos-go/internal/call"
+	"github.com/asuleymanov/golos-go/types"
 
 	// Vendor
 	"github.com/pkg/errors"
