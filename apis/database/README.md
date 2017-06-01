@@ -89,7 +89,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | Method Name              | Raw Version | Full Version |
 | ------------------------ |:-----------:|:------------:|
 | get_transaction_hex      |             |              |
-| get_transaction          |             |              |
+| get_transaction          | DONE        | DONE         |
 | get_required_signatures  |             |              |
 | get_potential_signatures |             |              |
 | verify_authority         |             |              |
@@ -115,10 +115,10 @@ It is a bit confusing to see `set_` prefix. Needs research.
 
 | Method Name             | Raw Version | Full Version |
 | ----------------------- |:-----------:|:------------:|
-| get_witnesses           |             |              |
+| get_witnesses           | DONE        | DONE         |
 | get_witness_by_account  | DONE        | DONE         |
 | get_witnesses_by_vote   | DONE        | DONE         |
-| lookup_witness_accounts |             |              |
+| lookup_witness_accounts | DONE        | DONE         |
 | get_witness_count       | DONE        | DONE         |
 | get_active_witnesses    | DONE        | DONE         |
 | get_miner_queue         | DONE        | DONE         |

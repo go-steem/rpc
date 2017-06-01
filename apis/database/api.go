@@ -382,6 +382,18 @@ func (api *API) GetOpenOrders(accountName string) ([]*OpenOrders, error) {
    (verify_account_authority)
 */
 
+func (api *API) GetTransactionRaw(id string) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_transaction", []string{id})
+}
+
+func (api *API) GetTransaction(id string) (*types.Transaction, error) {
+	var resp types.Transaction
+	if err := api.caller.Call("get_transaction", []string{id}, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 /*
    // Votes
    (get_active_votes)
@@ -466,12 +478,24 @@ func (api *API) GetRepliesByLastUpdateRaw(
    (get_miner_queue)
 */
 
+func (api *API) GetWitnessesRaw(id []uint32) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_witnesses", [][]uint32{id})
+}
+
+func (api *API) GetWitnesses(id []uint32) ([]*Witness, error) {
+	var resp []*Witness
+	if err := api.caller.Call("get_witnesses", [][]uint32{id}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 func (api *API) GetWitnessByAccountRaw(author string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_witness_by_account", []string{author})
 }
 
-func (api *API) GetWitnessByAccount(author string) (*WitnessByAccount_and_ByVote, error) {
-	var resp WitnessByAccount_and_ByVote
+func (api *API) GetWitnessByAccount(author string) (*Witness, error) {
+	var resp Witness
 	if err := api.caller.Call("get_witness_by_account", []string{author}, &resp); err != nil {
 		return nil, err
 	}
@@ -485,13 +509,31 @@ func (api *API) GetWitnessByVoteRaw(author string, limit uint) (*json.RawMessage
 	return call.Raw(api.caller, "get_witnesses_by_vote", []interface{}{author, limit})
 }
 
-func (api *API) GetWitnessByVote(author string, limit uint) ([]*WitnessByAccount_and_ByVote, error) {
+func (api *API) GetWitnessByVote(author string, limit uint) ([]*Witness, error) {
 	if limit > 1000 {
 		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
 	}
-	var resp []*WitnessByAccount_and_ByVote
+	var resp []*Witness
 	if err := api.caller.Call("get_witnesses_by_vote", []interface{}{author, limit}, &resp); err != nil {
 		return nil, err
+	}
+	return resp, nil
+}
+
+func (api *API) LookupWitnessAccountsRaw(author string, limit uint) (*json.RawMessage, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	return call.Raw(api.caller, "lookup_witness_accounts", []interface{}{author, limit})
+}
+
+func (api *API) LookupWitnessAccounts(author string, limit uint) ([]string, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	var resp []string
+	if err := api.caller.Call("lookup_witness_accounts", []interface{}{author, limit}, &resp); err != nil {
+		return []string{""}, err
 	}
 	return resp, nil
 }

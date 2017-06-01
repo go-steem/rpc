@@ -29,7 +29,7 @@ type Config struct {
 	SteemitBlockchainPrecisionDigits      *types.Int `json:"STEEMIT_BLOCKCHAIN_PRECISION_DIGITS"`
 	SteemitBlockchainHardforkVersion      string     `json:"STEEMIT_BLOCKCHAIN_HARDFORK_VERSION"`
 	SteemitBlockchainVersion              string     `json:"STEEMIT_BLOCKCHAIN_VERSION"`
-	SteemitBlockInterval                  *types.Int `json:"STEEMIT_BLOCK_INTERVAL"`
+	SteemitBlockInterval                  uint       `json:"STEEMIT_BLOCK_INTERVAL"`
 	SteemitBlocksPerDay                   *types.Int `json:"STEEMIT_BLOCKS_PER_DAY"`
 	SteemitBlocksPerHour                  *types.Int `json:"STEEMIT_BLOCKS_PER_HOUR"`
 	SteemitBlocksPerYear                  *types.Int `json:"STEEMIT_BLOCKS_PER_YEAR"`
@@ -134,7 +134,7 @@ type DynamicGlobalProperties struct {
 	TotalRewardShares2       *types.Int    `json:"total_reward_shares2"`
 	AverageBlockSize         *types.Int    `json:"average_block_size"`
 	CurrentAslot             *types.Int    `json:"current_aslot"`
-	LastIrreversibleBlockNum *types.UInt32 `json:"last_irreversible_block_num"`
+	LastIrreversibleBlockNum uint32        `json:"last_irreversible_block_num"`
 	TotalVestingShares       string        `json:"total_vesting_shares"`
 	TotalVersingFundSteem    string        `json:"total_vesting_fund_steem"`
 	HeadBlockID              string        `json:"head_block_id"`
@@ -432,7 +432,7 @@ type FeedHistory struct {
 	PriceHistory         []*CurrentMedianHistoryPrice `json:"price_history"`
 }
 
-type WitnessByAccount_and_ByVote struct {
+type Witness struct {
 	ID                    *types.Int                 `json:"id"`
 	Owner                 string                     `json:"owner"`
 	Created               *types.Time                `json:"created"`
