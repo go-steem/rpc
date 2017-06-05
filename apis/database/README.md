@@ -71,10 +71,10 @@ are taken from `database_api.hpp` in `steemit/steem`.
 | 58 | verify_account_authority               | *NONE* | *NONE* |
 | 59 | get_active_votes                       | **DONE** | **DONE** |
 | 60 | get_account_votes                      | **DONE** | **DONE** |
-| 61 | get_content                            | **DONE** | ***PARTIALLY DONE*** |
-| 62 | get_content_replies                    | **DONE** | ***PARTIALLY DONE*** |
-| 63 | get_discussions_by_author_before_date  | **DONE** | *NONE* |
-| 64 | get_replies_by_last_update             | **DONE** | *NONE* |
+| 61 | get_content                            | **DONE** | **DONE** |
+| 62 | get_content_replies                    | **DONE** | **DONE** |
+| 63 | get_discussions_by_author_before_date  | **DONE** | **DONE** |
+| 64 | get_replies_by_last_update             | **DONE** | **DONE** |
 | 65 | get_witnesses                          | **DONE** | **DONE** |
 | 66 | get_witness_by_account                 | **DONE** | **DONE** |
 | 67 | get_witnesses_by_vote                  | **DONE** | **DONE** |

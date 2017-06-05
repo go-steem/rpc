@@ -171,33 +171,51 @@ type Block struct {
 }
 
 type Content struct {
-	Id                      *types.ID        `json:"id"`
-	RootTitle               string           `json:"root_title"`
+	ID                      *types.ID        `json:"id"`
+	Author                  string           `json:"author"`
+	Permlink                string           `json:"permlink"`
+	Category                string           `json:"category"`
+	ParentAuthor            string           `json:"parent_author"`
+	ParentPermlink          string           `json:"parent_permlink"`
+	Title                   string           `json:"title"`
+	Body                    string           `json:"body"`
+	JsonMetadata            *ContentMetadata `json:"json_metadata"`
+	LastUpdate              *types.Time      `json:"last_update"`
+	Created                 *types.Time      `json:"created"`
 	Active                  *types.Time      `json:"active"`
+	LastPayout              *types.Time      `json:"last_payout"`
+	Depth                   *types.Int       `json:"depth"`
+	Children                *types.Int       `json:"children"`
+	ChildrenRshares2        *types.Int       `json:"children_rshares2"`
+	NetRshares              *types.Int       `json:"net_rshares"`
 	AbsRshares              *types.Int       `json:"abs_rshares"`
+	VoteRshares             *types.Int       `json:"vote_rshares"`
+	ChildrenAbsRshares      *types.Int       `json:"children_abs_rshares"`
+	CashoutTime             *types.Time      `json:"cashout_time"`
+	MaxCashoutTime          *types.Time      `json:"max_cashout_time"`
+	TotalVoteWeight         *types.Int       `json:"total_vote_weight"`
+	RewardWeight            *types.Int       `json:"reward_weight"`
+	TotalPayoutValue        string           `json:"total_payout_value"`
+	CuratorPayoutValue      string           `json:"curator_payout_value"`
+	AuthorRewards           *types.Int       `json:"author_rewards"`
+	NetVotes                *types.Int       `json:"net_votes"`
+	RootComment             *types.Int       `json:"root_comment"`
+	Mode                    string           `json:"mode"`
+	MaxAcceptedPayout       string           `json:"max_accepted_payout"`
+	PercentSteemDollars     *types.Int       `json:"percent_steem_dollars"`
+	AllowReplies            bool             `json:"allow_replies"`
+	AllowVotes              bool             `json:"allow_votes"`
+	AllowCurationRewards    bool             `json:"allow_curation_rewards"`
+	URL                     string           `json:"url"`
+	RootTitle               string           `json:"root_title"`
 	PendingPayoutValue      string           `json:"pending_payout_value"`
 	TotalPendingPayoutValue string           `json:"total_pending_payout_value"`
-	Category                string           `json:"category"`
-	Title                   string           `json:"title"`
-	LastUpdate              *types.Time      `json:"last_update"`
-	Stats                   string           `json:"stats"`
-	Body                    string           `json:"body"`
-	Created                 *types.Time      `json:"created"`
-	Replies                 []*Content       `json:"replies"`
-	Permlink                string           `json:"permlink"`
-	JsonMetadata            *ContentMetadata `json:"json_metadata"`
-	Children                *types.Int       `json:"children"`
-	NetRshares              *types.Int       `json:"net_rshares"`
-	URL                     string           `json:"url"`
 	ActiveVotes             []*VoteState     `json:"active_votes"`
-	ParentPermlink          string           `json:"parent_permlink"`
-	CashoutTime             *types.Time      `json:"cashout_time"`
-	TotalPayoutValue        string           `json:"total_payout_value"`
-	ParentAuthor            string           `json:"parent_author"`
-	ChildrenRshares2        *types.Int       `json:"children_rshares2"`
-	Author                  string           `json:"author"`
-	Depth                   *types.Int       `json:"depth"`
-	TotalVoteWeight         *types.Int       `json:"total_vote_weight"`
+	Replies                 []*Content       `json:"replies"`
+	AuthorReputation        *types.Int       `json:"author_reputation"`
+	Promoted                string           `json:"promoted"`
+	BodyLength              *types.Int       `json:"body_length"`
+	RebloggedBy             []interface{}    `json:"reblogged_by"`
 }
 
 func (content *Content) IsStory() bool {

@@ -502,7 +502,7 @@ func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
 	return resp, nil
 }
 
-//get_content                            | **DONE** | ***PARTIALLY DONE*** |
+//get_content                            | **DONE** | **DONE** |
 
 func (api *API) GetContentRaw(author, permlink string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_content", []string{author, permlink})
@@ -516,7 +516,7 @@ func (api *API) GetContent(author, permlink string) (*Content, error) {
 	return &resp, nil
 }
 
-//get_content_replies                    | **DONE** | ***PARTIALLY DONE*** |
+//get_content_replies                    | **DONE** | **DONE** |
 
 func (api *API) GetContentRepliesRaw(parentAuthor, parentPermlink string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_content_replies", []string{parentAuthor, parentPermlink})
@@ -531,22 +531,34 @@ func (api *API) GetContentReplies(parentAuthor, parentPermlink string) ([]*Conte
 	return resp, nil
 }
 
-//get_discussions_by_author_before_date  | **DONE** | *NONE* |
+//get_discussions_by_author_before_date  | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByAuthorBeforeDateRaw(Author, Permlink, Date string, limit uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_author_before_date", []interface{}{Author, Permlink, Date, limit})
 }
 
-//get_replies_by_last_update             | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByAuthorBeforeDate(Author, Permlink, Date string, limit uint32) ([]*Content, error) {
+	var resp []*Content
+	err := api.caller.Call("get_discussions_by_author_before_date", []interface{}{Author, Permlink, Date, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
 
-func (api *API) GetRepliesByLastUpdateRaw(
-	startAuthor string,
-	startPermlink string,
-	limit uint32,
-) (*json.RawMessage, error) {
+//get_replies_by_last_update             | **DONE** | **DONE** |
 
-	return call.Raw(
-		api.caller, "get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit})
+func (api *API) GetRepliesByLastUpdateRaw(startAuthor, startPermlink string, limit uint32) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit})
+}
+
+func (api *API) GetRepliesByLastUpdate(startAuthor, startPermlink string, limit uint32) ([]*Content, error) {
+	var resp []*Content
+	err := api.caller.Call("get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 //get_witnesses                          | **DONE** | **DONE** |
