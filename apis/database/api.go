@@ -34,10 +34,18 @@ func NewAPI(caller interfaces.Caller) *API {
 
 //cancel_all_subscriptions               | *NONE* | *NONE* |
 
-//get_trending_tags                      | **DONE** | *NONE* |
+//get_trending_tags                      | **DONE** | **DONE** |
 
 func (api *API) GetTrendingTagsRaw(afterTag string, limit uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_trending_tags", []interface{}{afterTag, limit})
+}
+
+func (api *API) GetTrendingTags(afterTag string, limit uint32) ([]*TrendingTags, error) {
+	var resp []*TrendingTags
+	if err := api.caller.Call("get_trending_tags", []interface{}{afterTag, limit}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 //get_tags_used_by_author                | **DONE** | *NONE* |
@@ -46,82 +54,186 @@ func (api *API) GetTagsUsedByAuthorRaw(accountName string) (*json.RawMessage, er
 	return call.Raw(api.caller, "get_tags_used_by_author", []interface{}{accountName})
 }
 
-//get_discussions_by_trending            | **DONE** | *NONE* |
+//get_discussions_by_trending            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByTrendingRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_trending", query)
 }
 
-//get_discussions_by_trending30          | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByTrending(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_trending", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_trending30          | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByTrending30Raw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_trending30", query)
 }
 
-//get_discussions_by_created             | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByTrending30(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_trending30", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_created             | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByCreatedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_created", query)
 }
 
-//get_discussions_by_active              | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByCreated(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_created", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_active              | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByActiveRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_active", query)
 }
 
-//get_discussions_by_cashout             | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByActive(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_active", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_cashout             | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByCashoutRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_cashout", query)
 }
 
-//get_discussions_by_payout              | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByCashout(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_cashout", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_payout              | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByPayoutRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_payout", query)
 }
 
-//get_discussions_by_votes               | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByPayout(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_payout", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_votes               | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByVotesRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_votes", query)
 }
 
-//get_discussions_by_children            | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByVotes(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_votes", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_children            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByChildrenRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_children", query)
 }
 
-//get_discussions_by_hot                 | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByChildren(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_children", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_hot                 | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByHotRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_hot", query)
 }
 
-//get_discussions_by_feed                | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByHot(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_hot", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_feed                | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByFeedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_feed", query)
 }
 
-//get_discussions_by_blog                | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByFeed(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_feed", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_blog                | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByBlogRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_blog", query)
 }
 
-//get_discussions_by_comments            | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByBlog(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_blog", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_comments            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByCommentsRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_comments", query)
 }
 
-//get_discussions_by_promoted            | **DONE** | *NONE* |
+func (api *API) GetDiscussionsByComments(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_comments", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_discussions_by_promoted            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByPromotedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_discussions_by_promoted", query)
+}
+
+func (api *API) GetDiscussionsByPromoted(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	if err := api.caller.Call("get_discussions_by_promoted", query, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 //get_block_header                       | **DONE** | **DONE** |

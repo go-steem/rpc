@@ -492,3 +492,12 @@ type SavingsWithdraw struct {
 	Amount    string      `json:"amount"`
 	Complete  *types.Time `json:"complete"`
 }
+
+type TrendingTags struct {
+	Name                  string     `json:"name"`
+	TotalChildrenRshares2 string     `json:"total_children_rshares2"`
+	TotalPayouts          string     `json:"total_payouts"`
+	NetVotes              *types.Int `json:"net_votes"`
+	TopPosts              *types.Int `json:"top_posts"`
+	Comments              *types.Int `json:"comments"`
+}
