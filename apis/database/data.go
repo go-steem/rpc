@@ -10,6 +10,16 @@ import (
 	"github.com/asuleymanov/golos-go/types"
 )
 
+type DiscussionQuery struct {
+	Tag            string   `json:"tag"`
+	Limit          uint32   `json:"limit"`
+	FilterTags     []string `json:"filter_tags"`
+	StartAuthor    string   `json:"start_author,omitempty"`
+	StartPermlink  string   `json:"start_permlink,omitempty"`
+	ParentAuthor   string   `json:"parent_author,omitempty"`
+	ParentPermlink string   `json:"parent_permlink"`
+}
+
 type Config struct {
 	SteemitBuildTestnet                   bool       `json:"STEEMIT_BUILD_TESTNET"`
 	GrapheneCurrentDBVersion              string     `json:"GRAPHENE_CURRENT_DB_VERSION"`
