@@ -7,7 +7,6 @@ This package adds support for `database_api`.
 The following subsections document the API completion. The method names
 are taken from `database_api.hpp` in `steemit/steem`.
 
-### Subscriptions
 | **ID** | **Command Name** | **Raw version** | **Full version** |
 |:-- |:--------------------------------------:|-------:|-------:|
 | 0  | set_subscribe_callback                 | *NONE* | *NONE* |
@@ -58,8 +57,8 @@ are taken from `database_api.hpp` in `steemit/steem`.
 | 45 | get_escrow                             | **DONE** | *NONE* |
 | 46 | get_withdraw_routes                    | **DONE** | *NONE* |
 | 47 | get_account_bandwidth                  | **DONE** | *NONE* |
-| 48 | get_savings_withdraw_from              | **DONE** | *NONE* |
-| 49 | get_savings_withdraw_to                | **DONE** | *NONE* |
+| 48 | get_savings_withdraw_from              | **DONE** | **DONE** |
+| 49 | get_savings_withdraw_to                | **DONE** | **DONE** |
 | 50 | get_order_book                         | **DONE** | **DONE** |
 | 51 | get_open_orders                        | **DONE** | **DONE** |
 | 52 | get_liquidity_queue                    | **DONE** | *NONE* |

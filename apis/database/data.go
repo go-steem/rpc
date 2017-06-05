@@ -482,3 +482,13 @@ type Witness struct {
 	HardforkVersionVote   string                     `json:"hardfork_version_vote"`
 	HardforkTimeVote      *types.Time                `json:"hardfork_time_vote"`
 }
+
+type SavingsWithdraw struct {
+	ID        *types.ID   `json:"id"`
+	From      string      `json:"from"`
+	To        string      `json:"to"`
+	Memo      string      `json:"memo"`
+	RequestID *types.Int  `json:"request_id"`
+	Amount    string      `json:"amount"`
+	Complete  *types.Time `json:"complete"`
+}

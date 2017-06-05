@@ -398,16 +398,32 @@ func (api *API) GetAccountBandwidthRaw(accountName string, bandwidth_type uint32
 	return call.Raw(api.caller, "get_account_bandwidth", []interface{}{accountName, bandwidth_type})
 }
 
-//get_savings_withdraw_from              | **DONE** | *NONE* |
+//get_savings_withdraw_from              | **DONE** | **DONE** |
 
 func (api *API) GetSavingsWithdrawFromRaw(accountName string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_savings_withdraw_from", []interface{}{accountName})
 }
 
-//get_savings_withdraw_to                | **DONE** | *NONE* |
+func (api *API) GetSavingsWithdrawFrom(accountName string) ([]*SavingsWithdraw, error) {
+	var resp []*SavingsWithdraw
+	if err := api.caller.Call("get_savings_withdraw_from", []string{accountName}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//get_savings_withdraw_to                | **DONE** | **DONE** |
 
 func (api *API) GetSavingsWithdrawToRaw(accountName string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_savings_withdraw_to", []interface{}{accountName})
+}
+
+func (api *API) GetSavingsWithdrawTo(accountName string) ([]*SavingsWithdraw, error) {
+	var resp []*SavingsWithdraw
+	if err := api.caller.Call("get_savings_withdraw_to", []string{accountName}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 //get_order_book                         | **DONE** | **DONE** |
