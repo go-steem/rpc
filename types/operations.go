@@ -143,6 +143,20 @@ func (op *AccountCreateOperation) Data() interface{} {
 	return op
 }
 
+func (op *AccountCreateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeAccountCreate.Code()))
+	enc.Encode(op.Fee)
+	enc.Encode(op.Creator)
+	enc.Encode(op.NewAccountName)
+	enc.Encode(op.Owner)
+	enc.Encode(op.Active)
+	enc.Encode(op.Posting)
+	enc.Encode(op.MemoKey)
+	enc.Encode(op.JsonMetadata)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::account_update_operation,
 //             (account)
 //             (owner)
@@ -189,6 +203,16 @@ func (op *TransferOperation) Data() interface{} {
 	return op
 }
 
+func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.To)
+	enc.Encode(op.Amount)
+	enc.Encode(op.Memo)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::transfer_to_vesting_operation,
 //             (from)
 //             (to)
@@ -206,6 +230,15 @@ func (op *TransferToVestingOperation) Type() OpType {
 
 func (op *TransferToVestingOperation) Data() interface{} {
 	return op
+}
+
+func (op *TransferToVestingOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransferToVesting.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.To)
+	enc.Encode(op.Amount)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::withdraw_vesting_operation,
@@ -307,6 +340,19 @@ func (op *CommentOperation) IsStoryOperation() bool {
 	return op.ParentAuthor == ""
 }
 
+func (op *CommentOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeComment.Code()))
+	enc.Encode(op.ParentAuthor)
+	enc.Encode(op.ParentPermlink)
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	enc.Encode(op.Title)
+	enc.Encode(op.Body)
+	enc.Encode(op.JMeta)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::vote_operation,
 //             (voter)
 //             (author)
@@ -400,6 +446,14 @@ func (op *DeleteCommentOperation) Type() OpType {
 
 func (op *DeleteCommentOperation) Data() interface{} {
 	return op
+}
+
+func (op *DeleteCommentOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeDeleteComment.Code()))
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::comment_options_operation,
