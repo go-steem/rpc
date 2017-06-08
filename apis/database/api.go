@@ -578,7 +578,10 @@ func (api *API) GetLiquidityQueueRaw(startAccount string, limit uint32) (*json.R
 	return call.Raw(api.caller, "get_liquidity_queue", []interface{}{startAccount, limit})
 }
 
-//get_transaction_hex                    | *NONE* | *NONE* |
+//get_transaction_hex                    | **DONE** | *NONE* |
+func (api *API) GetTransactionHexRaw(trx *types.Transaction) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_transaction_hex", []interface{}{&trx})
+}
 
 //get_transaction                        | **DONE** | **DONE** |
 
@@ -596,9 +599,33 @@ func (api *API) GetTransaction(id string) (*types.Transaction, error) {
 
 //get_required_signatures                | *NONE* | *NONE* |
 
-//get_potential_signatures               | *NONE* | *NONE* |
+//get_potential_signatures               | **DONE** | **DONE** |
 
-//verify_authority                       | *NONE* | *NONE* |
+func (api *API) GetPotentialSignaturesRaw(trx *types.Transaction) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "get_potential_signatures", []interface{}{&trx})
+}
+
+func (api *API) GetPotentialSignatures(trx *types.Transaction) ([]string, error) {
+	var resp []string
+	if err := api.caller.Call("get_potential_signatures", []interface{}{&trx}, &resp); err != nil {
+		return []string{""}, err
+	}
+	return resp, nil
+}
+
+//verify_authority                       | **DONE** | **DONE** |
+
+func (api *API) GetVerifyAuthorutyRaw(trx *types.Transaction) (*json.RawMessage, error) {
+	return call.Raw(api.caller, "verify_authority", []interface{}{&trx})
+}
+
+func (api *API) GetVerifyAuthoruty(trx *types.Transaction) (bool, error) {
+	var resp bool
+	if err := api.caller.Call("verify_authority", []interface{}{&trx}, &resp); err != nil {
+		return false, err
+	}
+	return resp, nil
+}
 
 //verify_account_authority               | *NONE* | *NONE* |
 
