@@ -266,10 +266,18 @@ func (api *API) GetBlock(blockNum uint32) (*Block, error) {
 	return &resp, nil
 }
 
-//get_ops_in_block                       | **DONE** | *NONE* |
+//get_ops_in_block                       | **DONE** | ***PARTIALLY DONE*** |
 
 func (api *API) GetOpsInBlockRaw(blockNum uint32, only_virtual bool) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_ops_in_block", []interface{}{blockNum, only_virtual})
+}
+
+func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*OpsInBlock, error) {
+	var resp []*OpsInBlock
+	if err := api.caller.Call("get_ops_in_block", []interface{}{blockNum, only_virtual}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 //get_state                              | **DONE** | *NONE* |
@@ -278,10 +286,18 @@ func (api *API) GetStateRaw(path string) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_state", []string{path})
 }
 
-//get_trending_categories                | **DONE** | *NONE* |
+//get_trending_categories                | **DONE** | **DONE** |
 
 func (api *API) GetTrendingCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "get_trending_categories", []interface{}{after, limit})
+}
+
+func (api *API) GetTrendingCategories(after string, limit uint32) ([]*Categories, error) {
+	var resp []*Categories
+	if err := api.caller.Call("get_trending_categories", []interface{}{after, limit}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 //get_best_categories                    | **DONE** | *NONE* |
@@ -440,10 +456,18 @@ func (api *API) LookupAccountNamesRaw(accountNames []string) (*json.RawMessage, 
 	return call.Raw(api.caller, "lookup_account_names", [][]string{accountNames})
 }
 
-//lookup_accounts                        | **DONE** | *NONE* |
+//lookup_accounts                        | **DONE** | **DONE** |
 
 func (api *API) LookupAccountsRaw(lowerBoundName string, limit uint32) (*json.RawMessage, error) {
 	return call.Raw(api.caller, "lookup_accounts", []interface{}{lowerBoundName, limit})
+}
+
+func (api *API) LookupAccounts(lowerBoundName string, limit uint32) ([]string, error) {
+	var resp []string
+	if err := api.caller.Call("lookup_accounts", []interface{}{lowerBoundName, limit}, &resp); err != nil {
+		return []string{""}, err
+	}
+	return resp, nil
 }
 
 //get_account_count                      | **DONE** | **DONE** |

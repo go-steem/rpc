@@ -30,9 +30,9 @@ are taken from `database_api.hpp` in `steemit/steem`.
 | 18 | get_discussions_by_promoted            | **DONE** | **DONE** |
 | 19 | get_block_header                       | **DONE** | **DONE** |
 | 20 | get_block                              | **DONE** | **DONE** |
-| 21 | get_ops_in_block                       | **DONE** | *NONE* |
+| 21 | get_ops_in_block                       | **DONE** | ***PARTIALLY DONE*** |
 | 22 | get_state                              | **DONE** | *NONE* |
-| 23 | get_trending_categories                | **DONE** | *NONE* |
+| 23 | get_trending_categories                | **DONE** | **DONE** |
 | 24 | get_best_categories                    | **DONE** | *NONE* |
 | 25 | get_active_categories                  | **DONE** | *NONE* |
 | 26 | get_recent_categories                  | **DONE** | *NONE* |
@@ -48,7 +48,7 @@ are taken from `database_api.hpp` in `steemit/steem`.
 | 36 | get_accounts                           | **DONE** | ***PARTIALLY DONE*** |
 | 37 | get_account_references                 | *NONE* | *NONE* |
 | 38 | lookup_account_names                   | **DONE** | *NONE* |
-| 39 | lookup_accounts                        | **DONE** | *NONE* |
+| 39 | lookup_accounts                        | **DONE** | **DONE** |
 | 40 | get_account_count                      | **DONE** | **DONE** |
 | 41 | get_conversion_requests                | **DONE** | **DONE** |
 | 42 | get_account_history                    | **DONE** | *NONE* |
