@@ -8,7 +8,7 @@ This package adds support for `market_history_api`.
 | ---------------------------- |:-----------:|:------------:|
 | `get_ticker`                 |             |              |
 | `get_volume`                 |             |              |
-| `get_order_book`             |             |              |
+| `get_order_book`             | DONE        | DONE         |
 | `get_trade_history`          |             |              |
 | `get_recent_trades`          |             |              |
 | `get_market_history`         |             |              |

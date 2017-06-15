@@ -32,19 +32,24 @@ func (api *API) call(method string, params, resp interface{}) error {
 }
 
 func (api *API) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
+	var resp json.RawMessage
 	if limit > 1000 {
-		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+		return nil, errors.New("golos-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	return call.Raw(api.caller, "get_order_book", []interface{}{limit})
+	if err := api.caller.Call("get_order_book", []interface{}{limit}, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
-	if limit > 1000 {
-		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	raw, err := api.GetOrderBookRaw(limit)
+	if err != nil {
+		return nil, err
 	}
 	var resp *OrderBook
-	if err := api.caller.Call("get_order_book", []interface{}{limit}, &resp); err != nil {
-		return nil, err
+	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
+		return nil, errors.Wrap(err, "golos-go: market_history_api: failed to unmarshal get_order_book response")
 	}
 	return resp, nil
 }
