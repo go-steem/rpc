@@ -30,3 +30,21 @@ func NewAPI(caller interfaces.Caller) (*API, error) {
 func (api *API) call(method string, params, resp interface{}) error {
 	return api.caller.Call("call", []interface{}{api.id, method, params}, resp)
 }
+
+func (api *API) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	return call.Raw(api.caller, "get_order_book", []interface{}{limit})
+}
+
+func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
+	if limit > 1000 {
+		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+	}
+	var resp *OrderBook
+	if err := api.caller.Call("get_order_book", []interface{}{limit}, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
