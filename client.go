@@ -5,6 +5,7 @@ import (
 	"github.com/asuleymanov/golos-go/apis/database"
 	"github.com/asuleymanov/golos-go/apis/follow"
 	"github.com/asuleymanov/golos-go/apis/login"
+	"github.com/asuleymanov/golos-go/apis/market"
 	"github.com/asuleymanov/golos-go/apis/networkbroadcast"
 	"github.com/asuleymanov/golos-go/interfaces"
 )
