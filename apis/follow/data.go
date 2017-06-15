@@ -17,6 +17,12 @@ type FeedEntry struct {
 	EntryID  uint32 `json:"entry_id"`
 }
 
+type FollowCount struct {
+	Account        string `json:"account"`
+	FollowerCount  int    `json:"follower_count"`
+	FollowingCount int    `json:"following_count"`
+}
+
 /*
 type CommentFeedEntry struct {
 	Comment *CommentObject `json:"comment"`

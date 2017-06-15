@@ -25,6 +25,9 @@ type Client struct {
 	// Follow represents follow_api.
 	Follow *follow.API
 
+	// Follow represents market_history_api.
+	Market *market.API
+
 	// NetworkBroadcast represents network_broadcast_api.
 	NetworkBroadcast *networkbroadcast.API
 }
@@ -40,6 +43,12 @@ func NewClient(cc interfaces.CallCloser) (*Client, error) {
 		return nil, err
 	}
 	client.Follow = followAPI
+
+	marketAPI, err := market.NewAPI(client.cc)
+	if err != nil {
+		return nil, err
+	}
+	client.Market = marketAPI
 
 	networkBroadcastAPI, err := networkbroadcast.NewAPI(client.cc)
 	if err != nil {

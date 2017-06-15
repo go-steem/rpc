@@ -28,7 +28,7 @@ func NewAPI(caller interfaces.Caller) (*API, error) {
 }
 
 func (api *API) call(method string, params, resp interface{}) error {
-	return api.caller.Call("call", []interface{}{"follow_api", method, params}, resp)
+	return api.caller.Call("call", []interface{}{api.id, method, params}, resp)
 }
 
 func (api *API) GetFollowersRaw(
