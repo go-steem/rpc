@@ -127,14 +127,11 @@ func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
 }
 
 func (api *API) GetMarketHistoryRaw(b_sec uint32, start, end string) (*json.RawMessage, error) {
-	if limit > 1000 {
-		return nil, errors.New("golos-go: market_history_api: get_order_book -> limit must not exceed 1000")
-	}
-	return api.Raw("get_market_history", []interface{}{limit})
+	return api.Raw("get_market_history", []interface{}{b_sec, start, end})
 }
 
-func (api *API) GetMarketHistory(limit uint32) ([]*MarketHistory, error) {
-	raw, err := api.GetMarketHistoryRaw(limit)
+func (api *API) GetMarketHistory(b_sec uint32, start, end string) ([]*MarketHistory, error) {
+	raw, err := api.GetMarketHistoryRaw(b_sec, start, end)
 	if err != nil {
 		return nil, err
 	}
