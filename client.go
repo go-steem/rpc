@@ -36,7 +36,13 @@ type Client struct {
 // NewClient creates a new RPC client that use the given CallCloser internally.
 func NewClient(cc interfaces.CallCloser) (*Client, error) {
 	client := &Client{cc: cc}
-	client.Login = login.NewAPI(client.cc)
+
+	loginAPI, err := login.NewAPI(client.cc)
+	if err != nil {
+		return nil, err
+	}
+	client.Login = loginAPI
+
 	client.Database = database.NewAPI(client.cc)
 
 	followAPI, err := follow.NewAPI(client.cc)

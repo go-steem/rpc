@@ -6,60 +6,87 @@ import (
 
 	// RPC
 	"github.com/asuleymanov/golos-go/interfaces"
+	"github.com/asuleymanov/golos-go/internal/rpc"
 
 	// Vendor
 	"github.com/pkg/errors"
 )
 
-const (
-	APIID         = "login_api"
-	NumbericAPIID = 1
-)
+const APIID = "login_api"
+
+var EmptyParams = []string{}
 
 type API struct {
+	id     int
 	caller interfaces.Caller
 }
 
-func NewAPI(caller interfaces.Caller) *API {
-	return &API{caller}
+type Version struct {
+	BlockchainVersion string `json:"blockchain_version"`
+	SteemRevision     string `json:"steem_revision"`
+	FcRevision        string `json:"fc_revision"`
 }
 
-func (api *API) call(method string, params, resp interface{}) error {
-	return api.caller.Call("call", []interface{}{NumbericAPIID, method, params}, resp)
+func NewAPI(caller interfaces.Caller) (*API, error) {
+	id, err := rpc.GetNumericAPIID(caller, APIID)
+	if err != nil {
+		return nil, err
+	}
+	return &API{id, caller}, nil
 }
 
-func (api *API) LoginRaw(username, password string) (*json.RawMessage, error) {
+func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
-	params := []interface{}{username, password}
-	if err := api.call("login", params, &resp); err != nil {
-		return nil, errors.Wrap(err, "golos-go: login_api: failed to call login")
+	if err := api.caller.Call("call", []interface{}{api.id, method, params}, &resp); err != nil {
+		return nil, errors.Wrapf(err, "golos-go: %v: failed to call %v\n", APIID, method)
 	}
 	return &resp, nil
 }
 
+func (api *API) LoginRaw(username, password string) (*json.RawMessage, error) {
+	return api.Raw("login", []interface{}{username, password})
+}
+
 func (api *API) Login(username, password string) (bool, error) {
+	raw, err := api.LoginRaw(username, password)
+	if err != nil {
+		return false, err
+	}
 	var resp bool
-	params := []interface{}{username, password}
-	if err := api.call("login", params, &resp); err != nil {
-		return false, errors.Wrap(err, "golos-go: login_api: failed to call login")
+	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
+		return false, errors.Wrap(err, "golos-go: login_api: failed to unmarshal login response")
 	}
 	return resp, nil
 }
 
 func (api *API) GetAPIByNameRaw(apiName string) (*json.RawMessage, error) {
-	var resp json.RawMessage
-	params := []interface{}{apiName}
-	if err := api.call("get_api_by_name", params, &resp); err != nil {
-		return nil, errors.Wrap(err, "golos-go: login_api: failed to call get_api_by_name")
-	}
-	return &resp, nil
+	return api.Raw("get_api_by_name", []interface{}{apiName})
 }
 
 func (api *API) GetAPIByName(apiName string) (int, error) {
+	raw, err := api.GetAPIByNameRaw(apiName)
+	if err != nil {
+		return 0, err
+	}
 	var resp int
-	params := []interface{}{apiName}
-	if err := api.call("get_api_by_name", params, &resp); err != nil {
-		return 0, errors.Wrap(err, "golos-go: login_api: failed to call get_api_by_name")
+	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
+		return 0, errors.Wrap(err, "golos-go: login_api: failed to unmarshal get_api_by_name response")
+	}
+	return resp, nil
+}
+
+func (api *API) GetVersionRaw() (*json.RawMessage, error) {
+	return api.Raw("get_version", EmptyParams)
+}
+
+func (api *API) GetVersion() (*Version, error) {
+	raw, err := api.GetVersionRaw()
+	if err != nil {
+		return nil, err
+	}
+	var resp *Version
+	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
+		return nil, errors.Wrap(err, "golos-go: login_api: failed to unmarshal get_version response")
 	}
 	return resp, nil
 }
