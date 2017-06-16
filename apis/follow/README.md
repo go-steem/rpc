@@ -15,4 +15,4 @@ This package adds support for `follow_api`.
 | `get_blog`                | DONE        | DONE         |
 | `get_account_reputations` | DONE        | DONE         |
 | `get_reblogged_by`        | DONE        | DONE         |
-| `get_blog_authors`        | DONE        |              |
+| `get_blog_authors`        | DONE        | DONE         |

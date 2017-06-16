@@ -1,6 +1,7 @@
 package follow
 
 import (
+	"encoding/json"
 	"github.com/asuleymanov/golos-go/types"
 )
 
@@ -87,4 +88,27 @@ type CommentData struct {
 type AccountReputation struct {
 	Account    string      `json:"account"`
 	Reputation interface{} `json:"reputation"`
+}
+
+type BlogAuthors struct {
+	BlogAuthor []*BlogAuthor
+}
+
+type BlogAuthor struct {
+	Name  string
+	Value float64
+}
+
+func (b *BlogAuthors) UnmarshalJSON(data []byte) error {
+	var v []interface{}
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	for _, r := range v {
+		rawRow := r.([]interface{})
+		row := &BlogAuthor{rawRow[0].(string), rawRow[1].(float64)}
+		b.BlogAuthor = append(b.BlogAuthor, row)
+	}
+
+	return nil
 }

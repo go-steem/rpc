@@ -197,3 +197,15 @@ func (api *API) GetRebloggedBy(author, permlink string) ([]string, error) {
 func (api *API) GetBlogAuthorsRaw(author string) (*json.RawMessage, error) {
 	return api.Raw("get_blog_authors", []interface{}{author})
 }
+
+func (api *API) GetBlogAuthors(author string) (*BlogAuthors, error) {
+	raw, err := api.GetBlogAuthorsRaw(author)
+	if err != nil {
+		return nil, err
+	}
+	var resp BlogAuthors
+	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
+		return nil, errors.Wrap(err, "golos-go: market_history_api: failed to unmarshal get_blog_authors response")
+	}
+	return &resp, nil
+}
