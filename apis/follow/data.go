@@ -1,8 +1,7 @@
 package follow
 
-const (
-	FollowKindFollow = "blog"
-	FollowKindIgnore = "ignore"
+import (
+	"github.com/asuleymanov/golos-go/types"
 )
 
 type FollowObject struct {
@@ -12,27 +11,80 @@ type FollowObject struct {
 }
 
 type FeedEntry struct {
-	Author   string `json:"string"`
-	Permlink string `json:"permlink"`
-	EntryID  uint32 `json:"entry_id"`
+	Author   string      `json:"author"`
+	Permlink string      `json:"permlink"`
+	ReblogBy []string    `json:"reblog_by"`
+	ReblogOn *types.Time `json:"reblog_on"`
+	EntryID  *types.Int  `json:"entry_id"`
+}
+
+type Feeds struct {
+	Comment  *CommentData `json:"comment"`
+	ReblogBy []string     `json:"reblog_by"`
+	ReblogOn *types.Time  `json:"reblog_on"`
+	EntryID  *types.Int   `json:"entry_id"`
 }
 
 type FollowCount struct {
-	Account        string `json:"account"`
-	FollowerCount  int    `json:"follower_count"`
-	FollowingCount int    `json:"following_count"`
+	Account        string     `json:"account"`
+	FollowerCount  *types.Int `json:"follower_count"`
+	FollowingCount *types.Int `json:"following_count"`
 }
 
-/*
-type CommentFeedEntry struct {
-	Comment *CommentObject `json:"comment"`
-	EntryID uint32         `json:"entry_id"`
+type BlogEntries struct {
+	Author   string      `json:"author"`
+	Permlink string      `json:"permlink"`
+	Blog     string      `json:"blog"`
+	ReblogOn *types.Time `json:"reblog_on"`
+	EntryID  *types.Int  `json:"entry_id"`
 }
-*/
 
-/*
+type Blogs struct {
+	Comment  *CommentData `json:"comment"`
+	Blog     string       `json:"blog"`
+	ReblogOn *types.Time  `json:"reblog_on"`
+	EntryID  *types.Int   `json:"entry_id"`
+}
+
+type CommentData struct {
+	ID                   *types.Int  `json:"id"`
+	Author               string      `json:"author"`
+	Permlink             string      `json:"permlink"`
+	Category             string      `json:"category"`
+	ParentAuthor         string      `json:"parent_author"`
+	ParentPermlink       string      `json:"parent_permlink"`
+	Title                string      `json:"title"`
+	Body                 string      `json:"body"`
+	JSONMetadata         string      `json:"json_metadata"`
+	LastUpdate           *types.Time `json:"last_update"`
+	Created              *types.Time `json:"created"`
+	Active               *types.Time `json:"active"`
+	LastPayout           *types.Time `json:"last_payout"`
+	Depth                *types.Int  `json:"depth"`
+	Children             *types.Int  `json:"children"`
+	ChildrenRshares2     string      `json:"children_rshares2"`
+	NetRshares           *types.Int  `json:"net_rshares"`
+	AbsRshares           *types.Int  `json:"abs_rshares"`
+	VoteRshares          *types.Int  `json:"vote_rshares"`
+	ChildrenAbsRshares   *types.Int  `json:"children_abs_rshares"`
+	CashoutTime          *types.Time `json:"cashout_time"`
+	MaxCashoutTime       *types.Time `json:"max_cashout_time"`
+	TotalVoteWeight      *types.Int  `json:"total_vote_weight"`
+	RewardWeight         *types.Int  `json:"reward_weight"`
+	TotalPayoutValue     string      `json:"total_payout_value"`
+	CuratorPayoutValue   string      `json:"curator_payout_value"`
+	AuthorRewards        *types.Int  `json:"author_rewards"`
+	NetVotes             *types.Int  `json:"net_votes"`
+	RootComment          *types.Int  `json:"root_comment"`
+	Mode                 string      `json:"mode"`
+	MaxAcceptedPayout    string      `json:"max_accepted_payout"`
+	PercentSteemDollars  *types.Int  `json:"percent_steem_dollars"`
+	AllowReplies         bool        `json:"allow_replies"`
+	AllowVotes           bool        `json:"allow_votes"`
+	AllowCurationRewards bool        `json:"allow_curation_rewards"`
+}
+
 type AccountReputation struct {
-	Account string `json:"account"`
-	Reputation ??? `json:"reputation"`
+	Account    string      `json:"account"`
+	Reputation interface{} `json:"reputation"`
 }
-*/
