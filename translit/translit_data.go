@@ -1,6 +1,6 @@
 package translit
 
-var extMap = map[string]string{
+var encMap = map[string]string{
 	"а": "a",
 	"б": "b",
 	"в": "v",
@@ -38,4 +38,5 @@ var extMap = map[string]string{
 	"э": "ye",
 	"ю": "yu",
 	"я": "ya",
+	" ": "-",
 }

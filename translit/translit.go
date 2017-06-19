@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func Transliteration(text string) string {
+func Encode(text string) string {
 	if text == "" {
 		return ""
 	}
@@ -23,15 +23,22 @@ func Transliteration(text string) string {
 			break
 		}
 
-		rr, ok = extMap[string(r)]
+		rr, ok = encMap[string(r)]
 		if ok {
 			output.WriteString(rr)
 			continue
+		} else {
+			output.WriteString(string(r))
+			continue
 		}
-		rr, ok = extMap[string(r)]
+		rr, ok = encMap[string(r)]
 		if ok {
 			output.WriteString(rr)
+		} else {
+			output.WriteString(string(r))
+			continue
 		}
 	}
+
 	return output.String()
 }
