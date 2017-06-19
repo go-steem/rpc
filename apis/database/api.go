@@ -6,7 +6,6 @@ import (
 
 	// RPC
 	"github.com/asuleymanov/golos-go/interfaces"
-	"github.com/asuleymanov/golos-go/internal/call"
 	"github.com/asuleymanov/golos-go/types"
 
 	// Vendor
@@ -26,6 +25,16 @@ func NewAPI(caller interfaces.Caller) *API {
 	return &API{caller}
 }
 
+var EmptyParams = []string{}
+
+func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error) {
+	var resp json.RawMessage
+	if err := api.caller.Call(method, params, &resp); err != nil {
+		return nil, errors.Wrapf(err, "golos-go: %v: failed to call %v\n", APIID, method)
+	}
+	return &resp, nil
+}
+
 //set_subscribe_callback                 | *NONE* | *NONE* |
 
 //set_pending_transaction_callback       | *NONE* | *NONE* |
@@ -36,8 +45,8 @@ func NewAPI(caller interfaces.Caller) *API {
 
 //get_trending_tags                      | **DONE** | **DONE** |
 
-func (api *API) GetTrendingTagsRaw(afterTag string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_trending_tags", []interface{}{afterTag, limit})
+func (api *API) GetTrendingTagsapiRaw(afterTag string, limit uint32) (*json.RawMessage, error) {
+	return api.Raw("get_trending_tags", []interface{}{afterTag, limit})
 }
 
 func (api *API) GetTrendingTags(afterTag string, limit uint32) ([]*TrendingTags, error) {
@@ -51,13 +60,13 @@ func (api *API) GetTrendingTags(afterTag string, limit uint32) ([]*TrendingTags,
 //get_tags_used_by_author                | **DONE** | *NONE* |
 
 func (api *API) GetTagsUsedByAuthorRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_tags_used_by_author", []interface{}{accountName})
+	return api.Raw("get_tags_used_by_author", []interface{}{accountName})
 }
 
 //get_discussions_by_trending            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByTrendingRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_trending", query)
+	return api.Raw("get_discussions_by_trending", query)
 }
 
 func (api *API) GetDiscussionsByTrending(query *DiscussionQuery) ([]*Content, error) {
@@ -71,7 +80,7 @@ func (api *API) GetDiscussionsByTrending(query *DiscussionQuery) ([]*Content, er
 //get_discussions_by_trending30          | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByTrending30Raw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_trending30", query)
+	return api.Raw("get_discussions_by_trending30", query)
 }
 
 func (api *API) GetDiscussionsByTrending30(query *DiscussionQuery) ([]*Content, error) {
@@ -85,7 +94,7 @@ func (api *API) GetDiscussionsByTrending30(query *DiscussionQuery) ([]*Content, 
 //get_discussions_by_created             | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByCreatedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_created", query)
+	return api.Raw("get_discussions_by_created", query)
 }
 
 func (api *API) GetDiscussionsByCreated(query *DiscussionQuery) ([]*Content, error) {
@@ -99,7 +108,7 @@ func (api *API) GetDiscussionsByCreated(query *DiscussionQuery) ([]*Content, err
 //get_discussions_by_active              | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByActiveRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_active", query)
+	return api.Raw("get_discussions_by_active", query)
 }
 
 func (api *API) GetDiscussionsByActive(query *DiscussionQuery) ([]*Content, error) {
@@ -113,7 +122,7 @@ func (api *API) GetDiscussionsByActive(query *DiscussionQuery) ([]*Content, erro
 //get_discussions_by_cashout             | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByCashoutRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_cashout", query)
+	return api.Raw("get_discussions_by_cashout", query)
 }
 
 func (api *API) GetDiscussionsByCashout(query *DiscussionQuery) ([]*Content, error) {
@@ -127,7 +136,7 @@ func (api *API) GetDiscussionsByCashout(query *DiscussionQuery) ([]*Content, err
 //get_discussions_by_payout              | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByPayoutRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_payout", query)
+	return api.Raw("get_discussions_by_payout", query)
 }
 
 func (api *API) GetDiscussionsByPayout(query *DiscussionQuery) ([]*Content, error) {
@@ -141,7 +150,7 @@ func (api *API) GetDiscussionsByPayout(query *DiscussionQuery) ([]*Content, erro
 //get_discussions_by_votes               | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByVotesRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_votes", query)
+	return api.Raw("get_discussions_by_votes", query)
 }
 
 func (api *API) GetDiscussionsByVotes(query *DiscussionQuery) ([]*Content, error) {
@@ -155,7 +164,7 @@ func (api *API) GetDiscussionsByVotes(query *DiscussionQuery) ([]*Content, error
 //get_discussions_by_children            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByChildrenRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_children", query)
+	return api.Raw("get_discussions_by_children", query)
 }
 
 func (api *API) GetDiscussionsByChildren(query *DiscussionQuery) ([]*Content, error) {
@@ -169,7 +178,7 @@ func (api *API) GetDiscussionsByChildren(query *DiscussionQuery) ([]*Content, er
 //get_discussions_by_hot                 | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByHotRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_hot", query)
+	return api.Raw("get_discussions_by_hot", query)
 }
 
 func (api *API) GetDiscussionsByHot(query *DiscussionQuery) ([]*Content, error) {
@@ -183,7 +192,7 @@ func (api *API) GetDiscussionsByHot(query *DiscussionQuery) ([]*Content, error) 
 //get_discussions_by_feed                | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByFeedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_feed", query)
+	return api.Raw("get_discussions_by_feed", query)
 }
 
 func (api *API) GetDiscussionsByFeed(query *DiscussionQuery) ([]*Content, error) {
@@ -197,7 +206,7 @@ func (api *API) GetDiscussionsByFeed(query *DiscussionQuery) ([]*Content, error)
 //get_discussions_by_blog                | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByBlogRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_blog", query)
+	return api.Raw("get_discussions_by_blog", query)
 }
 
 func (api *API) GetDiscussionsByBlog(query *DiscussionQuery) ([]*Content, error) {
@@ -211,7 +220,7 @@ func (api *API) GetDiscussionsByBlog(query *DiscussionQuery) ([]*Content, error)
 //get_discussions_by_comments            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByCommentsRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_comments", query)
+	return api.Raw("get_discussions_by_comments", query)
 }
 
 func (api *API) GetDiscussionsByComments(query *DiscussionQuery) ([]*Content, error) {
@@ -225,7 +234,7 @@ func (api *API) GetDiscussionsByComments(query *DiscussionQuery) ([]*Content, er
 //get_discussions_by_promoted            | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByPromotedRaw(query *DiscussionQuery) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_promoted", query)
+	return api.Raw("get_discussions_by_promoted", query)
 }
 
 func (api *API) GetDiscussionsByPromoted(query *DiscussionQuery) ([]*Content, error) {
@@ -239,7 +248,7 @@ func (api *API) GetDiscussionsByPromoted(query *DiscussionQuery) ([]*Content, er
 //get_block_header                       | **DONE** | **DONE** |
 
 func (api *API) GetBlockHeaderRaw(blockNum uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_block_header", []uint32{blockNum})
+	return api.Raw("get_block_header", []uint32{blockNum})
 }
 
 func (api *API) GetBlockHeader(blockNum uint32) (*BlockHeader, error) {
@@ -254,7 +263,7 @@ func (api *API) GetBlockHeader(blockNum uint32) (*BlockHeader, error) {
 //get_block                              | **DONE** | ***PARTIALLY DONE*** |
 
 func (api *API) GetBlockRaw(blockNum uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_block", []uint32{blockNum})
+	return api.Raw("get_block", []uint32{blockNum})
 }
 
 func (api *API) GetBlock(blockNum uint32) (*Block, error) {
@@ -269,7 +278,7 @@ func (api *API) GetBlock(blockNum uint32) (*Block, error) {
 //get_ops_in_block                       | **DONE** | ***PARTIALLY DONE*** |
 
 func (api *API) GetOpsInBlockRaw(blockNum uint32, only_virtual bool) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_ops_in_block", []interface{}{blockNum, only_virtual})
+	return api.Raw("get_ops_in_block", []interface{}{blockNum, only_virtual})
 }
 
 func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*OpsInBlock, error) {
@@ -283,13 +292,13 @@ func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*OpsInBlock
 //get_state                              | **DONE** | *NONE* |
 
 func (api *API) GetStateRaw(path string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_state", []string{path})
+	return api.Raw("get_state", []string{path})
 }
 
 //get_trending_categories                | **DONE** | **DONE** |
 
 func (api *API) GetTrendingCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_trending_categories", []interface{}{after, limit})
+	return api.Raw("get_trending_categories", []interface{}{after, limit})
 }
 
 func (api *API) GetTrendingCategories(after string, limit uint32) ([]*Categories, error) {
@@ -303,30 +312,30 @@ func (api *API) GetTrendingCategories(after string, limit uint32) ([]*Categories
 //get_best_categories                    | **DONE** | *NONE* |
 
 func (api *API) GetBestCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_best_categories", []interface{}{after, limit})
+	return api.Raw("get_best_categories", []interface{}{after, limit})
 }
 
 //get_active_categories                  | **DONE** | *NONE* |
 
 func (api *API) GetActiveCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_active_categories", []interface{}{after, limit})
+	return api.Raw("get_active_categories", []interface{}{after, limit})
 }
 
 //get_recent_categories                  | **DONE** | *NONE* |
 
 func (api *API) GetRecentCategoriesRaw(after string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_recent_categories", []interface{}{after, limit})
+	return api.Raw("get_recent_categories", []interface{}{after, limit})
 }
 
 //get_config                             | **DONE** | **DONE** |
 
 func (api *API) GetConfigRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_config", call.EmptyParams)
+	return api.Raw("get_config", EmptyParams)
 }
 
 func (api *API) GetConfig() (*Config, error) {
 	var resp Config
-	if err := api.caller.Call("get_config", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_config", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -335,12 +344,12 @@ func (api *API) GetConfig() (*Config, error) {
 //get_dynamic_global_properties          | **DONE** | **DONE** |
 
 func (api *API) GetDynamicGlobalPropertiesRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_dynamic_global_properties", call.EmptyParams)
+	return api.Raw("get_dynamic_global_properties", EmptyParams)
 }
 
 func (api *API) GetDynamicGlobalProperties() (*DynamicGlobalProperties, error) {
 	var resp DynamicGlobalProperties
-	if err := api.caller.Call("get_dynamic_global_properties", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_dynamic_global_properties", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -349,12 +358,12 @@ func (api *API) GetDynamicGlobalProperties() (*DynamicGlobalProperties, error) {
 //get_chain_properties                   | **DONE** | **DONE** |
 
 func (api *API) GetChainPropertiesRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_chain_properties", call.EmptyParams)
+	return api.Raw("get_chain_properties", EmptyParams)
 }
 
 func (api *API) GetChainProperties() (*ChainProperties, error) {
 	var resp ChainProperties
-	if err := api.caller.Call("get_chain_properties", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_chain_properties", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -363,12 +372,12 @@ func (api *API) GetChainProperties() (*ChainProperties, error) {
 //get_feed_history                       | **DONE** | **DONE** |
 
 func (api *API) GetFeedHistoryRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_feed_history", call.EmptyParams)
+	return api.Raw("get_feed_history", EmptyParams)
 }
 
 func (api *API) GetFeedHistory() (*FeedHistory, error) {
 	var resp FeedHistory
-	if err := api.caller.Call("get_feed_history", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_feed_history", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -377,12 +386,12 @@ func (api *API) GetFeedHistory() (*FeedHistory, error) {
 //get_current_median_history_price       | **DONE** | **DONE** |
 
 func (api *API) GetCurrentMedianHistoryPriceRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_current_median_history_price", call.EmptyParams)
+	return api.Raw("get_current_median_history_price", EmptyParams)
 }
 
 func (api *API) GetCurrentMedianHistoryPrice() (*CurrentMedianHistoryPrice, error) {
 	var resp CurrentMedianHistoryPrice
-	if err := api.caller.Call("get_current_median_history_price", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_current_median_history_price", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -391,12 +400,12 @@ func (api *API) GetCurrentMedianHistoryPrice() (*CurrentMedianHistoryPrice, erro
 //get_witness_schedule                   | **DONE** | **DONE** |
 
 func (api *API) GetWitnessScheduleRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_witness_schedule", call.EmptyParams)
+	return api.Raw("get_witness_schedule", EmptyParams)
 }
 
 func (api *API) GetWitnessSchedule() (*WitnessSchedule, error) {
 	var resp WitnessSchedule
-	if err := api.caller.Call("get_witness_schedule", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_witness_schedule", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -405,12 +414,12 @@ func (api *API) GetWitnessSchedule() (*WitnessSchedule, error) {
 //get_hardfork_version                   | **DONE** | **DONE** |
 
 func (api *API) GetHardforkVersionRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_hardfork_version", call.EmptyParams)
+	return api.Raw("get_hardfork_version", EmptyParams)
 }
 
 func (api *API) GetHardforkVersion() (string, error) {
 	var resp string
-	if err := api.caller.Call("get_hardfork_version", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_hardfork_version", EmptyParams, &resp); err != nil {
 		return "", err
 	}
 	return resp, nil
@@ -419,12 +428,12 @@ func (api *API) GetHardforkVersion() (string, error) {
 //get_next_scheduled_hardfork            | **DONE** | **DONE** |
 
 func (api *API) GetNextScheduledHardforkRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_next_scheduled_hardfork", call.EmptyParams)
+	return api.Raw("get_next_scheduled_hardfork", EmptyParams)
 }
 
 func (api *API) GetNextScheduledHardfork() (*NextScheduledHardfork, error) {
 	var resp NextScheduledHardfork
-	if err := api.caller.Call("get_next_scheduled_hardfork", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_next_scheduled_hardfork", EmptyParams, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
@@ -436,7 +445,7 @@ func (api *API) GetNextScheduledHardfork() (*NextScheduledHardfork, error) {
 //get_accounts                           | **DONE** | ***PARTIALLY DONE*** |
 
 func (api *API) GetAccountsRaw(accountNames []string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_accounts", [][]string{accountNames})
+	return api.Raw("get_accounts", [][]string{accountNames})
 }
 
 func (api *API) GetAccounts(accountNames []string) ([]*Account, error) {
@@ -453,13 +462,13 @@ func (api *API) GetAccounts(accountNames []string) ([]*Account, error) {
 //lookup_account_names                   | **DONE** | *NONE* |
 
 func (api *API) LookupAccountNamesRaw(accountNames []string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "lookup_account_names", [][]string{accountNames})
+	return api.Raw("lookup_account_names", [][]string{accountNames})
 }
 
 //lookup_accounts                        | **DONE** | **DONE** |
 
 func (api *API) LookupAccountsRaw(lowerBoundName string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "lookup_accounts", []interface{}{lowerBoundName, limit})
+	return api.Raw("lookup_accounts", []interface{}{lowerBoundName, limit})
 }
 
 func (api *API) LookupAccounts(lowerBoundName string, limit uint32) ([]string, error) {
@@ -473,12 +482,12 @@ func (api *API) LookupAccounts(lowerBoundName string, limit uint32) ([]string, e
 //get_account_count                      | **DONE** | **DONE** |
 
 func (api *API) GetAccountCountRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_account_count", call.EmptyParams)
+	return api.Raw("get_account_count", EmptyParams)
 }
 
 func (api *API) GetAccountCount() (uint32, error) {
 	var resp uint32
-	if err := api.caller.Call("get_account_count", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_account_count", EmptyParams, &resp); err != nil {
 		return 0, err
 	}
 	return resp, nil
@@ -487,7 +496,7 @@ func (api *API) GetAccountCount() (uint32, error) {
 //get_conversion_requests                | **DONE** | **DONE** |
 
 func (api *API) GetConversionRequestsRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_conversion_requests", []string{accountName})
+	return api.Raw("get_conversion_requests", []string{accountName})
 }
 
 func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests, error) {
@@ -501,43 +510,43 @@ func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests
 //get_account_history                    | **DONE** | *NONE* |
 
 func (api *API) GetAccountHistoryRaw(account string, from uint64, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_account_history", []interface{}{account, from, limit})
+	return api.Raw("get_account_history", []interface{}{account, from, limit})
 }
 
 //get_owner_history                      | **DONE** | *NONE* |
 
 func (api *API) GetOwnerHistoryRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_owner_history", []interface{}{accountName})
+	return api.Raw("get_owner_history", []interface{}{accountName})
 }
 
 //get_recovery_request                   | **DONE** | *NONE* |
 
 func (api *API) GetRecoveryRequestRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_recovery_request", []interface{}{accountName})
+	return api.Raw("get_recovery_request", []interface{}{accountName})
 }
 
 //get_escrow                             | **DONE** | *NONE* |
 
 func (api *API) GetEscrowRaw(from string, escrow_id uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_escrow", []interface{}{from, escrow_id})
+	return api.Raw("get_escrow", []interface{}{from, escrow_id})
 }
 
 //get_withdraw_routes                    | **DONE** | *NONE* |
 
 func (api *API) GetWuthdrawRoutesRaw(accountName string, withdraw_route_type string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_withdraw_routes", []interface{}{accountName, withdraw_route_type})
+	return api.Raw("get_withdraw_routes", []interface{}{accountName, withdraw_route_type})
 }
 
 //get_account_bandwidth                  | **DONE** | *NONE* |
 
 func (api *API) GetAccountBandwidthRaw(accountName string, bandwidth_type uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_account_bandwidth", []interface{}{accountName, bandwidth_type})
+	return api.Raw("get_account_bandwidth", []interface{}{accountName, bandwidth_type})
 }
 
 //get_savings_withdraw_from              | **DONE** | **DONE** |
 
 func (api *API) GetSavingsWithdrawFromRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_savings_withdraw_from", []interface{}{accountName})
+	return api.Raw("get_savings_withdraw_from", []interface{}{accountName})
 }
 
 func (api *API) GetSavingsWithdrawFrom(accountName string) ([]*SavingsWithdraw, error) {
@@ -551,7 +560,7 @@ func (api *API) GetSavingsWithdrawFrom(accountName string) ([]*SavingsWithdraw, 
 //get_savings_withdraw_to                | **DONE** | **DONE** |
 
 func (api *API) GetSavingsWithdrawToRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_savings_withdraw_to", []interface{}{accountName})
+	return api.Raw("get_savings_withdraw_to", []interface{}{accountName})
 }
 
 func (api *API) GetSavingsWithdrawTo(accountName string) ([]*SavingsWithdraw, error) {
@@ -568,7 +577,7 @@ func (api *API) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
 	if limit > 1000 {
 		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
 	}
-	return call.Raw(api.caller, "get_order_book", []interface{}{limit})
+	return api.Raw("get_order_book", []interface{}{limit})
 }
 
 func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
@@ -585,7 +594,7 @@ func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 //get_open_orders                        | **DONE** | **DONE** |
 
 func (api *API) GetOpenOrdersRaw(accountName string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_open_orders", []string{accountName})
+	return api.Raw("get_open_orders", []string{accountName})
 }
 
 func (api *API) GetOpenOrders(accountName string) ([]*OpenOrders, error) {
@@ -599,18 +608,18 @@ func (api *API) GetOpenOrders(accountName string) ([]*OpenOrders, error) {
 //get_liquidity_queue                    | **DONE** | *NONE* |
 
 func (api *API) GetLiquidityQueueRaw(startAccount string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_liquidity_queue", []interface{}{startAccount, limit})
+	return api.Raw("get_liquidity_queue", []interface{}{startAccount, limit})
 }
 
 //get_transaction_hex                    | **DONE** | *NONE* |
 func (api *API) GetTransactionHexRaw(trx *types.Transaction) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_transaction_hex", []interface{}{&trx})
+	return api.Raw("get_transaction_hex", []interface{}{&trx})
 }
 
 //get_transaction                        | **DONE** | **DONE** |
 
 func (api *API) GetTransactionRaw(id string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_transaction", []string{id})
+	return api.Raw("get_transaction", []string{id})
 }
 
 func (api *API) GetTransaction(id string) (*types.Transaction, error) {
@@ -626,7 +635,7 @@ func (api *API) GetTransaction(id string) (*types.Transaction, error) {
 //get_potential_signatures               | **DONE** | **DONE** |
 
 func (api *API) GetPotentialSignaturesRaw(trx *types.Transaction) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_potential_signatures", []interface{}{&trx})
+	return api.Raw("get_potential_signatures", []interface{}{&trx})
 }
 
 func (api *API) GetPotentialSignatures(trx *types.Transaction) ([]string, error) {
@@ -640,7 +649,7 @@ func (api *API) GetPotentialSignatures(trx *types.Transaction) ([]string, error)
 //verify_authority                       | **DONE** | **DONE** |
 
 func (api *API) GetVerifyAuthorutyRaw(trx *types.Transaction) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "verify_authority", []interface{}{&trx})
+	return api.Raw("verify_authority", []interface{}{&trx})
 }
 
 func (api *API) GetVerifyAuthoruty(trx *types.Transaction) (bool, error) {
@@ -656,7 +665,7 @@ func (api *API) GetVerifyAuthoruty(trx *types.Transaction) (bool, error) {
 //get_active_votes                       | **DONE** | **DONE** |
 
 func (api *API) GetActiveVotesRaw(author, permlink string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_active_votes", []string{author, permlink})
+	return api.Raw("get_active_votes", []string{author, permlink})
 }
 
 func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
@@ -670,7 +679,7 @@ func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
 //get_account_votes                      | **DONE** | **DONE** |
 
 func (api *API) GetAccountVotesRaw(author string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_account_votes", []string{author})
+	return api.Raw("get_account_votes", []string{author})
 }
 
 func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
@@ -684,7 +693,7 @@ func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
 //get_content                            | **DONE** | **DONE** |
 
 func (api *API) GetContentRaw(author, permlink string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_content", []string{author, permlink})
+	return api.Raw("get_content", []string{author, permlink})
 }
 
 func (api *API) GetContent(author, permlink string) (*Content, error) {
@@ -698,7 +707,7 @@ func (api *API) GetContent(author, permlink string) (*Content, error) {
 //get_content_replies                    | **DONE** | **DONE** |
 
 func (api *API) GetContentRepliesRaw(parentAuthor, parentPermlink string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_content_replies", []string{parentAuthor, parentPermlink})
+	return api.Raw("get_content_replies", []string{parentAuthor, parentPermlink})
 }
 
 func (api *API) GetContentReplies(parentAuthor, parentPermlink string) ([]*Content, error) {
@@ -713,7 +722,7 @@ func (api *API) GetContentReplies(parentAuthor, parentPermlink string) ([]*Conte
 //get_discussions_by_author_before_date  | **DONE** | **DONE** |
 
 func (api *API) GetDiscussionsByAuthorBeforeDateRaw(Author, Permlink, Date string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_discussions_by_author_before_date", []interface{}{Author, Permlink, Date, limit})
+	return api.Raw("get_discussions_by_author_before_date", []interface{}{Author, Permlink, Date, limit})
 }
 
 func (api *API) GetDiscussionsByAuthorBeforeDate(Author, Permlink, Date string, limit uint32) ([]*Content, error) {
@@ -728,7 +737,7 @@ func (api *API) GetDiscussionsByAuthorBeforeDate(Author, Permlink, Date string, 
 //get_replies_by_last_update             | **DONE** | **DONE** |
 
 func (api *API) GetRepliesByLastUpdateRaw(startAuthor, startPermlink string, limit uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit})
+	return api.Raw("get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit})
 }
 
 func (api *API) GetRepliesByLastUpdate(startAuthor, startPermlink string, limit uint32) ([]*Content, error) {
@@ -743,7 +752,7 @@ func (api *API) GetRepliesByLastUpdate(startAuthor, startPermlink string, limit 
 //get_witnesses                          | **DONE** | **DONE** |
 
 func (api *API) GetWitnessesRaw(id []uint32) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_witnesses", [][]uint32{id})
+	return api.Raw("get_witnesses", [][]uint32{id})
 }
 
 func (api *API) GetWitnesses(id []uint32) ([]*Witness, error) {
@@ -757,7 +766,7 @@ func (api *API) GetWitnesses(id []uint32) ([]*Witness, error) {
 //get_witness_by_account                 | **DONE** | **DONE** |
 
 func (api *API) GetWitnessByAccountRaw(author string) (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_witness_by_account", []string{author})
+	return api.Raw("get_witness_by_account", []string{author})
 }
 
 func (api *API) GetWitnessByAccount(author string) (*Witness, error) {
@@ -774,7 +783,7 @@ func (api *API) GetWitnessByVoteRaw(author string, limit uint) (*json.RawMessage
 	if limit > 1000 {
 		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
 	}
-	return call.Raw(api.caller, "get_witnesses_by_vote", []interface{}{author, limit})
+	return api.Raw("get_witnesses_by_vote", []interface{}{author, limit})
 }
 
 func (api *API) GetWitnessByVote(author string, limit uint) ([]*Witness, error) {
@@ -794,7 +803,7 @@ func (api *API) LookupWitnessAccountsRaw(author string, limit uint) (*json.RawMe
 	if limit > 1000 {
 		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
 	}
-	return call.Raw(api.caller, "lookup_witness_accounts", []interface{}{author, limit})
+	return api.Raw("lookup_witness_accounts", []interface{}{author, limit})
 }
 
 func (api *API) LookupWitnessAccounts(author string, limit uint) ([]string, error) {
@@ -811,12 +820,12 @@ func (api *API) LookupWitnessAccounts(author string, limit uint) ([]string, erro
 //get_witness_count                      | **DONE** | **DONE** |
 
 func (api *API) GetWitnessCountRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_witness_count", call.EmptyParams)
+	return api.Raw("get_witness_count", EmptyParams)
 }
 
 func (api *API) GetWitnessCount() (uint32, error) {
 	var resp uint32
-	if err := api.caller.Call("get_witness_count", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_witness_count", EmptyParams, &resp); err != nil {
 		return 0, err
 	}
 	return resp, nil
@@ -825,12 +834,12 @@ func (api *API) GetWitnessCount() (uint32, error) {
 //get_active_witnesses                   | **DONE** | **DONE** |
 
 func (api *API) GetActiveWitnessesRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_active_witnesses", call.EmptyParams)
+	return api.Raw("get_active_witnesses", EmptyParams)
 }
 
 func (api *API) GetActiveWitnesses() ([]string, error) {
 	var resp []string
-	if err := api.caller.Call("get_active_witnesses", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_active_witnesses", EmptyParams, &resp); err != nil {
 		return []string{""}, err
 	}
 	return resp, nil
@@ -839,12 +848,12 @@ func (api *API) GetActiveWitnesses() ([]string, error) {
 //get_miner_queue                        | **DONE** | **DONE** |
 
 func (api *API) GetMinerQueueRaw() (*json.RawMessage, error) {
-	return call.Raw(api.caller, "get_miner_queue", call.EmptyParams)
+	return api.Raw("get_miner_queue", EmptyParams)
 }
 
 func (api *API) GetMinerQueue() ([]string, error) {
 	var resp []string
-	if err := api.caller.Call("get_miner_queue", call.EmptyParams, &resp); err != nil {
+	if err := api.caller.Call("get_miner_queue", EmptyParams, &resp); err != nil {
 		return []string{""}, err
 	}
 	return resp, nil
