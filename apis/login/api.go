@@ -43,12 +43,9 @@ func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error)
 	return &resp, nil
 }
 
-func (api *API) LoginRaw(username, password string) (*json.RawMessage, error) {
-	return api.Raw("login", []interface{}{username, password})
-}
-
+//login
 func (api *API) Login(username, password string) (bool, error) {
-	raw, err := api.LoginRaw(username, password)
+	raw, err := api.Raw("login", []interface{}{username, password})
 	if err != nil {
 		return false, err
 	}
@@ -59,12 +56,9 @@ func (api *API) Login(username, password string) (bool, error) {
 	return resp, nil
 }
 
-func (api *API) GetAPIByNameRaw(apiName string) (*json.RawMessage, error) {
-	return api.Raw("get_api_by_name", []interface{}{apiName})
-}
-
+//get_api_by_name
 func (api *API) GetAPIByName(apiName string) (int, error) {
-	raw, err := api.GetAPIByNameRaw(apiName)
+	raw, err := api.Raw("get_api_by_name", []interface{}{apiName})
 	if err != nil {
 		return 0, err
 	}
@@ -75,12 +69,9 @@ func (api *API) GetAPIByName(apiName string) (int, error) {
 	return resp, nil
 }
 
-func (api *API) GetVersionRaw() (*json.RawMessage, error) {
-	return api.Raw("get_version", EmptyParams)
-}
-
+//get_version
 func (api *API) GetVersion() (*Version, error) {
-	raw, err := api.GetVersionRaw()
+	raw, err := api.Raw("get_version", EmptyParams)
 	if err != nil {
 		return nil, err
 	}

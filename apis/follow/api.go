@@ -35,12 +35,9 @@ func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error)
 	return &resp, nil
 }
 
-func (api *API) GetFollowersRaw(accountName, start, kind string, limit uint16) (*json.RawMessage, error) {
-	return api.Raw("get_followers", []interface{}{accountName, start, kind, limit})
-}
-
+//get_followers
 func (api *API) GetFollowers(accountName, start, kind string, limit uint16) ([]*FollowObject, error) {
-	raw, err := api.GetFollowersRaw(accountName, start, kind, limit)
+	raw, err := api.Raw("get_followers", []interface{}{accountName, start, kind, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -51,12 +48,9 @@ func (api *API) GetFollowers(accountName, start, kind string, limit uint16) ([]*
 	return resp, nil
 }
 
-func (api *API) GetFollowingRaw(accountName, start, kind string, limit uint16) (*json.RawMessage, error) {
-	return api.Raw("get_following", []interface{}{accountName, start, kind, limit})
-}
-
+//get_following
 func (api *API) GetFollowing(accountName, start, kind string, limit uint16) ([]*FollowObject, error) {
-	raw, err := api.GetFollowingRaw(accountName, start, kind, limit)
+	raw, err := api.Raw("get_following", []interface{}{accountName, start, kind, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -67,12 +61,9 @@ func (api *API) GetFollowing(accountName, start, kind string, limit uint16) ([]*
 	return resp, nil
 }
 
-func (api *API) GetFollowCountRaw(accountName string) (*json.RawMessage, error) {
-	return api.Raw("get_follow_count", []interface{}{accountName})
-}
-
+//get_follow_count
 func (api *API) GetFollowCount(accountName string) (*FollowCount, error) {
-	raw, err := api.GetFollowCountRaw(accountName)
+	raw, err := api.Raw("get_follow_count", []interface{}{accountName})
 	if err != nil {
 		return nil, err
 	}
@@ -83,15 +74,12 @@ func (api *API) GetFollowCount(accountName string) (*FollowCount, error) {
 	return resp, nil
 }
 
-func (api *API) GetFeedEntriesRaw(accountName string, entryID uint32, limit uint16) (*json.RawMessage, error) {
+//get_feed_entries
+func (api *API) GetFeedEntries(accountName string, entryID uint32, limit uint16) ([]*FeedEntry, error) {
 	if limit > 500 {
 		return nil, errors.New("golos-go: follow_api: get_feed_entries -> limit must not exceed 500")
 	}
-	return api.Raw("get_feed_entries", []interface{}{accountName, entryID, limit})
-}
-
-func (api *API) GetFeedEntries(accountName string, entryID uint32, limit uint16) ([]*FeedEntry, error) {
-	raw, err := api.GetFeedEntriesRaw(accountName, entryID, limit)
+	raw, err := api.Raw("get_feed_entries", []interface{}{accountName, entryID, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -102,15 +90,12 @@ func (api *API) GetFeedEntries(accountName string, entryID uint32, limit uint16)
 	return resp, nil
 }
 
-func (api *API) GetFeedRaw(accountName string, entryID uint32, limit uint16) (*json.RawMessage, error) {
+//get_feed
+func (api *API) GetFeed(accountName string, entryID uint32, limit uint16) ([]*Feeds, error) {
 	if limit > 500 {
 		return nil, errors.New("golos-go: follow_api: get_feed -> limit must not exceed 500")
 	}
-	return api.Raw("get_feed", []interface{}{accountName, entryID, limit})
-}
-
-func (api *API) GetFeed(accountName string, entryID uint32, limit uint16) ([]*Feeds, error) {
-	raw, err := api.GetFeedRaw(accountName, entryID, limit)
+	raw, err := api.Raw("get_feed", []interface{}{accountName, entryID, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -121,15 +106,12 @@ func (api *API) GetFeed(accountName string, entryID uint32, limit uint16) ([]*Fe
 	return resp, nil
 }
 
-func (api *API) GetBlogEntriesRaw(accountName string, entryID uint32, limit uint16) (*json.RawMessage, error) {
+//get_blog_entries
+func (api *API) GetBlogEntries(accountName string, entryID uint32, limit uint16) ([]*BlogEntries, error) {
 	if limit > 500 {
 		return nil, errors.New("golos-go: follow_api: get_blog_entries -> limit must not exceed 500")
 	}
-	return api.Raw("get_blog_entries", []interface{}{accountName, entryID, limit})
-}
-
-func (api *API) GetBlogEntries(accountName string, entryID uint32, limit uint16) ([]*BlogEntries, error) {
-	raw, err := api.GetBlogEntriesRaw(accountName, entryID, limit)
+	raw, err := api.Raw("get_blog_entries", []interface{}{accountName, entryID, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -140,15 +122,12 @@ func (api *API) GetBlogEntries(accountName string, entryID uint32, limit uint16)
 	return resp, nil
 }
 
-func (api *API) GetBlogRaw(accountName string, entryID uint32, limit uint16) (*json.RawMessage, error) {
+//get_blog
+func (api *API) GetBlog(accountName string, entryID uint32, limit uint16) ([]*Blogs, error) {
 	if limit > 500 {
 		return nil, errors.New("golos-go: follow_api: get_blog -> limit must not exceed 500")
 	}
-	return api.Raw("get_blog", []interface{}{accountName, entryID, limit})
-}
-
-func (api *API) GetBlog(accountName string, entryID uint32, limit uint16) ([]*Blogs, error) {
-	raw, err := api.GetBlogRaw(accountName, entryID, limit)
+	raw, err := api.Raw("get_blog", []interface{}{accountName, entryID, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -159,15 +138,12 @@ func (api *API) GetBlog(accountName string, entryID uint32, limit uint16) ([]*Bl
 	return resp, nil
 }
 
-func (api *API) GetAccountReputationsRaw(lowerBoundName string, limit uint32) (*json.RawMessage, error) {
+//get_account_reputations
+func (api *API) GetAccountReputations(lowerBoundName string, limit uint32) ([]*AccountReputation, error) {
 	if limit > 1000 {
 		return nil, errors.New("golos-go: follow_api: get_account_reputations -> limit must not exceed 1000")
 	}
-	return api.Raw("get_account_reputations", []interface{}{lowerBoundName, limit})
-}
-
-func (api *API) GetAccountReputations(lowerBoundName string, limit uint32) ([]*AccountReputation, error) {
-	raw, err := api.GetAccountReputationsRaw(lowerBoundName, limit)
+	raw, err := api.Raw("get_account_reputations", []interface{}{lowerBoundName, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -178,12 +154,9 @@ func (api *API) GetAccountReputations(lowerBoundName string, limit uint32) ([]*A
 	return resp, nil
 }
 
-func (api *API) GetRebloggedByRaw(author, permlink string) (*json.RawMessage, error) {
-	return api.Raw("get_reblogged_by", []interface{}{author, permlink})
-}
-
+//get_reblogged_by
 func (api *API) GetRebloggedBy(author, permlink string) ([]string, error) {
-	raw, err := api.GetRebloggedByRaw(author, permlink)
+	raw, err := api.Raw("get_reblogged_by", []interface{}{author, permlink})
 	if err != nil {
 		return nil, err
 	}
@@ -194,12 +167,9 @@ func (api *API) GetRebloggedBy(author, permlink string) ([]string, error) {
 	return resp, nil
 }
 
-func (api *API) GetBlogAuthorsRaw(author string) (*json.RawMessage, error) {
-	return api.Raw("get_blog_authors", []interface{}{author})
-}
-
+//get_blog_authors
 func (api *API) GetBlogAuthors(author string) (*BlogAuthors, error) {
-	raw, err := api.GetBlogAuthorsRaw(author)
+	raw, err := api.Raw("get_blog_authors", []interface{}{author})
 	if err != nil {
 		return nil, err
 	}

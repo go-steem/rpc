@@ -37,12 +37,9 @@ func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error)
 	return &resp, nil
 }
 
-func (api *API) GetTickerRaw() (*json.RawMessage, error) {
-	return api.Raw("get_ticker", EmptyParams)
-}
-
+//get_ticker
 func (api *API) GetTicker() (*Ticker, error) {
-	raw, err := api.GetTickerRaw()
+	raw, err := api.Raw("get_ticker", EmptyParams)
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +50,9 @@ func (api *API) GetTicker() (*Ticker, error) {
 	return resp, nil
 }
 
-func (api *API) GetVolumeRaw() (*json.RawMessage, error) {
-	return api.Raw("get_volume", EmptyParams)
-}
-
+//get_volume
 func (api *API) GetVolume() (*Volume, error) {
-	raw, err := api.GetVolumeRaw()
+	raw, err := api.Raw("get_volume", EmptyParams)
 	if err != nil {
 		return nil, err
 	}
@@ -69,15 +63,12 @@ func (api *API) GetVolume() (*Volume, error) {
 	return resp, nil
 }
 
-func (api *API) GetOrderBookRaw(limit uint32) (*json.RawMessage, error) {
+//get_order_book
+func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 	if limit > 1000 {
 		return nil, errors.New("golos-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	return api.Raw("get_order_book", []interface{}{limit})
-}
-
-func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
-	raw, err := api.GetOrderBookRaw(limit)
+	raw, err := api.Raw("get_order_book", []interface{}{limit})
 	if err != nil {
 		return nil, err
 	}
@@ -88,15 +79,12 @@ func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 	return resp, nil
 }
 
-func (api *API) GetTradeHistoryRaw(start, end string, limit uint32) (*json.RawMessage, error) {
+//get_trade_history
+func (api *API) GetTradeHistory(start, end string, limit uint32) ([]*Trades, error) {
 	if limit > 1000 {
 		return nil, errors.New("golos-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	return api.Raw("get_trade_history", []interface{}{start, end, limit})
-}
-
-func (api *API) GetTradeHistory(start, end string, limit uint32) ([]*Trades, error) {
-	raw, err := api.GetTradeHistoryRaw(start, end, limit)
+	raw, err := api.Raw("get_trade_history", []interface{}{start, end, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -107,15 +95,12 @@ func (api *API) GetTradeHistory(start, end string, limit uint32) ([]*Trades, err
 	return resp, nil
 }
 
-func (api *API) GetRecentTradesRaw(limit uint32) (*json.RawMessage, error) {
+//get_recent_trades
+func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
 	if limit > 1000 {
 		return nil, errors.New("golos-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	return api.Raw("get_recent_trades", []interface{}{limit})
-}
-
-func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
-	raw, err := api.GetRecentTradesRaw(limit)
+	raw, err := api.Raw("get_recent_trades", []interface{}{limit})
 	if err != nil {
 		return nil, err
 	}
@@ -126,12 +111,9 @@ func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
 	return resp, nil
 }
 
-func (api *API) GetMarketHistoryRaw(b_sec uint32, start, end string) (*json.RawMessage, error) {
-	return api.Raw("get_market_history", []interface{}{b_sec, start, end})
-}
-
+//get_market_history
 func (api *API) GetMarketHistory(b_sec uint32, start, end string) ([]*MarketHistory, error) {
-	raw, err := api.GetMarketHistoryRaw(b_sec, start, end)
+	raw, err := api.Raw("get_market_history", []interface{}{b_sec, start, end})
 	if err != nil {
 		return nil, err
 	}
@@ -142,12 +124,9 @@ func (api *API) GetMarketHistory(b_sec uint32, start, end string) ([]*MarketHist
 	return resp, nil
 }
 
-func (api *API) GetMarketHistoryBucketsRaw() (*json.RawMessage, error) {
-	return api.Raw("get_market_history_buckets", EmptyParams)
-}
-
+//get_market_history_buckets
 func (api *API) GetMarketHistoryBuckets() ([]uint32, error) {
-	raw, err := api.GetMarketHistoryBucketsRaw()
+	raw, err := api.Raw("get_market_history_buckets", EmptyParams)
 	if err != nil {
 		return nil, err
 	}
