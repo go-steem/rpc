@@ -72,6 +72,9 @@ func (encoder *Encoder) Encode(v interface{}) error {
 	case string:
 		return encoder.encodeString(v)
 
+	case bool:
+		return encoder.encodeBool(v)
+
 	default:
 		return errors.Errorf("encoder: unsupported type encountered")
 	}
@@ -95,6 +98,13 @@ func (encoder *Encoder) writeBytes(bs []byte) error {
 func (encoder *Encoder) writeString(s string) error {
 	if _, err := io.Copy(encoder.w, strings.NewReader(s)); err != nil {
 		return errors.Wrapf(err, "encoder: failed to write string: %v", s)
+	}
+	return nil
+}
+
+func (encoder *Encoder) encodeBool(v bool) error {
+	if err := binary.Write(encoder.w, binary.BigEndian, v); err != nil {
+		return errors.Wrapf(err, "encoder: failed to write bool: %v", v)
 	}
 	return nil
 }

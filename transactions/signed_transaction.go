@@ -72,7 +72,11 @@ func (tx *SignedTransaction) Digest(chain *Chain) ([]byte, error) {
 func (tx *SignedTransaction) Sign(privKeys [][]byte, chain *Chain) error {
 	var buf bytes.Buffer
 	chainid, _ := hex.DecodeString(chain.ID)
+	//fmt.Println(tx.Operations[0])
+	//fmt.Println(" ")
 	tx_raw, _ := tx.Serialize()
+	//fmt.Println(tx_raw)
+	//fmt.Println(" ")
 	buf.Write(chainid)
 	buf.Write(tx_raw)
 	data := buf.Bytes()

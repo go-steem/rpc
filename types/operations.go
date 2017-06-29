@@ -143,20 +143,6 @@ func (op *AccountCreateOperation) Data() interface{} {
 	return op
 }
 
-func (op *AccountCreateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
-	enc := transaction.NewRollingEncoder(encoder)
-	enc.EncodeUVarint(uint64(TypeAccountCreate.Code()))
-	enc.Encode(op.Fee)
-	enc.Encode(op.Creator)
-	enc.Encode(op.NewAccountName)
-	enc.Encode(op.Owner)
-	enc.Encode(op.Active)
-	enc.Encode(op.Posting)
-	enc.Encode(op.MemoKey)
-	enc.Encode(op.JsonMetadata)
-	return enc.Err()
-}
-
 // FC_REFLECT( steemit::chain::account_update_operation,
 //             (account)
 //             (owner)
@@ -203,16 +189,6 @@ func (op *TransferOperation) Data() interface{} {
 	return op
 }
 
-func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) error {
-	enc := transaction.NewRollingEncoder(encoder)
-	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
-	enc.Encode(op.From)
-	enc.Encode(op.To)
-	enc.Encode(op.Amount)
-	enc.Encode(op.Memo)
-	return enc.Err()
-}
-
 // FC_REFLECT( steemit::chain::transfer_to_vesting_operation,
 //             (from)
 //             (to)
@@ -230,15 +206,6 @@ func (op *TransferToVestingOperation) Type() OpType {
 
 func (op *TransferToVestingOperation) Data() interface{} {
 	return op
-}
-
-func (op *TransferToVestingOperation) MarshalTransaction(encoder *transaction.Encoder) error {
-	enc := transaction.NewRollingEncoder(encoder)
-	enc.EncodeUVarint(uint64(TypeTransferToVesting.Code()))
-	enc.Encode(op.From)
-	enc.Encode(op.To)
-	enc.Encode(op.Amount)
-	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::withdraw_vesting_operation,
@@ -484,6 +451,19 @@ func (op *CommentOptionsOperation) Data() interface{} {
 	return op
 }
 
+func (op *CommentOptionsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeCommentOptions.Code()))
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	enc.Encode(op.MaxAcceptedPayout)
+	enc.Encode(op.PercentSteemDollars)
+	enc.Encode(op.AllowVotes)
+	enc.Encode(op.AllowCurationRewards)
+	enc.Encode(op.Extensions)
+	return enc.Err()
+}
+
 type Authority struct {
 	AccountAuths    []*Auth `json:"account_auths"`
 	KeyAuths        []*Auth `json:"key_auths"`
@@ -539,11 +519,11 @@ func (op *UnknownOperation) Data() interface{} {
 
 // test
 type WitnessUpdateOperation struct {
-	Owner           string `json:"owner"`
-	Url             string `json:"url"`
-	BlockSigningKey string `json:"block_signing_key"`
-	Props           string `json:"props"`
-	Fee             string `json:"fee"`
+	Owner           string           `json:"owner"`
+	Url             string           `json:"url"`
+	BlockSigningKey string           `json:"block_signing_key"`
+	Props           *ChainProperties `json:"props"`
+	Fee             string           `json:"fee"`
 }
 
 func (op *WitnessUpdateOperation) Type() OpType {
