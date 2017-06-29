@@ -256,6 +256,15 @@ func (op *AccountWitnessVoteOperation) Data() interface{} {
 	return op
 }
 
+func (op *AccountWitnessVoteOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeAccountWitnessVote.Code()))
+	enc.Encode(op.Account)
+	enc.Encode(op.Witness)
+	enc.Encode(op.Approve)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::account_witness_proxy_operation,
 //             (account)
 //             (proxy) )
