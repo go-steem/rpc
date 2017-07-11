@@ -66,7 +66,8 @@ func NewApi(url string) *Golos {
 	}
 }
 
-func (api *Golos) Send_Trx(strx types.Operation) error {
+func (api *Golos) Send_Trx(strx types.Operation, chain string) error {
+	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -89,8 +90,17 @@ func (api *Golos) Send_Trx(strx types.Operation) error {
 	// Получаем необходимый для подписи ключ
 	privKeys := api.Signing_Keys(strx)
 
+	// Определяем ChainId
+	switch chain {
+	case "steem":
+		ChainId = transactions.SteemChain
+	case "golos":
+		ChainId = transactions.GolosChain
+	case "test":
+		ChainId = transactions.TestChain
+	}
 	// Подписываем транзакцию
-	if err := tx.Sign(privKeys, transactions.SteemChain); err != nil {
+	if err := tx.Sign(privKeys, ChainId); err != nil {
 		return errors.Wrapf(err, "Error Sign: ")
 	}
 

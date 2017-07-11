@@ -30,7 +30,7 @@ func init() {
 	OpTypeKey["account_witness_proxy"] = []string{"posting"}
 	OpTypeKey["pow"] = []string{"active"}
 	OpTypeKey["custom"] = []string{"active"}
-	OpTypeKey["report_over_production"] = []string{"posting"}\\\
+	OpTypeKey["report_over_production"] = []string{"posting"}
 	OpTypeKey["delete_comment"] = []string{"posting"}
 	OpTypeKey["custom_json"] = []string{"posting"}
 	OpTypeKey["comment_options"] = []string{"posting"}
