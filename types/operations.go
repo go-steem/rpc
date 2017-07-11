@@ -189,6 +189,16 @@ func (op *TransferOperation) Data() interface{} {
 	return op
 }
 
+func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.To)
+	enc.Encode(op.Amount)
+	enc.Encode(op.Memo)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::transfer_to_vesting_operation,
 //             (from)
 //             (to)
@@ -765,6 +775,16 @@ func (op *TransferToSavingsOperation) Type() OpType {
 
 func (op *TransferToSavingsOperation) Data() interface{} {
 	return op
+}
+
+func (op *TransferToSavingsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransferToSavings.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.To)
+	enc.Encode(op.Amount)
+	enc.Encode(op.Memo)
+	return enc.Err()
 }
 
 type TransferFromSavingsOperation struct {

@@ -11,7 +11,6 @@ import (
 
 	// RPC
 	"github.com/asuleymanov/golos-go"
-	//	"github.com/asuleymanov/golos-go/encoding/wif"
 	"github.com/asuleymanov/golos-go/transactions"
 	"github.com/asuleymanov/golos-go/transports/websocket"
 	"github.com/asuleymanov/golos-go/types"
@@ -87,14 +86,10 @@ func (api *Golos) Send_Trx(strx types.Operation) error {
 	// Добавление операций в транзакцию
 	tx.PushOperation(strx)
 
-	/*// Подпись транзакции
-	privKey, err := wif.Decode(api.User.PKey)
-	if err != nil {
-		return errors.Wrapf(err, "Error decode Key: ")
-	}
-	privKeys := [][]byte{privKey}
-	*/
+	// Получаем необходимый для подписи ключ
 	privKeys := api.Signing_Keys(strx)
+
+	// Подписываем транзакцию
 	if err := tx.Sign(privKeys, transactions.SteemChain); err != nil {
 		return errors.Wrapf(err, "Error Sign: ")
 	}
