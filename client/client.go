@@ -113,3 +113,53 @@ func (api *Golos) Send_Trx(strx types.Operation, chain string) error {
 	log.Printf("%+v\n", *resp)
 	return nil
 }
+
+func (api *Golos) Send_Arr_Trx(strx []types.Operation, chain string) error {
+	var ChainId *transactions.Chain
+	// Получение необходимых параметров
+	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	if err != nil {
+		return errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
+	}
+
+	// Создание транзакции
+	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
+	if err != nil {
+		return err
+	}
+	tx := transactions.NewSignedTransaction(&types.Transaction{
+		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
+		RefBlockPrefix: refBlockPrefix,
+	})
+
+	// Добавление операций в транзакцию
+	for _, val := range strx {
+		tx.PushOperation(val)
+	}
+
+	// Получаем необходимый для подписи ключ
+	privKeys := api.Signing_Keys(strx[0])
+
+	// Определяем ChainId
+	switch chain {
+	case "steem":
+		ChainId = transactions.SteemChain
+	case "golos":
+		ChainId = transactions.GolosChain
+	case "test":
+		ChainId = transactions.TestChain
+	}
+	// Подписываем транзакцию
+	if err := tx.Sign(privKeys, ChainId); err != nil {
+		return errors.Wrapf(err, "Error Sign: ")
+	}
+
+	// Отправка транзакции
+	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+
+	if err != nil {
+		return errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
+	}
+	log.Printf("%+v\n", *resp)
+	return nil
+}

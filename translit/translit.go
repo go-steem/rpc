@@ -5,10 +5,9 @@ import (
 	"strings"
 )
 
-func EncodeTag(tag string) string {
-	arrTag := strings.Split(tag, " ")
+func EncodeTags(tag []string) string {
 	var arrEncTag []string
-	for _, val := range arrTag {
+	for _, val := range tag {
 		str, count := encode(val)
 		if count > 0 {
 			str = "ru--" + str
@@ -16,6 +15,14 @@ func EncodeTag(tag string) string {
 		arrEncTag = append(arrEncTag, str)
 	}
 	return strings.Join(arrEncTag, " ")
+}
+
+func EncodeTag(tag string) string {
+	str, count := encode(tag)
+	if count > 0 {
+		str = "ru--" + str
+	}
+	return str
 }
 
 func EncodeTitle(title string) string {
