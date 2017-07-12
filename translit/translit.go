@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func EncodeTags(tag []string) string {
+func EncodeTags(tag []string) []string {
 	var arrEncTag []string
 	for _, val := range tag {
 		str, count := encode(val)
@@ -14,7 +14,7 @@ func EncodeTags(tag []string) string {
 		}
 		arrEncTag = append(arrEncTag, str)
 	}
-	return strings.Join(arrEncTag, " ")
+	return arrEncTag
 }
 
 func EncodeTag(tag string) string {
