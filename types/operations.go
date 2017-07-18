@@ -306,11 +306,11 @@ func (op *AccountWitnessProxyOperation) Data() interface{} {
 // In case Title is filled in and ParentAuthor is empty, it is a new post.
 // The post category can be read from ParentPermlink.
 type CommentOperation struct {
-	Author         string `json:"author"`
-	Title          string `json:"title"`
-	Permlink       string `json:"permlink"`
 	ParentAuthor   string `json:"parent_author"`
 	ParentPermlink string `json:"parent_permlink"`
+	Author         string `json:"author"`
+	Permlink       string `json:"permlink"`
+	Title          string `json:"title"`
 	Body           string `json:"body"`
 	JsonMetadata   string `json:"json_metadata"`
 }

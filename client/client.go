@@ -16,6 +16,8 @@ import (
 	"github.com/asuleymanov/golos-go/types"
 )
 
+const fdt = `"20060102t150405"`
+
 type User struct {
 	Name string `json:"username"`
 	PKey string `json:"posting_key"`
@@ -27,6 +29,21 @@ type User struct {
 type Golos struct {
 	Rpc  *rpc.Client
 	User *User
+}
+
+type BResp struct {
+	ID       string
+	BlockNum uint32
+	TrxNum   uint32
+	Expired  bool
+}
+
+type ErrAns struct {
+	Data struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Name    string `json:"name"`
+	} `json:"data"`
 }
 
 func readconfig() *User {
@@ -66,18 +83,18 @@ func NewApi(url string) *Golos {
 	}
 }
 
-func (api *Golos) Send_Trx(strx types.Operation, chain string) error {
+func (api *Golos) Send_Trx(strx types.Operation, chain string) (*BResp, error) {
 	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
-		return errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
+		return nil, errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
 	}
 
 	// Создание транзакции
 	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	tx := transactions.NewSignedTransaction(&types.Transaction{
 		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
@@ -101,31 +118,38 @@ func (api *Golos) Send_Trx(strx types.Operation, chain string) error {
 	}
 	// Подписываем транзакцию
 	if err := tx.Sign(privKeys, ChainId); err != nil {
-		return errors.Wrapf(err, "Error Sign: ")
+		return nil, errors.Wrapf(err, "Error Sign: ")
 	}
 
 	// Отправка транзакции
 	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
-		return errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
+		return nil, errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
+	} else {
+		var bresp BResp
+
+		bresp.ID = resp.ID
+		bresp.BlockNum = resp.BlockNum
+		bresp.TrxNum = resp.TrxNum
+		bresp.Expired = resp.Expired
+
+		return &bresp, nil
 	}
-	log.Printf("%+v\n", *resp)
-	return nil
 }
 
-func (api *Golos) Send_Arr_Trx(strx []types.Operation, chain string) error {
+func (api *Golos) Send_Arr_Trx(strx []types.Operation, chain string) (*BResp, error) {
 	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
-		return errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
+		return nil, errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
 	}
 
 	// Создание транзакции
 	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	tx := transactions.NewSignedTransaction(&types.Transaction{
 		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
@@ -151,15 +175,22 @@ func (api *Golos) Send_Arr_Trx(strx []types.Operation, chain string) error {
 	}
 	// Подписываем транзакцию
 	if err := tx.Sign(privKeys, ChainId); err != nil {
-		return errors.Wrapf(err, "Error Sign: ")
+		return nil, errors.Wrapf(err, "Error Sign: ")
 	}
 
 	// Отправка транзакции
 	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
-		return errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
+		return nil, errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
+	} else {
+		var bresp BResp
+
+		bresp.ID = resp.ID
+		bresp.BlockNum = resp.BlockNum
+		bresp.TrxNum = resp.TrxNum
+		bresp.Expired = resp.Expired
+
+		return &bresp, nil
 	}
-	log.Printf("%+v\n", *resp)
-	return nil
 }
