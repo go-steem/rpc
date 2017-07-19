@@ -58,7 +58,7 @@ func run() (err error) {
 							fmt.Printf("@%v voted for @%v/%v\n", op.Voter, op.Author, op.Permlink)
 					*/
 					case *types.CustomJSONOperation:
-						fmt.Printf("@%v \n", op.JSON)
+						fmt.Printf("@%v \n", op)
 
 						// You can add more cases here, it depends on
 						// what operations you actually need to process.

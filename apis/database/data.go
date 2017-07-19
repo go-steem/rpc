@@ -352,23 +352,6 @@ type AccountKeys struct {
 	AccountAuths    []interface{} `json:"account_auths"`
 	KeyAuths        []interface{} `json:"key_auths"`
 }
-type AccountKeyAuth struct {
-	Key  string `json:"0"`
-	Num1 int    `json:"1"`
-}
-
-type AccountJMeta struct {
-	Profile *AccountJProfile `json:"profile"`
-}
-
-type AccountJProfile struct {
-	Name         string        `json:"name"`
-	Location     string        `json:"location"`
-	ProfileImage string        `json:"profile_image"`
-	Website      string        `json:"website"`
-	About        string        `json:"about"`
-	SelectTags   []interface{} `json:"select_tags"`
-}
 
 type Account struct {
 	ID                            *types.Int    `json:"id"`
