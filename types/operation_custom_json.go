@@ -14,10 +14,12 @@ import (
 
 const (
 	TypeFollow = "follow"
+	TypeReblog = "reblog"
 )
 
 var customJSONDataObjects = map[string]interface{}{
 	TypeFollow: &FollowOperation{},
+	TypeReblog: &ReblogOperation{},
 }
 
 // FC_REFLECT( steemit::chain::custom_json_operation,
@@ -77,3 +79,15 @@ func (op *CustomJSONOperation) UnmarshalData() (interface{}, error) {
 
 	return opData, nil
 }
+
+/*
+func (op *CustomJSONOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeCustomJSON.Code()))
+	enc.Encode(op.RequiredAuths)
+	enc.Encode(op.RequiredPostingAuths)
+	enc.Encode(op.ID)
+	enc.Encode(op.JSON)
+	return enc.Err()
+}
+*/

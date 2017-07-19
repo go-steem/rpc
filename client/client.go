@@ -27,8 +27,9 @@ type User struct {
 }
 
 type Golos struct {
-	Rpc  *rpc.Client
-	User *User
+	Rpc   *rpc.Client
+	User  *User
+	Chain string
 }
 
 type BResp struct {
@@ -36,14 +37,6 @@ type BResp struct {
 	BlockNum uint32
 	TrxNum   uint32
 	Expired  bool
-}
-
-type ErrAns struct {
-	Data struct {
-		Code    int    `json:"code"`
-		Message string `json:"message"`
-		Name    string `json:"name"`
-	} `json:"data"`
 }
 
 func readconfig() *User {
@@ -76,14 +69,15 @@ func initclient(url string) *rpc.Client {
 	return client
 }
 
-func NewApi(url string) *Golos {
+func NewApi(chain, url string) *Golos {
 	return &Golos{
-		Rpc:  initclient(url),
-		User: readconfig(),
+		Rpc:   initclient(url),
+		User:  readconfig(),
+		Chain: chain,
 	}
 }
 
-func (api *Golos) Send_Trx(strx types.Operation, chain string) (*BResp, error) {
+func (api *Golos) Send_Trx(strx types.Operation) (*BResp, error) {
 	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
@@ -108,7 +102,7 @@ func (api *Golos) Send_Trx(strx types.Operation, chain string) (*BResp, error) {
 	privKeys := api.Signing_Keys(strx)
 
 	// Определяем ChainId
-	switch chain {
+	switch api.Chain {
 	case "steem":
 		ChainId = transactions.SteemChain
 	case "golos":
@@ -138,7 +132,7 @@ func (api *Golos) Send_Trx(strx types.Operation, chain string) (*BResp, error) {
 	}
 }
 
-func (api *Golos) Send_Arr_Trx(strx []types.Operation, chain string) (*BResp, error) {
+func (api *Golos) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
 	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
@@ -165,7 +159,7 @@ func (api *Golos) Send_Arr_Trx(strx []types.Operation, chain string) (*BResp, er
 	privKeys := api.Signing_Keys(strx[0])
 
 	// Определяем ChainId
-	switch chain {
+	switch api.Chain {
 	case "steem":
 		ChainId = transactions.SteemChain
 	case "golos":
