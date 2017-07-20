@@ -29,7 +29,7 @@ type User struct {
 type Golos struct {
 	Rpc   *rpc.Client
 	User  *User
-	Chain string
+	Chain *transactions.Chain
 }
 
 type BResp struct {
@@ -69,16 +69,27 @@ func initclient(url string) *rpc.Client {
 	return client
 }
 
+func initChainId(str string) *transactions.Chain {
+	var ChainId transactions.Chain
+	// Определяем ChainId
+	switch str {
+	case "steem":
+		ChainId = *transactions.SteemChain
+	case "golos":
+		ChainId = *transactions.GolosChain
+	}
+	return &ChainId
+}
+
 func NewApi(chain, url string) *Golos {
 	return &Golos{
 		Rpc:   initclient(url),
 		User:  readconfig(),
-		Chain: chain,
+		Chain: initChainId(chain),
 	}
 }
 
 func (api *Golos) Send_Trx(strx types.Operation) (*BResp, error) {
-	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -101,17 +112,8 @@ func (api *Golos) Send_Trx(strx types.Operation) (*BResp, error) {
 	// Получаем необходимый для подписи ключ
 	privKeys := api.Signing_Keys(strx)
 
-	// Определяем ChainId
-	switch api.Chain {
-	case "steem":
-		ChainId = transactions.SteemChain
-	case "golos":
-		ChainId = transactions.GolosChain
-	case "test":
-		ChainId = transactions.TestChain
-	}
 	// Подписываем транзакцию
-	if err := tx.Sign(privKeys, ChainId); err != nil {
+	if err := tx.Sign(privKeys, api.Chain); err != nil {
 		return nil, errors.Wrapf(err, "Error Sign: ")
 	}
 
@@ -133,7 +135,6 @@ func (api *Golos) Send_Trx(strx types.Operation) (*BResp, error) {
 }
 
 func (api *Golos) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
-	var ChainId *transactions.Chain
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -158,17 +159,8 @@ func (api *Golos) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
 	// Получаем необходимый для подписи ключ
 	privKeys := api.Signing_Keys(strx[0])
 
-	// Определяем ChainId
-	switch api.Chain {
-	case "steem":
-		ChainId = transactions.SteemChain
-	case "golos":
-		ChainId = transactions.GolosChain
-	case "test":
-		ChainId = transactions.TestChain
-	}
 	// Подписываем транзакцию
-	if err := tx.Sign(privKeys, ChainId); err != nil {
+	if err := tx.Sign(privKeys, api.Chain); err != nil {
 		return nil, errors.Wrapf(err, "Error Sign: ")
 	}
 

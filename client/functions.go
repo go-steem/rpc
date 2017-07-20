@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
-	"github.com/asuleymanov/golos-go/translit"
+	_ "github.com/asuleymanov/golos-go/translit"
 	"github.com/asuleymanov/golos-go/types"
 )
 
@@ -86,6 +86,21 @@ func (api *Golos) Comment_Vote(author, ppermlink, body string, weight_post int) 
 	}
 }
 
+func (api *Golos) DeleteComment(permlink string) error {
+	tx := &types.DeleteCommentOperation{
+		Author:   api.User.Name,
+		Permlink: permlink,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Delete Comment: ")
+	} else {
+		log.Println("Delete Comment to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+/*
 func (api *Golos) Post(title, body string, tags []string) error {
 	permlink := translit.EncodeTitle(title)
 	tag := translit.EncodeTags(tags)
@@ -119,16 +134,75 @@ func (api *Golos) Post(title, body string, tags []string) error {
 	}
 }
 
-func (api *Golos) DeleteComment(permlink string) error {
-	tx := &types.DeleteCommentOperation{
-		Author:   api.User.Name,
-		Permlink: permlink,
+func (api *Golos) Reblog(author, permlink string) error {
+	json_string := "[\"reblog\",{\"account\":\"" + api.User.Name + "\",\"author\":\"" + author + "\",\"permlink\":\"" + permlink + "\"}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "follow",
+		JSON:                 json_string,
 	}
 	resp, err := api.Send_Trx(tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Delete Comment: ")
+		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Delete Comment to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
 		return nil
 	}
 }
+
+func (api *Golos) Follow(author string) error {
+	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"blog\"]}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "follow",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+func (api *Golos) Unfollow(author string) error {
+	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"\"]}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "reblog",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+func (api *Golos) Ignore(author string) error {
+	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"ignore\"]}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "reblog",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+*/

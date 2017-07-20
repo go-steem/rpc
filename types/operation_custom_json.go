@@ -10,6 +10,9 @@ import (
 
 	// Vendor
 	"github.com/pkg/errors"
+
+	// RPC
+	_ "github.com/asuleymanov/golos-go/encoding/transaction"
 )
 
 const (
@@ -84,10 +87,14 @@ func (op *CustomJSONOperation) UnmarshalData() (interface{}, error) {
 func (op *CustomJSONOperation) MarshalTransaction(encoder *transaction.Encoder) error {
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeCustomJSON.Code()))
-	enc.Encode(op.RequiredAuths)
-	enc.Encode(op.RequiredPostingAuths)
-	enc.Encode(op.ID)
 	enc.Encode(op.JSON)
+	for _, valra := range op.RequiredAuths {
+		enc.Encode(valra)
+	}
+	for _, valrpa := range op.RequiredPostingAuths {
+		enc.Encode(valrpa)
+	}
+	enc.Encode(op.ID)
 	return enc.Err()
 }
 */
