@@ -23,6 +23,7 @@ for more complete and ready to use examples.
 
 ```go
 	cls := client.NewApi()
+	defer cls.Rpc.Close()
 	
 	// Get config.
 	log.Println("---> GetConfig()")
