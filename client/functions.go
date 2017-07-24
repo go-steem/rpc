@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
-	_ "github.com/asuleymanov/golos-go/translit"
+	"github.com/asuleymanov/golos-go/translit"
 	"github.com/asuleymanov/golos-go/types"
 )
 
@@ -111,7 +111,6 @@ func (api *Client) DeleteComment(permlink string) error {
 	}
 }
 
-/*
 func (api *Client) Post(title, body string, tags []string) error {
 	permlink := translit.EncodeTitle(title)
 	tag := translit.EncodeTags(tags)
@@ -145,6 +144,7 @@ func (api *Client) Post(title, body string, tags []string) error {
 	}
 }
 
+/*
 func (api *Client) Follow(author string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"blog\"]}]"
 

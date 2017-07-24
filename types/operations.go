@@ -211,7 +211,7 @@ func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) er
 		enc.Encode(int64(amm))
 		enc.Encode(uint8(perc))
 		enc.Encode(asset[1])
-		for i := 0; i < 10-len(asset[1]); i++ {
+		for i := len(asset[1]); i < 7; i++ {
 			enc.Encode(uint8(0))
 		}
 	} else {
@@ -355,7 +355,7 @@ func (op *CommentOperation) MarshalTransaction(encoder *transaction.Encoder) err
 	if !op.IsStoryOperation() {
 		enc.Encode(op.ParentAuthor)
 	} else {
-		enc.Encode(uint8(0))
+		enc.Encode(byte(0))
 	}
 	enc.Encode(op.ParentPermlink)
 	enc.Encode(op.Author)
