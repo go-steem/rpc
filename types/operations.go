@@ -293,7 +293,11 @@ func (op *AccountWitnessVoteOperation) MarshalTransaction(encoder *transaction.E
 	enc.EncodeUVarint(uint64(TypeAccountWitnessVote.Code()))
 	enc.Encode(op.Account)
 	enc.Encode(op.Witness)
-	enc.Encode(op.Approve)
+	if op.Approve {
+		enc.Encode(byte(1))
+	} else {
+		enc.Encode(byte(0))
+	}
 	return enc.Err()
 }
 

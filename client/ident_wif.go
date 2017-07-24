@@ -26,7 +26,7 @@ func init() {
 	OpTypeKey["account_create"] = []string{"active"}
 	OpTypeKey["account_update"] = []string{"active"}
 	OpTypeKey["witness_update"] = []string{"active"}
-	OpTypeKey["account_witness_vote"] = []string{"posting"}
+	OpTypeKey["account_witness_vote"] = []string{"active"}
 	OpTypeKey["account_witness_proxy"] = []string{"posting"}
 	OpTypeKey["pow"] = []string{"active"}
 	OpTypeKey["custom"] = []string{"active"}

@@ -144,6 +144,42 @@ func (api *Client) Post(title, body string, tags []string) error {
 	}
 }
 
+func (api *Client) Post_Options(title, body string, tags []string) error {
+	permlink := translit.EncodeTitle(title)
+	tag := translit.EncodeTags(tags)
+	ptag := translit.EncodeTag(tags[0])
+
+	json_meta := "{\"tag\":["
+	for k, v := range tag {
+		if k != len(tags)-1 {
+			json_meta = json_meta + "\"" + v + "\","
+		} else {
+			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+		}
+	}
+
+	var trx []types.Operation
+
+	txp := &types.CommentOperation{
+		ParentAuthor:   "",
+		ParentPermlink: ptag,
+		Author:         api.User.Name,
+		Permlink:       permlink,
+		Title:          title,
+		Body:           body,
+		JsonMetadata:   json_meta,
+	}
+	trx = append(trx, txp)
+
+	resp, err := api.Send_Arr_Trx(trx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Post_Options: ")
+	} else {
+		log.Println("Add Post to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
 /*
 func (api *Client) Follow(author string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"blog\"]}]"
