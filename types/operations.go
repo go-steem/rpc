@@ -209,10 +209,10 @@ func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) er
 			perc = len(asset[0]) - ind - 1
 		}
 		enc.Encode(int64(amm))
-		enc.Encode(uint8(perc))
+		enc.Encode(int64(perc))
 		enc.Encode(asset[1])
 		for i := len(asset[1]); i < 7; i++ {
-			enc.Encode(uint8(0))
+			enc.Encode(byte(0))
 		}
 	} else {
 		return errors.New("Expecting amount like '99.000 SYMBOL'")
@@ -293,11 +293,12 @@ func (op *AccountWitnessVoteOperation) MarshalTransaction(encoder *transaction.E
 	enc.EncodeUVarint(uint64(TypeAccountWitnessVote.Code()))
 	enc.Encode(op.Account)
 	enc.Encode(op.Witness)
-	if op.Approve {
+	enc.EncodeBool(op.Approve)
+	/*if op.Approve {
 		enc.Encode(byte(1))
 	} else {
 		enc.Encode(byte(0))
-	}
+	}*/
 	return enc.Err()
 }
 

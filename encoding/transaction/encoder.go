@@ -113,3 +113,11 @@ func (encoder *Encoder) writeString(s string) error {
 	}
 	return nil
 }
+
+func (encoder *Encoder) EncodeBool(b bool) error {
+	if b {
+		return encoder.EncodeNumber(byte(1))
+	} else {
+		return encoder.EncodeNumber(byte(0))
+	}
+}
