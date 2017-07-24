@@ -7,27 +7,14 @@ Golang RPC client library for [Golos](https://golos.io).
 ## Compatibility
 
 `golosd 0.16.0`
+`steemd 0.18.0`
 
 ## Usage
 
 ```go
-import "github.com/asuleymanov/golos-go"
+import "github.com/asuleymanov/golos-go/client"
 ```
 
-
-## Installation
-
-This package calls [bitcoin-core/secp256k1](https://github.com/bitcoin-core/secp256k1)
-using CGO to implement signed transactions, so you need to install `secp256k1` first.
-Then it will be possible to build `asuleymanov/golos-go`.
-
-In case you don't need signed transactions, i.e. you don't need to use
-`network_broadcast_api`, it is possible to build the package with `nosigning`
-tag to exclude the functionality:
-
-```bash
-$ go build -tags nosigning
-```
 
 ## Example
 
@@ -35,95 +22,74 @@ This is just a code snippet. Please check the `examples` directory
 for more complete and ready to use examples.
 
 ```go
-// Instantiate the WebSocket transport.
-t, _ := websocket.NewTransport("wss://localhost:8090")
-
-// Use the transport to create an RPC client.
-client, _ := rpc.NewClient(t)
-defer client.Close()
-
-// Call "get_config".
-config, _ := client.Database.GetConfig()
-
-// Start processing blocks.
-lastBlock := 1800000
-for {
-	// Call "get_dynamic_global_properties".
-	props, _ := client.Database.GetDynamicGlobalProperties()
-
-	for props.LastIrreversibleBlockNum-lastBlock > 0 {
-		// Call "get_block".
-		block, _ := client.Database.GetBlock(lastBlock)
-
-		// Process the transactions.
-		for _, tx := range block.Transactions {
-			for _, op := range tx.Operations {
-				switch body := op.Data().(type) {
-					// Comment operation.
-					case *types.CommentOperation:
-						content, _ := client.Database.GetContent(body.Author, body.Permlink)
-						fmt.Printf("COMMENT @%v %v\n", content.Author, content.URL)
-
-					// Vote operation.
-					case *types.VoteOperation:
-						fmt.Printf("VOTE @%v @%v/%v\n", body.Voter, body.Author, body.Permlink)
-
-					// You can add more cases, it depends on what
-					// operations you actually need to process.
-				}
-			}
-		}
-
-		lastBlock++
+	cls := client.NewApi()
+	
+	// Get config.
+	log.Println("---> GetConfig()")
+	config, err := cls.Rpc.Database.GetConfig()
+	if err != nil {
+		return err
 	}
 
-	time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
-}
+	// Use the last irreversible block number as the initial last block number.
+	props, err := cls.Rpc.Database.GetDynamicGlobalProperties()
+	if err != nil {
+		return err
+	}
+	lastBlock := props.LastIrreversibleBlockNum
+
+	// Keep processing incoming blocks forever.
+	log.Printf("---> Entering the block processing loop (last block = %v)\n", lastBlock)
+	for {
+		// Get current properties.
+		props, err := cls.Rpc.Database.GetDynamicGlobalProperties()
+		if err != nil {
+			return err
+		}
+
+		// Process new blocks.
+		for props.LastIrreversibleBlockNum-lastBlock > 0 {
+			block, err := cls.Rpc.Database.GetBlock(lastBlock)
+			if err != nil {
+				return err
+			}
+
+			// Process the transactions.
+			for _, tx := range block.Transactions {
+				for _, operation := range tx.Operations {
+					switch op := operation.Data().(type) {
+					case *types.VoteOperation:
+						log.Printf("@%v voted for @%v/%v\n", op.Voter, op.Author, op.Permlink)
+
+						// You can add more cases here, it depends on
+						// what operations you actually need to process.
+					}
+				}
+			}
+
+			lastBlock++
+		}
+
+		// Sleep for STEEMIT_BLOCK_INTERVAL seconds before the next iteration.
+		time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
+	}
 ```
 
 ## Package Organisation
 
-You need to create a `Client` object to be able to do anything. To be able to
-instantiate a `Client`, you first need to create a transport to be used to
-execute RPC calls. The WebSocket transport is available in `transports/websocket`.
-Then you just need to call `NewClient(transport)`.
+
+You need to create a `Client` object to be able to do anything.
+Then you just need to call `NewApi()`.
 
 Once you create a `Client` object, you can start calling the methods exported
-via `steemd`'s RPC endpoint by invoking associated methods on the client object.
+via `golosd(steemd)`'s RPC endpoint by invoking associated methods on the client object.
 There are multiple APIs that can be exported, e.g. `database_api` and `login_api`,
 so the methods on the Client object are also namespaced accoding to these APIs.
 For example, to call `get_block` from `database_api`, you need to use
-`Client.Database.GetBlock` method.
+`Client.Rpc.Database.GetBlock` method.
 
 When looking for a method to call, all you need is to turn the method name into
-CamelCase, e.g. `get_config` becomes `Client.Database.GetConfig`.
-
-### Raw and Full Methods
-
-There are two methods implemented for every method exported via the RPC endpoint.
-The regular version and the raw version. Let's see an example for `get_config`:
-
-```go
-func (client *Client) GetConfig() (*Config, error) {
-	...
-}
-
-func (client *Client) GetConfigRaw() (*json.RawMessage, error) {
-	...
-}
-```
-
-As we can see, the difference is that the raw version returns `*json.RawMessage`,
-so it is not trying to unmarshall the response into a properly typed response.
-
-There are two reasons for this:
-
-1. To be able to see raw data.
-2. To be able to call most of the remote methods even though the response
-   object is not yet known or specified.
-
-It is already benefitial to just have the raw version because at least
-the method parameters are statically typed.
+CamelCase, e.g. `get_config` becomes `Client.Rpc.Database.GetConfig`.
 
 ## Status
 
