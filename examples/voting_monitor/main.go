@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -9,7 +8,7 @@ import (
 	"github.com/asuleymanov/golos-go/types"
 )
 
-var cls = client.NewApi("golos", "wss://ws.golos.io")
+var cls = client.NewApi()
 
 func main() {
 	defer cls.Rpc.Close()
@@ -53,12 +52,8 @@ func run() (err error) {
 			for _, tx := range block.Transactions {
 				for _, operation := range tx.Operations {
 					switch op := operation.Data().(type) {
-					/*
-						case *types.VoteOperation:
-							fmt.Printf("@%v voted for @%v/%v\n", op.Voter, op.Author, op.Permlink)
-					*/
-					case *types.CustomJSONOperation:
-						fmt.Printf("@%v \n", op)
+					case *types.VoteOperation:
+						log.Printf("@%v voted for @%v/%v\n", op.Voter, op.Author, op.Permlink)
 
 						// You can add more cases here, it depends on
 						// what operations you actually need to process.

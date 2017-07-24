@@ -3,6 +3,9 @@ package types
 import (
 	// Stdlib
 	"encoding/json"
+	"regexp"
+	"strconv"
+	"strings"
 
 	// RPC
 	"github.com/asuleymanov/golos-go/encoding/transaction"
@@ -194,7 +197,26 @@ func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) er
 	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
 	enc.Encode(op.From)
 	enc.Encode(op.To)
-	enc.Encode(op.Amount)
+	r, _ := regexp.Compile("^[0-9]+\\.?[0-9]* [A-Za-z0-9]+$")
+	if r.MatchString(op.Amount) {
+		asset := strings.Split(op.Amount, " ")
+		amm, _ := strconv.ParseInt(strings.Replace(asset[0], ".", "", -1), 10, 64)
+		ind := strings.Index(asset[0], ".")
+		var perc int
+		if ind == -1 {
+			perc = 0
+		} else {
+			perc = len(asset[0]) - ind - 1
+		}
+		enc.Encode(int64(amm))
+		enc.Encode(uint8(perc))
+		enc.Encode(asset[1])
+		for i := 0; i < 10-len(asset[1]); i++ {
+			enc.Encode(uint8(0))
+		}
+	} else {
+		return errors.New("Expecting amount like '99.000 SYMBOL'")
+	}
 	enc.Encode(op.Memo)
 	return enc.Err()
 }
@@ -330,7 +352,11 @@ func (op *CommentOperation) IsStoryOperation() bool {
 func (op *CommentOperation) MarshalTransaction(encoder *transaction.Encoder) error {
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeComment.Code()))
-	enc.Encode(op.ParentAuthor)
+	if !op.IsStoryOperation() {
+		enc.Encode(op.ParentAuthor)
+	} else {
+		enc.Encode(uint8(0))
+	}
 	enc.Encode(op.ParentPermlink)
 	enc.Encode(op.Author)
 	enc.Encode(op.Permlink)

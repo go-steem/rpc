@@ -41,6 +41,16 @@ func (encoder *Encoder) EncodeNumber(v interface{}) error {
 	return nil
 }
 
+func (encoder *Encoder) EncodeArrString(v []string) error {
+	if err := encoder.EncodeUVarint(uint64(len(v))); err != nil {
+		return errors.Wrapf(err, "encoder: failed to write string: %v", v)
+	}
+	for _, val := range v {
+		return encoder.writeString(val)
+	}
+	return nil
+}
+
 func (encoder *Encoder) Encode(v interface{}) error {
 	if marshaller, ok := v.(TransactionMarshaller); ok {
 		return marshaller.MarshalTransaction(encoder)
@@ -73,7 +83,7 @@ func (encoder *Encoder) Encode(v interface{}) error {
 		return encoder.encodeString(v)
 
 	case bool:
-		return encoder.encodeBool(v)
+		return encoder.EncodeNumber(v)
 
 	default:
 		return errors.Errorf("encoder: unsupported type encountered")
@@ -98,13 +108,6 @@ func (encoder *Encoder) writeBytes(bs []byte) error {
 func (encoder *Encoder) writeString(s string) error {
 	if _, err := io.Copy(encoder.w, strings.NewReader(s)); err != nil {
 		return errors.Wrapf(err, "encoder: failed to write string: %v", s)
-	}
-	return nil
-}
-
-func (encoder *Encoder) encodeBool(v bool) error {
-	if err := binary.Write(encoder.w, binary.BigEndian, v); err != nil {
-		return errors.Wrapf(err, "encoder: failed to write bool: %v", v)
 	}
 	return nil
 }

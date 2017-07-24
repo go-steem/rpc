@@ -19,14 +19,16 @@ import (
 const fdt = `"20060102t150405"`
 
 type User struct {
-	Name string `json:"username"`
-	PKey string `json:"posting_key"`
-	AKey string `json:"active_key"`
-	OKey string `json:"owner_key"`
-	MKey string `json:"memo_key"`
+	Name  string `json:"username"`
+	Chain string `json:"chain"`
+	Url   string `json:"url"`
+	PKey  string `json:"posting_key"`
+	AKey  string `json:"active_key"`
+	OKey  string `json:"owner_key"`
+	MKey  string `json:"memo_key"`
 }
 
-type Golos struct {
+type Client struct {
 	Rpc   *rpc.Client
 	User  *User
 	Chain *transactions.Chain
@@ -42,12 +44,12 @@ type BResp struct {
 func readconfig() *User {
 	file, e := ioutil.ReadFile("./config.json")
 	if e != nil {
-		log.Println(errors.Wrapf(e, "Error read config.json: "))
+		log.Fatal(errors.Wrapf(e, "Error read config.json: "))
 	}
 
 	var jsontype *User
 	if erru := json.Unmarshal(file, &jsontype); erru != nil {
-		log.Println(errors.Wrapf(erru, "Error UnMarshal config.json: "))
+		log.Println(errors.Wrapf(erru, "Error Unmarshal config.json: "))
 		return nil
 	}
 	return jsontype
@@ -81,15 +83,16 @@ func initChainId(str string) *transactions.Chain {
 	return &ChainId
 }
 
-func NewApi(chain, url string) *Golos {
-	return &Golos{
-		Rpc:   initclient(url),
-		User:  readconfig(),
-		Chain: initChainId(chain),
+func NewApi() *Client {
+	tmpUser := readconfig()
+	return &Client{
+		User:  tmpUser,
+		Rpc:   initclient(tmpUser.Url),
+		Chain: initChainId(tmpUser.Chain),
 	}
 }
 
-func (api *Golos) Send_Trx(strx types.Operation) (*BResp, error) {
+func (api *Client) Send_Trx(strx types.Operation) (*BResp, error) {
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -134,7 +137,7 @@ func (api *Golos) Send_Trx(strx types.Operation) (*BResp, error) {
 	}
 }
 
-func (api *Golos) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
+func (api *Client) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -178,5 +181,43 @@ func (api *Golos) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
 		bresp.Expired = resp.Expired
 
 		return &bresp, nil
+	}
+}
+
+func (api *Client) Verify_Trx(strx types.Operation) (bool, error) {
+	// Получение необходимых параметров
+	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	if err != nil {
+		return false, errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
+	}
+
+	// Создание транзакции
+	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
+	if err != nil {
+		return false, err
+	}
+	tx := transactions.NewSignedTransaction(&types.Transaction{
+		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
+		RefBlockPrefix: refBlockPrefix,
+	})
+
+	// Добавление операций в транзакцию
+	tx.PushOperation(strx)
+
+	// Получаем необходимый для подписи ключ
+	privKeys := api.Signing_Keys(strx)
+
+	// Подписываем транзакцию
+	if err := tx.Sign(privKeys, api.Chain); err != nil {
+		return false, errors.Wrapf(err, "Error Sign: ")
+	}
+
+	// Отправка транзакции
+	resp, err := api.Rpc.Database.GetVerifyAuthoruty(tx.Transaction)
+
+	if err != nil {
+		return false, errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
+	} else {
+		return resp, nil
 	}
 }

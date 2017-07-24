@@ -73,7 +73,7 @@ func init() {
 
 }
 
-func (api *Golos) Signing_Keys(trx types.Operation) [][]byte {
+func (api *Client) Signing_Keys(trx types.Operation) [][]byte {
 	var keys [][]byte
 	op_keys := OpTypeKey[trx.Type()]
 	for _, val := range op_keys {

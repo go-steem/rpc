@@ -14,9 +14,12 @@ import (
 	"github.com/asuleymanov/golos-go/types"
 )
 
-func (api *Golos) Vote(author, permlink string, weight int) error {
+func (api *Client) Vote(author, permlink string, weight int) error {
 	if weight > 10000 {
 		return errors.New("The value of Weight can not be more than 10,000")
+	}
+	if api.Verify_Voter(author, permlink, api.User.Name) {
+		return errors.New("The voter is on the list")
 	}
 	tx := &types.VoteOperation{
 		Voter:    api.User.Name,
@@ -33,7 +36,7 @@ func (api *Golos) Vote(author, permlink string, weight int) error {
 	}
 }
 
-func (api *Golos) Comment(author, ppermlink, body string) error {
+func (api *Client) Comment(author, ppermlink, body string) error {
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
 	permlink := "re-" + author + "-" + ppermlink + "-" + times
 	tx := &types.CommentOperation{
@@ -54,7 +57,7 @@ func (api *Golos) Comment(author, ppermlink, body string) error {
 	}
 }
 
-func (api *Golos) Comment_Vote(author, ppermlink, body string, weight_post int) error {
+func (api *Client) Comment_Vote(author, ppermlink, body string, weight_post int) error {
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
 	permlink := "re-" + author + "-" + ppermlink + "-" + times
 	var trx []types.Operation
@@ -69,13 +72,15 @@ func (api *Golos) Comment_Vote(author, ppermlink, body string, weight_post int) 
 	}
 	trx = append(trx, txc)
 
-	txv := &types.VoteOperation{
-		Voter:    api.User.Name,
-		Author:   author,
-		Permlink: ppermlink,
-		Weight:   types.Int16(weight_post),
+	if !api.Verify_Voter(author, permlink, api.User.Name) {
+		txv := &types.VoteOperation{
+			Voter:    api.User.Name,
+			Author:   author,
+			Permlink: ppermlink,
+			Weight:   types.Int16(weight_post),
+		}
+		trx = append(trx, txv)
 	}
-	trx = append(trx, txv)
 
 	resp, err := api.Send_Arr_Trx(trx)
 	if err != nil {
@@ -86,7 +91,13 @@ func (api *Golos) Comment_Vote(author, ppermlink, body string, weight_post int) 
 	}
 }
 
-func (api *Golos) DeleteComment(permlink string) error {
+func (api *Client) DeleteComment(permlink string) error {
+	if api.Verify_Votes(api.User.Name, permlink) {
+		return errors.New("You can not delete already there are voted")
+	}
+	if api.Verify_Comments(api.User.Name, permlink) {
+		return errors.New("You can not delete already have comments")
+	}
 	tx := &types.DeleteCommentOperation{
 		Author:   api.User.Name,
 		Permlink: permlink,
@@ -101,7 +112,7 @@ func (api *Golos) DeleteComment(permlink string) error {
 }
 
 /*
-func (api *Golos) Post(title, body string, tags []string) error {
+func (api *Client) Post(title, body string, tags []string) error {
 	permlink := translit.EncodeTitle(title)
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
@@ -117,9 +128,9 @@ func (api *Golos) Post(title, body string, tags []string) error {
 
 	tx := &types.CommentOperation{
 		ParentAuthor:   "",
-		ParentPermlink: permlink,
+		ParentPermlink: ptag,
 		Author:         api.User.Name,
-		Permlink:       ptag,
+		Permlink:       permlink,
 		Title:          title,
 		Body:           body,
 		JsonMetadata:   json_meta,
@@ -134,25 +145,7 @@ func (api *Golos) Post(title, body string, tags []string) error {
 	}
 }
 
-func (api *Golos) Reblog(author, permlink string) error {
-	json_string := "[\"reblog\",{\"account\":\"" + api.User.Name + "\",\"author\":\"" + author + "\",\"permlink\":\"" + permlink + "\"}]"
-
-	tx := &types.CustomJSONOperation{
-		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{api.User.Name},
-		ID:                   "follow",
-		JSON:                 json_string,
-	}
-	resp, err := api.Send_Trx(tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
-	} else {
-		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
-		return nil
-	}
-}
-
-func (api *Golos) Follow(author string) error {
+func (api *Client) Follow(author string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"blog\"]}]"
 
 	tx := &types.CustomJSONOperation{
@@ -170,7 +163,25 @@ func (api *Golos) Follow(author string) error {
 	}
 }
 
-func (api *Golos) Unfollow(author string) error {
+func (api *Client) Reblog(author, permlink string) error {
+	json_string := "[\"reblog\",{\"account\":\"" + api.User.Name + "\",\"author\":\"" + author + "\",\"permlink\":\"" + permlink + "\"}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "follow",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+func (api *Client) Unfollow(author string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"\"]}]"
 
 	tx := &types.CustomJSONOperation{
@@ -188,7 +199,7 @@ func (api *Golos) Unfollow(author string) error {
 	}
 }
 
-func (api *Golos) Ignore(author string) error {
+func (api *Client) Ignore(author string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"ignore\"]}]"
 
 	tx := &types.CustomJSONOperation{
