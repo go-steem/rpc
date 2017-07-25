@@ -143,9 +143,6 @@ func (encoder *Encoder) EncodeMoney(s string) error {
 			return errors.Wrapf(err, "encoder: failed to write number: %v", perc)
 		}
 
-		if err := encoder.EncodeUVarint(uint64(len(asset[1]))); err != nil {
-			return errors.Wrapf(err, "encoder: failed to write string: %v", asset[1])
-		}
 		if _, err := io.Copy(encoder.w, strings.NewReader(asset[1])); err != nil {
 			return errors.Wrapf(err, "encoder: failed to write string: %v", asset[1])
 		}
