@@ -86,9 +86,9 @@ func (op *CustomJSONOperation) UnmarshalData() (interface{}, error) {
 func (op *CustomJSONOperation) MarshalTransaction(encoder *transaction.Encoder) error {
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeCustomJSON.Code()))
-	enc.Encode(op.JSON)
 	enc.EncodeArrString(op.RequiredAuths)
 	enc.EncodeArrString(op.RequiredPostingAuths)
 	enc.Encode(op.ID)
+	enc.Encode(op.JSON)
 	return enc.Err()
 }

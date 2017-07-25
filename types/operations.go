@@ -3,9 +3,6 @@ package types
 import (
 	// Stdlib
 	"encoding/json"
-	"regexp"
-	"strconv"
-	"strings"
 
 	// RPC
 	"github.com/asuleymanov/golos-go/encoding/transaction"
@@ -197,26 +194,7 @@ func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) er
 	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
 	enc.Encode(op.From)
 	enc.Encode(op.To)
-	r, _ := regexp.Compile("^[0-9]+\\.?[0-9]* [A-Za-z0-9]+$")
-	if r.MatchString(op.Amount) {
-		asset := strings.Split(op.Amount, " ")
-		amm, _ := strconv.ParseInt(strings.Replace(asset[0], ".", "", -1), 10, 64)
-		ind := strings.Index(asset[0], ".")
-		var perc int
-		if ind == -1 {
-			perc = 0
-		} else {
-			perc = len(asset[0]) - ind - 1
-		}
-		enc.Encode(int64(amm))
-		enc.Encode(int64(perc))
-		enc.Encode(asset[1])
-		for i := len(asset[1]); i < 7; i++ {
-			enc.Encode(byte(0))
-		}
-	} else {
-		return errors.New("Expecting amount like '99.000 SYMBOL'")
-	}
+	enc.EncodeMoney(op.Amount)
 	enc.Encode(op.Memo)
 	return enc.Err()
 }
@@ -294,11 +272,6 @@ func (op *AccountWitnessVoteOperation) MarshalTransaction(encoder *transaction.E
 	enc.Encode(op.Account)
 	enc.Encode(op.Witness)
 	enc.EncodeBool(op.Approve)
-	/*if op.Approve {
-		enc.Encode(byte(1))
-	} else {
-		enc.Encode(byte(0))
-	}*/
 	return enc.Err()
 }
 
@@ -508,8 +481,8 @@ func (op *CommentOptionsOperation) MarshalTransaction(encoder *transaction.Encod
 	enc.Encode(op.Permlink)
 	enc.Encode(op.MaxAcceptedPayout)
 	enc.Encode(op.PercentSteemDollars)
-	enc.Encode(op.AllowVotes)
-	enc.Encode(op.AllowCurationRewards)
+	enc.EncodeBool(op.AllowVotes)
+	enc.EncodeBool(op.AllowCurationRewards)
 	enc.Encode(op.Extensions)
 	return enc.Err()
 }

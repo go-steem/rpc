@@ -52,3 +52,18 @@ func (api *Client) Verify_Comments(author, permlink string) bool {
 		}
 	}
 }
+
+func (api *Client) Verify_Reblogs(author, permlink, rebloger string) bool {
+	ans, err := api.Rpc.Follow.GetRebloggedBy(author, permlink)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "Error Verify Reblogs: "))
+		return false
+	} else {
+		for _, v := range ans {
+			if v == rebloger {
+				return true
+			}
+		}
+		return false
+	}
+}

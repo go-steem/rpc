@@ -58,6 +58,9 @@ func (api *Client) Comment(author, ppermlink, body string) error {
 }
 
 func (api *Client) Comment_Vote(author, ppermlink, body string, weight_post int) error {
+	if weight_post > 10000 {
+		return errors.New("The value of Weight can not be more than 10,000")
+	}
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
 	permlink := "re-" + author + "-" + ppermlink + "-" + times
 	var trx []types.Operation
@@ -144,43 +147,6 @@ func (api *Client) Post(title, body string, tags []string) error {
 	}
 }
 
-func (api *Client) Post_Options(title, body string, tags []string) error {
-	permlink := translit.EncodeTitle(title)
-	tag := translit.EncodeTags(tags)
-	ptag := translit.EncodeTag(tags[0])
-
-	json_meta := "{\"tag\":["
-	for k, v := range tag {
-		if k != len(tags)-1 {
-			json_meta = json_meta + "\"" + v + "\","
-		} else {
-			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
-		}
-	}
-
-	var trx []types.Operation
-
-	txp := &types.CommentOperation{
-		ParentAuthor:   "",
-		ParentPermlink: ptag,
-		Author:         api.User.Name,
-		Permlink:       permlink,
-		Title:          title,
-		Body:           body,
-		JsonMetadata:   json_meta,
-	}
-	trx = append(trx, txp)
-
-	resp, err := api.Send_Arr_Trx(trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Post_Options: ")
-	} else {
-		log.Println("Add Post to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
-		return nil
-	}
-}
-
-/*
 func (api *Client) Follow(author string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"blog\"]}]"
 
@@ -194,12 +160,69 @@ func (api *Client) Follow(author string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("Follow to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+func (api *Client) Unfollow(author string) error {
+	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[]}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "follow",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Unfollow to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+func (api *Client) Ignore(author string) error {
+	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"ignore\"]}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "follow",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Ignore to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		return nil
+	}
+}
+
+func (api *Client) Notice(author string) error {
+	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[]}]"
+
+	tx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{api.User.Name},
+		ID:                   "follow",
+		JSON:                 json_string,
+	}
+	resp, err := api.Send_Trx(tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Reblog: ")
+	} else {
+		log.Println("Notice to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
 		return nil
 	}
 }
 
 func (api *Client) Reblog(author, permlink string) error {
+	if api.Verify_Reblogs(author, permlink, api.User.Name) {
+		return errors.New("The user already did repost")
+	}
 	json_string := "[\"reblog\",{\"account\":\"" + api.User.Name + "\",\"author\":\"" + author + "\",\"permlink\":\"" + permlink + "\"}]"
 
 	tx := &types.CustomJSONOperation{
@@ -217,39 +240,17 @@ func (api *Client) Reblog(author, permlink string) error {
 	}
 }
 
-func (api *Client) Unfollow(author string) error {
-	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"\"]}]"
-
-	tx := &types.CustomJSONOperation{
-		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{api.User.Name},
-		ID:                   "reblog",
-		JSON:                 json_string,
+func (api *Client) Witness_Vote(witness string, approv bool) error {
+	tx := &types.AccountWitnessVoteOperation{
+		Account: api.User.Name,
+		Witness: witness,
+		Approve: approv,
 	}
 	resp, err := api.Send_Trx(tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("Witness Vote to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
 		return nil
 	}
 }
-
-func (api *Client) Ignore(author string) error {
-	json_string := "[\"follow\",{\"follower\":\"" + api.User.Name + "\",\"following\":\"" + author + "\",\"what\":[\"ignore\"]}]"
-
-	tx := &types.CustomJSONOperation{
-		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{api.User.Name},
-		ID:                   "reblog",
-		JSON:                 json_string,
-	}
-	resp, err := api.Send_Trx(tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
-	} else {
-		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
-		return nil
-	}
-}
-*/
