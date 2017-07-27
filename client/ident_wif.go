@@ -73,36 +73,40 @@ func init() {
 
 }
 
-func (api *Client) Signing_Keys(trx types.Operation) [][]byte {
+func (api *Client) Signing_Keys(username string, trx types.Operation) [][]byte {
 	var keys [][]byte
-	op_keys := OpTypeKey[trx.Type()]
-	for _, val := range op_keys {
-		switch {
-		case val == "posting":
-			privKey, err := wif.Decode(string([]byte(api.User.PKey)))
-			if err != nil {
-				log.Println(errors.Wrapf(err, "Error decode Key: "))
+	if _, ok := Key_List[username]; ok {
+		op_keys := OpTypeKey[trx.Type()]
+		for _, val := range op_keys {
+			switch {
+			case val == "posting":
+				privKey, err := wif.Decode(string([]byte(Key_List[username].PKey)))
+				if err != nil {
+					log.Println(errors.Wrapf(err, "Error decode Key: "))
+				}
+				keys = append(keys, privKey)
+			case val == "active":
+				privKey, err := wif.Decode(string([]byte(Key_List[username].AKey)))
+				if err != nil {
+					log.Println(errors.Wrapf(err, "Error decode Key: "))
+				}
+				keys = append(keys, privKey)
+			case val == "owner":
+				privKey, err := wif.Decode(string([]byte(Key_List[username].OKey)))
+				if err != nil {
+					log.Println(errors.Wrapf(err, "Error decode Key: "))
+				}
+				keys = append(keys, privKey)
+			case val == "memo":
+				privKey, err := wif.Decode(string([]byte(Key_List[username].MKey)))
+				if err != nil {
+					log.Println(errors.Wrapf(err, "Error decode Key: "))
+				}
+				keys = append(keys, privKey)
 			}
-			keys = append(keys, privKey)
-		case val == "active":
-			privKey, err := wif.Decode(string([]byte(api.User.AKey)))
-			if err != nil {
-				log.Println(errors.Wrapf(err, "Error decode Key: "))
-			}
-			keys = append(keys, privKey)
-		case val == "owner":
-			privKey, err := wif.Decode(string([]byte(api.User.OKey)))
-			if err != nil {
-				log.Println(errors.Wrapf(err, "Error decode Key: "))
-			}
-			keys = append(keys, privKey)
-		case val == "memo":
-			privKey, err := wif.Decode(string([]byte(api.User.MKey)))
-			if err != nil {
-				log.Println(errors.Wrapf(err, "Error decode Key: "))
-			}
-			keys = append(keys, privKey)
 		}
+	} else {
+		log.Println(errors.New("No user keys found"))
 	}
 	return keys
 }

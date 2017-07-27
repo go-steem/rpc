@@ -1,11 +1,6 @@
 package client
 
 import (
-	// Stdlib
-	"encoding/json"
-	"io/ioutil"
-	"log"
-
 	// Vendor
 	"github.com/pkg/errors"
 
@@ -18,19 +13,17 @@ import (
 
 const fdt = `"20060102t150405"`
 
-type User struct {
-	Name  string `json:"username"`
-	Chain string `json:"chain"`
-	Url   string `json:"url"`
-	PKey  string `json:"posting_key"`
-	AKey  string `json:"active_key"`
-	OKey  string `json:"owner_key"`
-	MKey  string `json:"memo_key"`
+var Key_List = make(map[string]Keys)
+
+type Keys struct {
+	PKey string
+	AKey string
+	OKey string
+	MKey string
 }
 
 type Client struct {
 	Rpc   *rpc.Client
-	User  *User
 	Chain *transactions.Chain
 }
 
@@ -39,20 +32,6 @@ type BResp struct {
 	BlockNum uint32
 	TrxNum   uint32
 	Expired  bool
-}
-
-func readconfig() *User {
-	file, e := ioutil.ReadFile("./config.json")
-	if e != nil {
-		log.Fatal(errors.Wrapf(e, "Error read config.json: "))
-	}
-
-	var jsontype *User
-	if erru := json.Unmarshal(file, &jsontype); erru != nil {
-		log.Println(errors.Wrapf(erru, "Error Unmarshal config.json: "))
-		return nil
-	}
-	return jsontype
 }
 
 func initclient(url string) *rpc.Client {
@@ -83,16 +62,14 @@ func initChainId(str string) *transactions.Chain {
 	return &ChainId
 }
 
-func NewApi() *Client {
-	tmpUser := readconfig()
+func NewApi(url, chain string) *Client {
 	return &Client{
-		User:  tmpUser,
-		Rpc:   initclient(tmpUser.Url),
-		Chain: initChainId(tmpUser.Chain),
+		Rpc:   initclient(url),
+		Chain: initChainId(chain),
 	}
 }
 
-func (api *Client) Send_Trx(strx types.Operation) (*BResp, error) {
+func (api *Client) Send_Trx(username string, strx types.Operation) (*BResp, error) {
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -113,7 +90,7 @@ func (api *Client) Send_Trx(strx types.Operation) (*BResp, error) {
 	tx.PushOperation(strx)
 
 	// Получаем необходимый для подписи ключ
-	privKeys := api.Signing_Keys(strx)
+	privKeys := api.Signing_Keys(username, strx)
 
 	// Подписываем транзакцию
 	if err := tx.Sign(privKeys, api.Chain); err != nil {
@@ -137,7 +114,7 @@ func (api *Client) Send_Trx(strx types.Operation) (*BResp, error) {
 	}
 }
 
-func (api *Client) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
+func (api *Client) Send_Arr_Trx(username string, strx []types.Operation) (*BResp, error) {
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -160,7 +137,7 @@ func (api *Client) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
 	}
 
 	// Получаем необходимый для подписи ключ
-	privKeys := api.Signing_Keys(strx[0])
+	privKeys := api.Signing_Keys(username, strx[0])
 
 	// Подписываем транзакцию
 	if err := tx.Sign(privKeys, api.Chain); err != nil {
@@ -184,7 +161,7 @@ func (api *Client) Send_Arr_Trx(strx []types.Operation) (*BResp, error) {
 	}
 }
 
-func (api *Client) Verify_Trx(strx types.Operation) (bool, error) {
+func (api *Client) Verify_Trx(username string, strx types.Operation) (bool, error) {
 	// Получение необходимых параметров
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
@@ -205,7 +182,7 @@ func (api *Client) Verify_Trx(strx types.Operation) (bool, error) {
 	tx.PushOperation(strx)
 
 	// Получаем необходимый для подписи ключ
-	privKeys := api.Signing_Keys(strx)
+	privKeys := api.Signing_Keys(username, strx)
 
 	// Подписываем транзакцию
 	if err := tx.Sign(privKeys, api.Chain); err != nil {

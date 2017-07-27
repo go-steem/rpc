@@ -16,7 +16,7 @@ import (
 
 func (api *Client) Vote(user_name, author_name, permlink string, weight int) error {
 	if weight > 10000 {
-		return errors.New("The value of Weight can not be more than 10,000")
+		weight = 10000
 	}
 	if api.Verify_Voter(author_name, permlink, user_name) {
 		return errors.New("The voter is on the list")
@@ -27,7 +27,7 @@ func (api *Client) Vote(user_name, author_name, permlink string, weight int) err
 		Permlink: permlink,
 		Weight:   types.Int16(weight),
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(user_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Vote: ")
 	} else {
@@ -48,7 +48,7 @@ func (api *Client) Comment(user_name, author_name, ppermlink, body string) error
 		Body:           body,
 		JsonMetadata:   "{\"app\":\"golos-go(go-steem)\"}",
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(user_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Comment: ")
 	} else {
@@ -85,7 +85,7 @@ func (api *Client) Comment_Vote(user_name, author_name, ppermlink, body string, 
 		trx = append(trx, txv)
 	}
 
-	resp, err := api.Send_Arr_Trx(trx)
+	resp, err := api.Send_Arr_Trx(user_name, trx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Comment and Vote: ")
 	} else {
@@ -105,7 +105,7 @@ func (api *Client) DeleteComment(author_name, permlink string) error {
 		Author:   author_name,
 		Permlink: permlink,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(author_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Delete Comment: ")
 	} else {
@@ -138,7 +138,7 @@ func (api *Client) Post(author_name, title, body string, tags []string) error {
 		JsonMetadata:   json_meta,
 	}
 
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(author_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Post: ")
 	} else {
@@ -156,7 +156,7 @@ func (api *Client) Follow(follower, following string) error {
 		ID:                   "follow",
 		JSON:                 json_string,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
@@ -174,7 +174,7 @@ func (api *Client) Unfollow(follower, following string) error {
 		ID:                   "follow",
 		JSON:                 json_string,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
@@ -192,7 +192,7 @@ func (api *Client) Ignore(follower, following string) error {
 		ID:                   "follow",
 		JSON:                 json_string,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
@@ -210,7 +210,7 @@ func (api *Client) Notice(follower, following string) error {
 		ID:                   "follow",
 		JSON:                 json_string,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
@@ -231,7 +231,7 @@ func (api *Client) Reblog(user_name, author_name, permlink string) error {
 		ID:                   "follow",
 		JSON:                 json_string,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(user_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
@@ -246,7 +246,7 @@ func (api *Client) Witness_Vote(user_name, witness_name string, approv bool) err
 		Witness: witness_name,
 		Approve: approv,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(user_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
@@ -262,7 +262,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 		Amount: ammount,
 		Memo:   memo,
 	}
-	resp, err := api.Send_Trx(tx)
+	resp, err := api.Send_Trx(from_name, tx)
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
