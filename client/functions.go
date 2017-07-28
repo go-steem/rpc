@@ -31,7 +31,7 @@ func (api *Client) Vote(user_name, author_name, permlink string, weight int) err
 	if err != nil {
 		return errors.Wrapf(err, "Error Vote: ")
 	} else {
-		log.Println("Add Vote to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Vote] Block -> ", resp.BlockNum, " User -> ", user_name)
 		return nil
 	}
 }
@@ -52,14 +52,14 @@ func (api *Client) Comment(user_name, author_name, ppermlink, body string) error
 	if err != nil {
 		return errors.Wrapf(err, "Error Comment: ")
 	} else {
-		log.Println("Add Comment to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Comment] Block -> ", resp.BlockNum, " User -> ", user_name)
 		return nil
 	}
 }
 
 func (api *Client) Comment_Vote(user_name, author_name, ppermlink, body string, weight_post int) error {
 	if weight_post > 10000 {
-		return errors.New("The value of Weight can not be more than 10,000")
+		weight_post = 10000
 	}
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
 	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
@@ -89,7 +89,7 @@ func (api *Client) Comment_Vote(user_name, author_name, ppermlink, body string, 
 	if err != nil {
 		return errors.Wrapf(err, "Error Comment and Vote: ")
 	} else {
-		log.Println("Add Comment and Vote to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Comment and Vote] Block -> ", resp.BlockNum, " User -> ", user_name)
 		return nil
 	}
 }
@@ -109,7 +109,7 @@ func (api *Client) DeleteComment(author_name, permlink string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Delete Comment: ")
 	} else {
-		log.Println("Delete Comment to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Delete Comment] Block -> ", resp.BlockNum, " User -> ", author_name)
 		return nil
 	}
 }
@@ -142,7 +142,154 @@ func (api *Client) Post(author_name, title, body string, tags []string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Post: ")
 	} else {
-		log.Println("Add Post to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Post] Block -> ", resp.BlockNum, " User -> ", author_name)
+		return nil
+	}
+}
+
+func (api *Client) Post_Vote(author_name, title, body string, tags []string, weight_post int) error {
+	if weight_post > 10000 {
+		weight_post = 10000
+	}
+	permlink := translit.EncodeTitle(title)
+	tag := translit.EncodeTags(tags)
+	ptag := translit.EncodeTag(tags[0])
+
+	json_meta := "{\"tag\":["
+	for k, v := range tag {
+		if k != len(tags)-1 {
+			json_meta = json_meta + "\"" + v + "\","
+		} else {
+			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+		}
+	}
+	var trx []types.Operation
+	txp := &types.CommentOperation{
+		ParentAuthor:   "",
+		ParentPermlink: ptag,
+		Author:         author_name,
+		Permlink:       permlink,
+		Title:          title,
+		Body:           body,
+		JsonMetadata:   json_meta,
+	}
+	trx = append(trx, txp)
+
+	txv := &types.VoteOperation{
+		Voter:    author_name,
+		Author:   author_name,
+		Permlink: permlink,
+		Weight:   types.Int16(weight_post),
+	}
+	trx = append(trx, txv)
+
+	resp, err := api.Send_Arr_Trx(author_name, trx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Post and Vote: ")
+	} else {
+		log.Println("[Post and Vote] Block -> ", resp.BlockNum, " User -> ", author_name)
+		return nil
+	}
+}
+
+func (api *Client) Post_Options(author_name, title, body string, tags []string, percent uint16, votes, curation bool) error {
+	permlink := translit.EncodeTitle(title)
+	tag := translit.EncodeTags(tags)
+	ptag := translit.EncodeTag(tags[0])
+
+	json_meta := "{\"tag\":["
+	for k, v := range tag {
+		if k != len(tags)-1 {
+			json_meta = json_meta + "\"" + v + "\","
+		} else {
+			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+		}
+	}
+	var trx []types.Operation
+	txp := &types.CommentOperation{
+		ParentAuthor:   "",
+		ParentPermlink: ptag,
+		Author:         author_name,
+		Permlink:       permlink,
+		Title:          title,
+		Body:           body,
+		JsonMetadata:   json_meta,
+	}
+	trx = append(trx, txp)
+
+	txo := &types.CommentOptionsOperation{
+		Author:               author_name,
+		Permlink:             permlink,
+		MaxAcceptedPayout:    "1000000.000 GBG",
+		PercentSteemDollars:  percent,
+		AllowVotes:           true,
+		AllowCurationRewards: true,
+		Extensions:           []interface{}{},
+	}
+	trx = append(trx, txo)
+
+	resp, err := api.Send_Arr_Trx(author_name, trx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Post and Vote: ")
+	} else {
+		log.Println("[Post and Options] Block -> ", resp.BlockNum, " User -> ", author_name)
+		return nil
+	}
+}
+
+func (api *Client) Post_Options_Vote(author_name, title, body string, tags []string, percent uint16, weight_post int, votes, curation bool) error {
+	if weight_post > 10000 {
+		weight_post = 10000
+	}
+	permlink := translit.EncodeTitle(title)
+	tag := translit.EncodeTags(tags)
+	ptag := translit.EncodeTag(tags[0])
+
+	json_meta := "{\"tag\":["
+	for k, v := range tag {
+		if k != len(tags)-1 {
+			json_meta = json_meta + "\"" + v + "\","
+		} else {
+			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+		}
+	}
+	var trx []types.Operation
+
+	txp := &types.CommentOperation{
+		ParentAuthor:   "",
+		ParentPermlink: ptag,
+		Author:         author_name,
+		Permlink:       permlink,
+		Title:          title,
+		Body:           body,
+		JsonMetadata:   json_meta,
+	}
+	trx = append(trx, txp)
+
+	txo := &types.CommentOptionsOperation{
+		Author:               author_name,
+		Permlink:             permlink,
+		MaxAcceptedPayout:    "1000000.000 GBG",
+		PercentSteemDollars:  percent,
+		AllowVotes:           true,
+		AllowCurationRewards: true,
+		//Extensions:           "",
+	}
+	trx = append(trx, txo)
+
+	txv := &types.VoteOperation{
+		Voter:    author_name,
+		Author:   author_name,
+		Permlink: permlink,
+		Weight:   types.Int16(weight_post),
+	}
+	trx = append(trx, txv)
+
+	resp, err := api.Send_Arr_Trx(author_name, trx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Post and Vote: ")
+	} else {
+		log.Println("[Post and Options] Block -> ", resp.BlockNum, " User -> ", author_name)
 		return nil
 	}
 }
@@ -160,7 +307,7 @@ func (api *Client) Follow(follower, following string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Follow to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Follow] Block -> ", resp.BlockNum, " Follower user -> ", follower, " Following user -> ", following)
 		return nil
 	}
 }
@@ -178,7 +325,7 @@ func (api *Client) Unfollow(follower, following string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Unfollow to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Unfollow] Block -> ", resp.BlockNum, " Unfollower user -> ", follower, " Unfollowing user -> ", following)
 		return nil
 	}
 }
@@ -196,7 +343,7 @@ func (api *Client) Ignore(follower, following string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Ignore to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Ignore] Block -> ", resp.BlockNum, " Ignore user -> ", follower, " Ignoring user -> ", following)
 		return nil
 	}
 }
@@ -214,7 +361,7 @@ func (api *Client) Notice(follower, following string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Notice to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Notice] Block -> ", resp.BlockNum, " Notice user -> ", follower, " Noticing user -> ", following)
 		return nil
 	}
 }
@@ -235,7 +382,7 @@ func (api *Client) Reblog(user_name, author_name, permlink string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Reblog to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Reblog] Block -> ", resp.BlockNum, " Reblog user -> ", user_name, " Rebloging -> ", author_name, "/", permlink)
 		return nil
 	}
 }
@@ -250,7 +397,7 @@ func (api *Client) Witness_Vote(user_name, witness_name string, approv bool) err
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Witness Vote to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Witness Vote] Block -> ", resp.BlockNum, " User -> ", user_name, " Witness user -> ", witness_name)
 		return nil
 	}
 }
@@ -266,7 +413,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 	if err != nil {
 		return errors.Wrapf(err, "Error Reblog: ")
 	} else {
-		log.Println("Transfer to Block -> ", resp.BlockNum, " Trx -> ", resp.ID)
+		log.Println("[Transfer] Block -> ", resp.BlockNum, " From user -> ", from_name, " To user -> ", to_name)
 		return nil
 	}
 }

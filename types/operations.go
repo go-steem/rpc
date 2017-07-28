@@ -479,11 +479,11 @@ func (op *CommentOptionsOperation) MarshalTransaction(encoder *transaction.Encod
 	enc.EncodeUVarint(uint64(TypeCommentOptions.Code()))
 	enc.Encode(op.Author)
 	enc.Encode(op.Permlink)
-	enc.Encode(op.MaxAcceptedPayout)
+	enc.EncodeMoney(op.MaxAcceptedPayout)
 	enc.Encode(op.PercentSteemDollars)
 	enc.EncodeBool(op.AllowVotes)
 	enc.EncodeBool(op.AllowCurationRewards)
-	enc.Encode(op.Extensions)
+	enc.Encode(byte(0))
 	return enc.Err()
 }
 
