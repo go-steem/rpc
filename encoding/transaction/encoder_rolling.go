@@ -27,6 +27,24 @@ func (encoder *RollingEncoder) EncodeNumber(v interface{}) {
 	}
 }
 
+func (encoder *RollingEncoder) EncodeBool(v bool) {
+	if encoder.err == nil {
+		encoder.err = encoder.next.EncodeBool(v)
+	}
+}
+
+func (encoder *RollingEncoder) EncodeMoney(v string) {
+	if encoder.err == nil {
+		encoder.err = encoder.next.EncodeMoney(v)
+	}
+}
+
+func (encoder *RollingEncoder) EncodeArrString(v []string) {
+	if encoder.err == nil {
+		encoder.err = encoder.next.EncodeArrString(v)
+	}
+}
+
 func (encoder *RollingEncoder) Encode(v interface{}) {
 	if encoder.err == nil {
 		encoder.err = encoder.next.Encode(v)

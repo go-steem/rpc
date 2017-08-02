@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	// RPC
-	"github.com/go-steem/rpc/encoding/transaction"
+	"github.com/asuleymanov/golos-go/encoding/transaction"
 
 	// Vendor
 	"github.com/pkg/errors"
@@ -189,6 +189,16 @@ func (op *TransferOperation) Data() interface{} {
 	return op
 }
 
+func (op *TransferOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.To)
+	enc.EncodeMoney(op.Amount)
+	enc.Encode(op.Memo)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::transfer_to_vesting_operation,
 //             (from)
 //             (to)
@@ -256,6 +266,15 @@ func (op *AccountWitnessVoteOperation) Data() interface{} {
 	return op
 }
 
+func (op *AccountWitnessVoteOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeAccountWitnessVote.Code()))
+	enc.Encode(op.Account)
+	enc.Encode(op.Witness)
+	enc.EncodeBool(op.Approve)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::account_witness_proxy_operation,
 //             (account)
 //             (proxy) )
@@ -287,12 +306,13 @@ func (op *AccountWitnessProxyOperation) Data() interface{} {
 // In case Title is filled in and ParentAuthor is empty, it is a new post.
 // The post category can be read from ParentPermlink.
 type CommentOperation struct {
-	Author         string `json:"author"`
-	Title          string `json:"title"`
-	Permlink       string `json:"permlink"`
 	ParentAuthor   string `json:"parent_author"`
 	ParentPermlink string `json:"parent_permlink"`
+	Author         string `json:"author"`
+	Permlink       string `json:"permlink"`
+	Title          string `json:"title"`
 	Body           string `json:"body"`
+	JsonMetadata   string `json:"json_metadata"`
 }
 
 func (op *CommentOperation) Type() OpType {
@@ -305,6 +325,23 @@ func (op *CommentOperation) Data() interface{} {
 
 func (op *CommentOperation) IsStoryOperation() bool {
 	return op.ParentAuthor == ""
+}
+
+func (op *CommentOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeComment.Code()))
+	if !op.IsStoryOperation() {
+		enc.Encode(op.ParentAuthor)
+	} else {
+		enc.Encode(byte(0))
+	}
+	enc.Encode(op.ParentPermlink)
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	enc.Encode(op.Title)
+	enc.Encode(op.Body)
+	enc.Encode(op.JsonMetadata)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::vote_operation,
@@ -402,6 +439,14 @@ func (op *DeleteCommentOperation) Data() interface{} {
 	return op
 }
 
+func (op *DeleteCommentOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeDeleteComment.Code()))
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	return enc.Err()
+}
+
 // FC_REFLECT( steemit::chain::comment_options_operation,
 //             (author)
 //             (permlink)
@@ -427,6 +472,19 @@ func (op *CommentOptionsOperation) Type() OpType {
 
 func (op *CommentOptionsOperation) Data() interface{} {
 	return op
+}
+
+func (op *CommentOptionsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeCommentOptions.Code()))
+	enc.Encode(op.Author)
+	enc.Encode(op.Permlink)
+	enc.EncodeMoney(op.MaxAcceptedPayout)
+	enc.Encode(op.PercentSteemDollars)
+	enc.EncodeBool(op.AllowVotes)
+	enc.EncodeBool(op.AllowCurationRewards)
+	enc.Encode(byte(0))
+	return enc.Err()
 }
 
 type Authority struct {
@@ -480,4 +538,591 @@ func (op *UnknownOperation) Type() OpType {
 
 func (op *UnknownOperation) Data() interface{} {
 	return op.data
+}
+
+// test
+type WitnessUpdateOperation struct {
+	Owner           string           `json:"owner"`
+	Url             string           `json:"url"`
+	BlockSigningKey string           `json:"block_signing_key"`
+	Props           *ChainProperties `json:"props"`
+	Fee             string           `json:"fee"`
+}
+
+func (op *WitnessUpdateOperation) Type() OpType {
+	return TypeWitnessUpdate
+}
+
+func (op *WitnessUpdateOperation) Data() interface{} {
+	return op
+}
+
+type CustomOperation struct {
+	RequiredAuths []string `json:"required_auths"`
+	Id            uint16   `json:"id"`
+	Datas         []byte   `json:"data"`
+}
+
+func (op *CustomOperation) Type() OpType {
+	return TypeCustom
+}
+
+func (op *CustomOperation) Data() interface{} {
+	return op
+}
+
+type SetWithdrawVestingRouteOperation struct {
+	FromAccount string `json:"from_account"`
+	ToAccount   string `json:"to_account"`
+	Percent     uint16 `json:"percent"`
+	AutoVest    bool   `json:"auto_vest"`
+}
+
+func (op *SetWithdrawVestingRouteOperation) Type() OpType {
+	return TypeSetWithdrawVestingRoute
+}
+
+func (op *SetWithdrawVestingRouteOperation) Data() interface{} {
+	return op
+}
+
+type LimitOrderCreate2Operation struct {
+	Qwner        string `json:"owner"`
+	Orderid      uint32 `json:"orderid"`
+	AmountToSell string `json:"amount_to_sell"`
+	ExchangeRate string `json:"exchange_rate"`
+	FillOrKill   bool   `json:"fill_or_kill"`
+	Expiration   uint32 `json:"expiration"`
+}
+
+func (op *LimitOrderCreate2Operation) Type() OpType {
+	return TypeLimitOrderCreate2
+}
+
+func (op *LimitOrderCreate2Operation) Data() interface{} {
+	return op
+}
+
+type ChallengeAuthorityOperation struct {
+	Challenger   string `json:"challenger"`
+	Challenged   string `json:"challenged"`
+	RequireOwner bool   `json:"require_owner"`
+}
+
+func (op *ChallengeAuthorityOperation) Type() OpType {
+	return TypeChallengeAuthority
+}
+
+func (op *ChallengeAuthorityOperation) Data() interface{} {
+	return op
+}
+
+type ProveAuthorityOperation struct {
+	Challenged   string `json:"challenged"`
+	RequireOwner bool   `json:"require_owner"`
+}
+
+func (op *ProveAuthorityOperation) Type() OpType {
+	return TypeProveAuthority
+}
+
+func (op *ProveAuthorityOperation) Data() interface{} {
+	return op
+}
+
+type RequestAccountRecoveryOperation struct {
+	RecoveryAccount   string        `json:"recovery_account"`
+	AccountToRecover  string        `json:"account_to_recover"`
+	NewOwnerAuthority string        `json:"new_owner_authority"`
+	Extensions        []interface{} `json:"extensions"`
+}
+
+func (op *RequestAccountRecoveryOperation) Type() OpType {
+	return TypeRequestAccountRecovery
+}
+
+func (op *RequestAccountRecoveryOperation) Data() interface{} {
+	return op
+}
+
+type RecoverAccountOperation struct {
+	AccountToRecover     string        `json:"account_to_recover"`
+	NewOwnerAuthority    string        `json:"new_owner_authority"`
+	RecentOwnerAuthority string        `json:"recent_owner_authority"`
+	Extensions           []interface{} `json:"extensions"`
+}
+
+func (op *RecoverAccountOperation) Type() OpType {
+	return TypeRecoverAccount
+}
+
+func (op *RecoverAccountOperation) Data() interface{} {
+	return op
+}
+
+type ChangeRecoveryAccountOperation struct {
+	AccountToRecover   string        `json:"account_to_recover"`
+	NewRecoveryAccount string        `json:"new_recovery_account"`
+	Extensions         []interface{} `json:"extensions"`
+}
+
+func (op *ChangeRecoveryAccountOperation) Type() OpType {
+	return TypeChangeRecoveryAccount
+}
+
+func (op *ChangeRecoveryAccountOperation) Data() interface{} {
+	return op
+}
+
+type EscrowTransferOperation struct {
+	From                 string `json:"from"`
+	To                   string `json:"to"`
+	SbdAmount            string `json:"sbd_amount"`
+	SteemAmount          string `json:"steem_amount"`
+	EscrowId             uint32 `json:"escrow_id"`
+	Agent                string `json:"agent"`
+	Fee                  string `json:"fee"`
+	JsonMeta             string `json:"json_meta"`
+	RatificationDeadline uint32 `json:"ratification_deadline"`
+	EscrowExpiration     uint32 `json:"escrow_expiration"`
+}
+
+func (op *EscrowTransferOperation) Type() OpType {
+	return TypeEscrowTransfer
+}
+
+func (op *EscrowTransferOperation) Data() interface{} {
+	return op
+}
+
+type EscrowDisputeOperation struct {
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Agent    string `json:"agent"`
+	Who      string `json:"who"`
+	EscrowId uint32 `json:"escrow_id"`
+}
+
+func (op *EscrowDisputeOperation) Type() OpType {
+	return TypeEscrowDispute
+}
+
+func (op *EscrowDisputeOperation) Data() interface{} {
+	return op
+}
+
+type EscrowReleaseOperation struct {
+	From        string `json:"from"`
+	To          string `json:"to"`
+	Agent       string `json:"agent"`
+	Who         string `json:"who"`
+	Receiver    string `json:"receiver"`
+	EscrowId    uint32 `json:"escrow_id"`
+	SbdAmount   string `json:"sbd_amount"`
+	SteemAmount string `json:"steem_amount"`
+}
+
+func (op *EscrowReleaseOperation) Type() OpType {
+	return TypeEscrowRelease
+}
+
+func (op *EscrowReleaseOperation) Data() interface{} {
+	return op
+}
+
+type POW2Operation struct {
+	Input      *POW2Input `json:"input"`
+	PowSummary uint32     `json:"pow_summary"`
+}
+
+type POW2Input struct {
+	WorkerAccount string `json:"worker_account"`
+	PrevBlock     []byte `json:"prev_block"`
+	Nonce         uint64 `json:"nonce"`
+}
+
+func (op *POW2Operation) Type() OpType {
+	return TypePOW2
+}
+
+func (op *POW2Operation) Data() interface{} {
+	return op
+}
+
+type EscrowApproveOperation struct {
+	From     string `json:"from"`
+	To       string `json:"to"`
+	Agent    string `json:"agent"`
+	Who      string `json:"who"`
+	EscrowId uint32 `json:"escrow_id"`
+	Approve  bool   `json:"approve"`
+}
+
+func (op *EscrowApproveOperation) Type() OpType {
+	return TypeEscrowApprove
+}
+
+func (op *EscrowApproveOperation) Data() interface{} {
+	return op
+}
+
+type TransferToSavingsOperation struct {
+	From   string `json:"from"`
+	To     string `json:"to"`
+	Amount string `json:"amount"`
+	Memo   string `json:"memo"`
+}
+
+func (op *TransferToSavingsOperation) Type() OpType {
+	return TypeTransferToSavings
+}
+
+func (op *TransferToSavingsOperation) Data() interface{} {
+	return op
+}
+
+func (op *TransferToSavingsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransferToSavings.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.To)
+	enc.Encode(op.Amount)
+	enc.Encode(op.Memo)
+	return enc.Err()
+}
+
+type TransferFromSavingsOperation struct {
+	From      string `json:"from"`
+	RequestId uint32 `json:"request_id"`
+	To        string `json:"to"`
+	Amount    string `json:"amount"`
+	Memo      string `json:"memo"`
+}
+
+func (op *TransferFromSavingsOperation) Type() OpType {
+	return TypeTransferFromSavings
+}
+
+func (op *TransferFromSavingsOperation) Data() interface{} {
+	return op
+}
+
+type CancelTransferFromSavingsOperation struct {
+	From      string `json:"from"`
+	RequestId uint32 `json:"request_id"`
+}
+
+func (op *CancelTransferFromSavingsOperation) Type() OpType {
+	return TypeCancelTransferFromSavings
+}
+
+func (op *CancelTransferFromSavingsOperation) Data() interface{} {
+	return op
+}
+
+type CustomBinaryOperation struct {
+	RequiredOwnerAuths   []string `json:"required_owner_auths"`
+	RequiredActiveAuths  []string `json:"required_active_auths"`
+	RequiredPostingAuths []string `json:"required_posting_auths"`
+	RequiredAuths        []string `json:"required_auths"`
+	Id                   string   `json:"id"`
+	Datas                []byte   `json:"data"`
+}
+
+func (op *CustomBinaryOperation) Type() OpType {
+	return TypeCustomBinary
+}
+
+func (op *CustomBinaryOperation) Data() interface{} {
+	return op
+}
+
+type DeclineVotingRightsOperation struct {
+	Account string `json:"account"`
+	Decline bool   `json:"decline"`
+}
+
+func (op *DeclineVotingRightsOperation) Type() OpType {
+	return TypeDeclineVotingRights
+}
+
+func (op *DeclineVotingRightsOperation) Data() interface{} {
+	return op
+}
+
+type ResetAccountOperation struct {
+	ResetAccount      string `json:"reset_account"`
+	AccountToReset    string `json:"Account_to_reset"`
+	NewOwnerAuthority string `json:"new_owner_authority"`
+}
+
+func (op *ResetAccountOperation) Type() OpType {
+	return TypeResetAccount
+}
+
+func (op *ResetAccountOperation) Data() interface{} {
+	return op
+}
+
+type SetResetAccountOperation struct {
+	Account             string `json:"account"`
+	CurrentResetAccount string `json:"current_reset_account"`
+	ResetAccount        string `json:"reset_account"`
+}
+
+func (op *SetResetAccountOperation) Type() OpType {
+	return TypeSetResetAccount
+}
+
+func (op *SetResetAccountOperation) Data() interface{} {
+	return op
+}
+
+type ClaimRewardBalanceOperation struct {
+	Account     string `json:"account"`
+	RewardSteem string `json:"reward_steem"`
+	RewardSbd   string `json:"reward_sbd"`
+	RewardVests string `json:"reward_vests"`
+}
+
+func (op *ClaimRewardBalanceOperation) Type() OpType {
+	return TypeClaimRewardBalance
+}
+
+func (op *ClaimRewardBalanceOperation) Data() interface{} {
+	return op
+}
+
+type DelegateVestingSharesOperation struct {
+	Delegator     string `json:"delegator"`
+	Delegatee     string `json:"delegatee"`
+	VestingShares string `json:"vesting_shares"`
+}
+
+func (op *DelegateVestingSharesOperation) Type() OpType {
+	return TypeDelegateVestingShares
+}
+
+func (op *DelegateVestingSharesOperation) Data() interface{} {
+	return op
+}
+
+type AccountCreateWithSelegationOperation struct {
+	Fee            string        `json:"fee"`
+	Delegation     string        `json:"delegation"`
+	Creator        string        `json:"creator"`
+	NewAccountName string        `json:"new_account_name"`
+	Owner          string        `json:"owner"`
+	Active         string        `json:"active"`
+	Posting        string        `json:"posting"`
+	MemoKey        string        `json:"memo_key"`
+	JsonMetadata   string        `json:"json_metadata"`
+	Extensions     []interface{} `json:"extensions"`
+}
+
+func (op *AccountCreateWithSelegationOperation) Type() OpType {
+	return TypeAccountCreateWithSelegation
+}
+
+func (op *AccountCreateWithSelegationOperation) Data() interface{} {
+	return op
+}
+
+type FillConvertRequestOperation struct {
+	Owner     string `json:"owner"`
+	Requestid uint32 `json:"requestid"`
+	AmountIn  string `json:"amount_in"`
+	AmountOut string `json:"amount_out"`
+}
+
+func (op *FillConvertRequestOperation) Type() OpType {
+	return TypeFillConvertRequest
+}
+
+func (op *FillConvertRequestOperation) Data() interface{} {
+	return op
+}
+
+type AuthorRewardOperation struct {
+	Author        string `json:"author"`
+	Permlink      string `json:"permlink"`
+	SbdPayout     string `json:"sbd_payout"`
+	SteemPayout   string `json:"steem_payout"`
+	VestingPayout string `json:"vesting_payout"`
+}
+
+func (op *AuthorRewardOperation) Type() OpType {
+	return TypeAuthorReward
+}
+
+func (op *AuthorRewardOperation) Data() interface{} {
+	return op
+}
+
+type CurationRewardOperation struct {
+	Curator         string `json:"curator"`
+	Reward          string `json:"reward"`
+	CommentAuthor   string `json:"comment_author"`
+	CommentPermlink string `json:"comment_permlink"`
+}
+
+func (op *CurationRewardOperation) Type() OpType {
+	return TypeCurationReward
+}
+
+func (op *CurationRewardOperation) Data() interface{} {
+	return op
+}
+
+type CommentRewardOperation struct {
+	Author   string `json:"author"`
+	Permlink string `json:"permlink"`
+	Payout   string `json:"payout"`
+}
+
+func (op *CommentRewardOperation) Type() OpType {
+	return TypeCommentReward
+}
+
+func (op *CommentRewardOperation) Data() interface{} {
+	return op
+}
+
+type LiquidityRewardOperation struct {
+	Owner  string `json:"owner"`
+	Payout string `json:"payout"`
+}
+
+func (op *LiquidityRewardOperation) Type() OpType {
+	return TypeLiquidityReward
+}
+
+func (op *LiquidityRewardOperation) Data() interface{} {
+	return op
+}
+
+type InterestOperation struct {
+	Owner    string `json:"owner"`
+	Interest string `json:"interest"`
+}
+
+func (op *InterestOperation) Type() OpType {
+	return TypeInterest
+}
+
+func (op *InterestOperation) Data() interface{} {
+	return op
+}
+
+type FillVestingWithdrawOperation struct {
+	FromAccount string `json:"from_account"`
+	ToAccount   string `json:"to_account"`
+	Withdrawn   string `json:"withdrawn"`
+	Deposited   string `json:"deposited"`
+}
+
+func (op *FillVestingWithdrawOperation) Type() OpType {
+	return TypeFillVestingWithdraw
+}
+
+func (op *FillVestingWithdrawOperation) Data() interface{} {
+	return op
+}
+
+type FillOrderOperation struct {
+	CurrentOwner   string `json:"current_owner"`
+	CurrentOrderid uint32 `json:"current_orderid"`
+	CurrentPays    string `json:"current_pays"`
+	OpenOwner      string `json:"open_owner"`
+	OpenOrderid    uint32 `json:"open_orderid"`
+	OpenPays       string `json:"open_pays"`
+}
+
+func (op *FillOrderOperation) Type() OpType {
+	return TypeFillOrder
+}
+
+func (op *FillOrderOperation) Data() interface{} {
+	return op
+}
+
+type ShutdownWitnessOperation struct {
+	Owner string `json:"owner"`
+}
+
+func (op *ShutdownWitnessOperation) Type() OpType {
+	return TypeShutdownWitness
+}
+
+func (op *ShutdownWitnessOperation) Data() interface{} {
+	return op
+}
+
+type FillTransferFromSavingsOperation struct {
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Amount    string `json:"amount"`
+	RequestId uint32 `json:"request_id"`
+	Memo      string `json:"memo"`
+}
+
+func (op *FillTransferFromSavingsOperation) Type() OpType {
+	return TypeFillTransferFromSavings
+}
+
+func (op *FillTransferFromSavingsOperation) Data() interface{} {
+	return op
+}
+
+type HardforkOperation struct {
+	HardforkId uint32 `json:"hardfork_id"`
+}
+
+func (op *HardforkOperation) Type() OpType {
+	return TypeHardfork
+}
+
+func (op *HardforkOperation) Data() interface{} {
+	return op
+}
+
+type CommentPayoutUpdateOperation struct {
+	Author   string `json:"author"`
+	Permlink string `json:"permlink"`
+}
+
+func (op *CommentPayoutUpdateOperation) Type() OpType {
+	return TypeCommentPayoutUpdate
+}
+
+func (op *CommentPayoutUpdateOperation) Data() interface{} {
+	return op
+}
+
+type ReturnVestingDelegationOperation struct {
+	Account       string `json:"account"`
+	VestingShares string `json:"vesting_shares"`
+}
+
+func (op *ReturnVestingDelegationOperation) Type() OpType {
+	return TypeReturnVestingDelegation
+}
+
+func (op *ReturnVestingDelegationOperation) Data() interface{} {
+	return op
+}
+
+type CommentBenefactorRewardOperation struct {
+	Benefactor string `json:"benefactor"`
+	Author     string `json:"author"`
+	Permlink   string `json:"permlink"`
+	Reward     string `json:"reward"`
+}
+
+func (op *CommentBenefactorRewardOperation) Type() OpType {
+	return TypeCommentBenefactorReward
+}
+
+func (op *CommentBenefactorRewardOperation) Data() interface{} {
+	return op
 }

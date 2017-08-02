@@ -2,7 +2,7 @@ package websocket
 
 import (
 	// Vendor
-	"github.com/go-steem/rpc-codec/jsonrpc2"
+	"github.com/asuleymanov/rpc-codec/jsonrpc2"
 	"github.com/pkg/errors"
 	"golang.org/x/net/websocket"
 )

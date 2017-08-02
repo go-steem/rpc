@@ -8,3 +8,4 @@ This package adds support for `login_api`.
 | ----------------- |:-----------:|:------------:|
 | `login`           | DONE        | DONE         |
 | `get_api_by_name` | DONE        | DONE         |
+| `get_version`     | DONE        | DONE         |
