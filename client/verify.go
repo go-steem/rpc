@@ -67,3 +67,20 @@ func (api *Client) Verify_Reblogs(author, permlink, rebloger string) bool {
 		return false
 	}
 }
+
+func (api *Client) Verify_Follow(follower, following string) bool {
+	ans, err := api.Rpc.Follow.GetFollowing(follower, following, "blog", 1)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "Error Verify Follow: "))
+		return false
+	} else {
+		for _, v := range ans {
+			if (v.Follower == follower) && (v.Following == following) {
+				return true
+			} else {
+				return false
+			}
+		}
+		return false
+	}
+}
