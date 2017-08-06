@@ -45,6 +45,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | get_best_categories     | DONE        |                |
 | get_active_categories   | DONE        |                |
 | get_recent_categories   | DONE        |                |
+| get_ops_in_block        | DONE        |                |
 
 ### Globals
 

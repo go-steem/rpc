@@ -359,3 +359,12 @@ func (api *API) GetRepliesByLastUpdateRaw(
    (get_active_witnesses)
    (get_miner_queue)
 */
+
+//
+// Some randomly added functions.
+//
+
+func (api *API) GetOpsInBlockRaw(blockNum uint32, onlyVirtual bool) (*json.RawMessage, error) {
+	return call.Raw(
+		api.caller, "get_ops_in_block", []interface{}{blockNum, onlyVirtual})
+}
