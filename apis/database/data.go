@@ -143,3 +143,13 @@ type VoteState struct {
 	Percent *types.Int  `json:"percent"`
 	Time    *types.Time `json:"time"`
 }
+
+type OperationObject struct {
+	BlockNumber            uint32          `json:"block"`
+	TransactionID          string          `json:"trx_id"`
+	TransactionInBlock     uint32          `json:"trx_in_block"`
+	Operation              types.Operation `json:"op"`
+	OperationInTransaction uint16          `json:"op_in_trx"`
+	VirtualOperation       uint64          `json:"virtual_op"`
+	Timestamp              *types.Time     `json:"timestamp"`
+}

@@ -40,6 +40,7 @@ It is a bit confusing to see `set_` prefix. Needs research.
 | ----------------------- |:-----------:|:--------------:|
 | get_block_header        | DONE        |                |
 | get_block               | DONE        | PARTIALLY DONE |
+| get_ops_in_block        | DONE        | DONE           |
 | get_state               | DONE        |                |
 | get_trending_categories | DONE        |                |
 | get_best_categories     | DONE        |                |
