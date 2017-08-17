@@ -3,8 +3,6 @@ package types
 import (
 	// Stdlib
 	"encoding/json"
-	"strconv"
-	"strings"
 
 	// RPC
 	"github.com/go-steem/rpc/encoding/transaction"
@@ -289,13 +287,12 @@ func (op *AccountWitnessProxyOperation) Data() interface{} {
 // In case Title is filled in and ParentAuthor is empty, it is a new post.
 // The post category can be read from ParentPermlink.
 type CommentOperation struct {
-	Author         string           `json:"author"`
-	Title          string           `json:"title"`
-	Permlink       string           `json:"permlink"`
-	ParentAuthor   string           `json:"parent_author"`
-	ParentPermlink string           `json:"parent_permlink"`
-	Body           string           `json:"body"`
-	JsonMetadata   *ContentMetadata `json:"json_metadata"`
+	Author         string `json:"author"`
+	Title          string `json:"title"`
+	Permlink       string `json:"permlink"`
+	ParentAuthor   string `json:"parent_author"`
+	ParentPermlink string `json:"parent_permlink"`
+	Body           string `json:"body"`
 }
 
 func (op *CommentOperation) Type() OpType {
@@ -308,58 +305,6 @@ func (op *CommentOperation) Data() interface{} {
 
 func (op *CommentOperation) IsStoryOperation() bool {
 	return op.ParentAuthor == ""
-}
-
-type ContentMetadata struct {
-	Flag   bool
-	Users  []string
-	Tags   []string
-	Image  []string
-	App    string
-	Format string
-}
-
-type ContentMetadataRaw struct {
-	Users  StringSlice `json:"users"`
-	Tags   StringSlice `json:"tags"`
-	Image  StringSlice `json:"image"`
-	App    string      `json:"app"`
-	Format string      `json:"format"`
-}
-
-func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
-	unquoted, err := strconv.Unquote(string(data))
-	if err != nil {
-		return err
-	}
-
-	switch unquoted {
-	case "true":
-		metadata.Flag = true
-		return nil
-	case "false":
-		metadata.Flag = false
-		return nil
-	}
-
-	if len(unquoted) == 0 {
-		var value ContentMetadata
-		metadata = &value
-		return nil
-	}
-
-	var raw ContentMetadataRaw
-	if err := json.NewDecoder(strings.NewReader(unquoted)).Decode(&raw); err != nil {
-		return err
-	}
-
-	metadata.Users = raw.Users
-	metadata.Tags = raw.Tags
-	metadata.Image = raw.Image
-	metadata.App = raw.App
-	metadata.Format = raw.Format
-
-	return nil
 }
 
 // FC_REFLECT( steemit::chain::vote_operation,
