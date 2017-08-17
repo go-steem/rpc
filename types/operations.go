@@ -293,6 +293,7 @@ type CommentOperation struct {
 	ParentAuthor   string `json:"parent_author"`
 	ParentPermlink string `json:"parent_permlink"`
 	Body           string `json:"body"`
+	JsonMetadata   string `json:"json_metadata"`
 }
 
 func (op *CommentOperation) Type() OpType {
