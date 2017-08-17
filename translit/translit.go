@@ -2,6 +2,8 @@ package translit
 
 import (
 	"bytes"
+	"log"
+	"regexp"
 	"strings"
 )
 
@@ -26,7 +28,12 @@ func EncodeTag(tag string) string {
 }
 
 func EncodeTitle(title string) string {
-	str, _ := encode(title)
+	reg, err := regexp.Compile("[^a-zA-Z0-9а-яА-Я.]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	processedString := reg.ReplaceAllString(title, "-")
+	str, _ := encode(processedString)
 	return str
 }
 

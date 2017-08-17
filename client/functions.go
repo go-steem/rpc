@@ -370,7 +370,7 @@ func (api *Client) Reblog(user_name, author_name, permlink string) error {
 	if api.Verify_Reblogs(author_name, permlink, user_name) {
 		return errors.New("The user already did repost")
 	}
-	json_string := "[\"reblog\",{\"account\":\"" + user_name + "\",\"author\":\"" + author_name + "\",\"permlink\":\"" + permlink + "\"}]"
+	json_string := "[\"reblog\",{\"account\":\"" + user_name + "\",\"author\":\"" + author_name + "\",\"permlink\":\"" + permlink + "\"]"
 
 	tx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
