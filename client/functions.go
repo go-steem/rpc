@@ -421,7 +421,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 }
 
 func (api *Client) Login(user_name, pass string) bool {
-	json_string := "[\"login\",{\"account\":\"" + user_name + "\"}]"
+	json_string := "[\"golos-go(go-steem)\",{\"account\":\"" + user_name + "\"}]"
 
 	strx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
