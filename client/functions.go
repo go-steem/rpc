@@ -10,6 +10,8 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
+	"github.com/asuleymanov/golos-go/encoding/wif"
+	"github.com/asuleymanov/golos-go/transactions"
 	"github.com/asuleymanov/golos-go/translit"
 	"github.com/asuleymanov/golos-go/types"
 )
@@ -415,5 +417,54 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 	} else {
 		log.Println("[Transfer] Block -> ", resp.BlockNum, " From user -> ", from_name, " To user -> ", to_name)
 		return nil
+	}
+}
+
+func (api *Client) Login(user_name, pass string) bool {
+	json_string := "[\"login\",{\"account\":\"" + user_name + "\"}]"
+
+	strx := &types.CustomJSONOperation{
+		RequiredAuths:        []string{},
+		RequiredPostingAuths: []string{user_name},
+		ID:                   "login",
+		JSON:                 json_string,
+	}
+
+	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	if err != nil {
+		return false
+	}
+
+	// Создание транзакции
+	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
+	if err != nil {
+		return false
+	}
+	tx := transactions.NewSignedTransaction(&types.Transaction{
+		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
+		RefBlockPrefix: refBlockPrefix,
+	})
+
+	// Добавление операций в транзакцию
+	tx.PushOperation(strx)
+
+	// Получаем необходимый для подписи ключ
+	var keys [][]byte
+	privKey, _ := wif.Decode(string([]byte(pass)))
+	keys = append(keys, privKey)
+
+	// Подписываем транзакцию
+	if err := tx.Sign(keys, api.Chain); err != nil {
+		return false
+	}
+
+	// Отправка транзакции
+	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+
+	if err != nil {
+		return false
+	} else {
+		log.Println("[Login] Block -> ", resp.BlockNum, " User -> ", user_name)
+		return true
 	}
 }
