@@ -121,7 +121,7 @@ func (api *Client) Post(author_name, title, body string, tags []string) error {
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
 
-	json_meta := "{\"tag\":["
+	json_meta := "{\"tags\":["
 	for k, v := range tag {
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
@@ -157,7 +157,7 @@ func (api *Client) Post_Vote(author_name, title, body string, tags []string, wei
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
 
-	json_meta := "{\"tag\":["
+	json_meta := "{\"tags\":["
 	for k, v := range tag {
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
@@ -199,7 +199,7 @@ func (api *Client) Post_Options(author_name, title, body string, tags []string, 
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
 
-	json_meta := "{\"tag\":["
+	json_meta := "{\"tags\":["
 	for k, v := range tag {
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
@@ -247,7 +247,7 @@ func (api *Client) Post_Options_Vote(author_name, title, body string, tags []str
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
 
-	json_meta := "{\"tag\":["
+	json_meta := "{\"tags\":["
 	for k, v := range tag {
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
@@ -421,7 +421,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 }
 
 func (api *Client) Login(user_name, pass string) bool {
-	json_string := "[\"golos-go(go-steem)\",{\"account\":\"" + user_name + "\"}]"
+	json_string := "[\"login\",{\"account\":\"" + user_name + "\",\"app\":\"golos-go(go-steem)\"}]"
 
 	strx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
