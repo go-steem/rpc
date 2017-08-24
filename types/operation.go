@@ -2,6 +2,7 @@ package types
 
 import (
 	// Stdlib
+	"bytes"
 	"encoding/json"
 	"reflect"
 
@@ -101,7 +102,7 @@ func (ops *Operations) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (ops Operations) MarshalJSON() ([]byte, error) {
+/*func (ops Operations) MarshalJSON() ([]byte, error) {
 	tuples := make([]*operationTuple, 0, len(ops))
 	for _, op := range ops {
 		tuples = append(tuples, &operationTuple{
@@ -110,6 +111,17 @@ func (ops Operations) MarshalJSON() ([]byte, error) {
 		})
 	}
 	return json.Marshal(tuples)
+}*/
+
+func (ops Operations) MarshalJSON() ([]byte, error) {
+	tuples := make([]*operationTuple, 0, len(ops))
+	for _, op := range ops {
+		tuples = append(tuples, &operationTuple{
+			Type: op.Type(),
+			Data: op.Data().(Operation),
+		})
+	}
+	return JSONMarshal(tuples)
 }
 
 type operationTuple struct {
@@ -117,11 +129,26 @@ type operationTuple struct {
 	Data Operation
 }
 
-func (op *operationTuple) MarshalJSON() ([]byte, error) {
+/*func (op *operationTuple) MarshalJSON() ([]byte, error) {
 	return json.Marshal([]interface{}{
 		op.Type,
 		op.Data,
 	})
+}*/
+
+func (op *operationTuple) MarshalJSON() ([]byte, error) {
+	return JSONMarshal([]interface{}{
+		op.Type,
+		op.Data,
+	})
+}
+
+func JSONMarshal(t interface{}) ([]byte, error) {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(t)
+	return buffer.Bytes(), err
 }
 
 func (op *operationTuple) UnmarshalJSON(data []byte) error {

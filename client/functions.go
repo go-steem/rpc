@@ -224,8 +224,8 @@ func (api *Client) Post_Options(author_name, title, body string, tags []string, 
 		Permlink:             permlink,
 		MaxAcceptedPayout:    "1000000.000 GBG",
 		PercentSteemDollars:  percent,
-		AllowVotes:           true,
-		AllowCurationRewards: true,
+		AllowVotes:           votes,
+		AllowCurationRewards: curation,
 		Extensions:           []interface{}{},
 	}
 	trx = append(trx, txo)
@@ -273,8 +273,8 @@ func (api *Client) Post_Options_Vote(author_name, title, body string, tags []str
 		Permlink:             permlink,
 		MaxAcceptedPayout:    "1000000.000 GBG",
 		PercentSteemDollars:  percent,
-		AllowVotes:           true,
-		AllowCurationRewards: true,
+		AllowVotes:           votes,
+		AllowCurationRewards: curation,
 		//Extensions:           "",
 	}
 	trx = append(trx, txo)
