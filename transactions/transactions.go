@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func RefBlockNum(blockNumber types.UInt32) types.UInt16 {
+func RefBlockNum(blockNumber uint32) types.UInt16 {
 	return types.UInt16(blockNumber)
 }
 
