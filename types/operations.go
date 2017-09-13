@@ -6,9 +6,6 @@ import (
 
 	// RPC
 	"github.com/asuleymanov/golos-go/encoding/transaction"
-
-	// Vendor
-	"github.com/pkg/errors"
 )
 
 // FC_REFLECT( steemit::chain::report_over_production_operation,
@@ -488,43 +485,9 @@ func (op *CommentOptionsOperation) MarshalTransaction(encoder *transaction.Encod
 }
 
 type Authority struct {
-	AccountAuths    []*Auth `json:"account_auths"`
-	KeyAuths        []*Auth `json:"key_auths"`
-	WeightThreshold uint32  `json:"weight_threshold"`
-}
-
-// XXX: Not sure about the struct field names.
-type Auth struct {
-	Key   string
-	Check uint32
-}
-
-func (auth *Auth) UnmarshalJSON(data []byte) error {
-	// The auth object is [key, check].
-	raw := make([]json.RawMessage, 2)
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
-	if len(raw) != 2 {
-		return errors.Errorf("invalid auth object: %v", string(data))
-	}
-
-	// Unmarshal Key.
-	var key string
-	if err := json.Unmarshal(raw[0], &key); err != nil {
-		return errors.Wrapf(err, "failed to unmarshal Auth.Key: %v", string(raw[0]))
-	}
-
-	// Unmarshal Check.
-	var check uint32
-	if err := json.Unmarshal(raw[1], &check); err != nil {
-		return errors.Wrapf(err, "failed to unmarshal Auth.Check: %v", string(raw[1]))
-	}
-
-	// Update fields.
-	auth.Key = key
-	auth.Check = check
-	return nil
+	AccountAuths    StringInt64Map `json:"account_auths"`
+	KeyAuths        StringInt64Map `json:"key_auths"`
+	WeightThreshold uint32         `json:"weight_threshold"`
 }
 
 type UnknownOperation struct {
