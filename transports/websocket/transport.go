@@ -1,51 +1,69 @@
 package websocket
 
 import (
+	"io"
 	// Stdlib
-	"crypto/tls"
+	"context"
 	"net"
-	"net/url"
 	"time"
 
-	// RPC
-	"github.com/go-steem/rpc/interfaces"
-
 	// Vendor
+	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"golang.org/x/net/websocket"
+	"github.com/sourcegraph/jsonrpc2"
+	tomb "gopkg.in/tomb.v2"
 )
 
 const (
-	DefaultDialTimeout           = 30 * time.Second
-	DefaultAutoReconnectMaxDelay = 5 * time.Minute
+	DefaultHandshakeTimeout      = 30 * time.Second
+	DefaultWriteTimeout          = 10 * time.Second
+	DefaultReadTimeout           = 20 * time.Second
+	DefaultAutoReconnectMaxDelay = 1 * time.Minute
+
+	InitialAutoReconnectDelay       = 1 * time.Second
+	AutoReconnectBackoffCoefficient = 1.5
 )
+
+var netDialer net.Dialer
 
 // Transport implements a CallCloser accessing the Steem RPC endpoint over WebSocket.
 type Transport struct {
-	// URL as passed into the constructor.
-	url *url.URL
+	// URLs as passed into the constructor.
+	urls         []string
+	nextURLIndex int
+	currentURL   string
 
 	// Options.
-	dialTimeout  time.Duration
-	readTimeout  time.Duration
-	writeTimeout time.Duration
+	handshakeTimeout time.Duration
+	readTimeout      time.Duration
+	writeTimeout     time.Duration
 
 	autoReconnectEnabled  bool
 	autoReconnectMaxDelay time.Duration
 
 	monitorChan chan<- interface{}
 
-	// Underlying CallCloser.
-	cc interfaces.CallCloser
+	// The underlying JSON-RPC connection.
+	connCh chan chan *jsonrpc2.Conn
+	errCh  chan error
+
+	t *tomb.Tomb
 }
 
 // Option represents an option that can be passed into the transport constructor.
 type Option func(*Transport)
 
 // SetDialTimeout can be used to set the timeout when establishing a new connection.
+//
+// This function is deprecated, please use SetHandshakeTimeout.
 func SetDialTimeout(timeout time.Duration) Option {
+	return SetHandshakeTimeout(timeout)
+}
+
+// SetHandshakeTimeout can be used to set the timeout for WebSocket handshake.
+func SetHandshakeTimeout(timeout time.Duration) Option {
 	return func(t *Transport) {
-		t.dialTimeout = timeout
+		t.handshakeTimeout = timeout
 	}
 }
 
@@ -110,19 +128,22 @@ func SetMonitor(monitorChan chan<- interface{}) Option {
 	}
 }
 
-// NewTransport creates a new transport that connects to the given WebSocket URL.
-func NewTransport(endpointURL string, options ...Option) (*Transport, error) {
-	// Parse the URL.
-	epURL, err := url.Parse(endpointURL)
-	if err != nil {
-		return nil, errors.Wrap(err, "invalid endpoint URL")
-	}
-
+// NewTransport creates a new transport that connects to the given WebSocket URLs.
+//
+// It is possible to specify multiple WebSocket endpoint URLs.
+// In case the transport is configured to reconnect automatically,
+// the URL to connect to is rotated on every connect attempt using round-robin.
+func NewTransport(urls []string, options ...Option) (*Transport, error) {
 	// Prepare a transport instance.
 	t := &Transport{
-		url:                   epURL,
-		dialTimeout:           DefaultDialTimeout,
+		urls:                  urls,
+		handshakeTimeout:      DefaultHandshakeTimeout,
+		readTimeout:           DefaultReadTimeout,
+		writeTimeout:          DefaultWriteTimeout,
 		autoReconnectMaxDelay: DefaultAutoReconnectMaxDelay,
+		connCh:                make(chan chan *jsonrpc2.Conn),
+		errCh:                 make(chan error),
+		t:                     &tomb.Tomb{},
 	}
 
 	// Apply the options.
@@ -130,105 +151,156 @@ func NewTransport(endpointURL string, options ...Option) (*Transport, error) {
 		opt(t)
 	}
 
-	// Instantiate the underlying CallCloser based on the options.
-	var cc interfaces.CallCloser
-	if t.autoReconnectEnabled {
-		cc = newReconnectingTransport(t)
-	} else {
-		cc, err = newSimpleTransport(t)
-	}
-	if err != nil {
-		return nil, err
-	}
-	t.cc = cc
+	t.t.Go(t.dialer)
 
 	// Return the new transport.
 	return t, nil
 }
 
 // Call implements interfaces.CallCloser.
-func (t *Transport) Call(method string, params, response interface{}) error {
-	return t.cc.Call(method, params, response)
+func (t *Transport) Call(method string, params, result interface{}) error {
+	// Limit the request context with the tomb context.
+	ctx := t.t.Context(nil)
+
+Loop:
+	for {
+		// Request a connection.
+		connCh := make(chan *jsonrpc2.Conn, 1)
+		select {
+		case t.connCh <- connCh:
+		case <-ctx.Done():
+			return errors.Wrap(ctx.Err(), "context closed")
+		}
+
+		// Receive the connection.
+		conn := <-connCh
+
+		// Perform the call.
+		err := conn.Call(ctx, method, params, result)
+		if err == nil {
+			return nil
+		}
+
+		// In case this is a context error, return immediately.
+		if err := ctx.Err(); err != nil {
+			return errors.Wrap(err, "context closed")
+		}
+
+		// In case auto-reconnect is disabled, fail immediately.
+		if !t.autoReconnectEnabled {
+			return errors.Wrap(err, "call failed")
+		}
+
+		// In case this is a connection error, request a new connection.
+		err = errors.Cause(err)
+		if _, ok := err.(*websocket.CloseError); ok || err == io.ErrUnexpectedEOF {
+			select {
+			case t.errCh <- errors.Wrap(err, "WebSocket closed"):
+				continue Loop
+			case <-ctx.Done():
+				return errors.Wrap(ctx.Err(), "context closed")
+			}
+		}
+
+		// Some other error occurred, return it immediately.
+		return errors.Wrap(err, "call failed")
+	}
+}
+
+func (t *Transport) dialer() error {
+	ctx := t.t.Context(nil)
+
+	var conn *jsonrpc2.Conn
+	defer func() {
+		if conn != nil {
+			conn.Close()
+			err := errors.Wrap(ctx.Err(), "context closed")
+			t.emit(&DisconnectedEvent{t.currentURL, err})
+		}
+	}()
+
+	connect := func() {
+		delay := InitialAutoReconnectDelay
+
+		for {
+			var err error
+			conn, err = t.dial(ctx)
+			if err == nil {
+				break
+			}
+
+			select {
+			case <-time.After(delay):
+				delay = time.Duration(float64(delay) * AutoReconnectBackoffCoefficient)
+				if delay > t.autoReconnectMaxDelay {
+					delay = t.autoReconnectMaxDelay
+				}
+
+			case <-ctx.Done():
+				return
+			}
+		}
+	}
+
+	// Establish the initial connection.
+	connect()
+
+	for {
+		select {
+		case connCh := <-t.connCh:
+			connCh <- conn
+
+		case err := <-t.errCh:
+			conn.Close()
+			t.emit(&DisconnectedEvent{t.currentURL, err})
+			connect()
+
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func (t *Transport) dial(ctx context.Context) (*jsonrpc2.Conn, error) {
+	// Set up a dialer.
+	dialer := websocket.Dialer{
+		NetDial: func(network, addr string) (net.Conn, error) {
+			return netDialer.DialContext(ctx, network, addr)
+		},
+		HandshakeTimeout: t.handshakeTimeout,
+	}
+
+	// Get the next URL to try.
+	u := t.urls[t.nextURLIndex]
+	t.nextURLIndex = (t.nextURLIndex + 1) % len(t.urls)
+	t.currentURL = u
+
+	// Connect the WebSocket.
+	t.emit(&ConnectingEvent{u})
+	ws, _, err := dialer.Dial(u, nil)
+	if err != nil {
+		err = errors.Wrapf(err, "failed to dial %v", u)
+		t.emit(&DisconnectedEvent{u, err})
+		return nil, err
+	}
+	t.emit(&ConnectedEvent{u})
+
+	// Wrap the WebSocket with JSON-RPC2.
+	stream := NewObjectStream(ws, t.writeTimeout, t.readTimeout)
+	return jsonrpc2.NewConn(ctx, stream, nil), nil
+}
+
+func (t *Transport) emit(v interface{}) {
+	if t.monitorChan != nil {
+		select {
+		case t.monitorChan <- v:
+		default:
+		}
+	}
 }
 
 // Close implements interfaces.CallCloser.
 func (t *Transport) Close() error {
-	return t.cc.Close()
-}
-
-// dial establishes a WebSocket connection according to the transport configuration.
-func (t *Transport) dial(cancel <-chan struct{}) (*websocket.Conn, error) {
-	// Prepare a WebSocket config.
-	urlString := t.url.String()
-	config, err := websocket.NewConfig(urlString, "http://localhost")
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create WebSocket config")
-	}
-
-	// Establish the underlying TCP connection.
-	// We need to do this manually so that we can set up the timeout and the cancel channel.
-	var conn net.Conn
-	dialer := &net.Dialer{
-		Timeout: t.dialTimeout,
-		Cancel:  cancel,
-	}
-	switch t.url.Scheme {
-	case "ws":
-		conn, err = dialer.Dial("tcp", toHostPort(t.url))
-
-	case "wss":
-		conn, err = tls.DialWithDialer(dialer, "tcp", toHostPort(t.url), nil)
-
-	default:
-		err = errors.Wrapf(websocket.ErrBadScheme, "invalid WebSocket URL scheme: %v", t.url.Scheme)
-	}
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to establish TCP connection")
-	}
-
-	// Establish the WebSocket connection.
-	ws, err := websocket.NewClient(config, conn)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to establish WebSocket connection")
-	}
-	return ws, nil
-}
-
-func (t *Transport) updateDeadline(ws *websocket.Conn) error {
-	// Set deadline in case read timeout is the same as write timeout.
-	if t.readTimeout != 0 && t.writeTimeout == t.readTimeout {
-		if err := ws.SetDeadline(time.Now().Add(t.readTimeout)); err != nil {
-			return errors.Wrap(err, "failed to set connection deadline")
-		}
-		return nil
-	}
-
-	// Set read deadline.
-	if t.readTimeout != 0 {
-		if err := ws.SetReadDeadline(time.Now().Add(t.readTimeout)); err != nil {
-			return errors.Wrap(err, "failed to set connection read deadline")
-		}
-	}
-
-	// Set write deadline.
-	if t.writeTimeout != 0 {
-		if err := ws.SetWriteDeadline(time.Now().Add(t.writeTimeout)); err != nil {
-			return errors.Wrap(err, "failed to set connection write deadline")
-		}
-	}
-	return nil
-}
-
-var portMap = map[string]string{
-	"ws":  "80",
-	"wss": "443",
-}
-
-func toHostPort(u *url.URL) string {
-	if _, ok := portMap[u.Scheme]; ok {
-		if _, _, err := net.SplitHostPort(u.Host); err != nil {
-			return net.JoinHostPort(u.Host, portMap[u.Scheme])
-		}
-	}
-	return u.Host
+	t.t.Kill(nil)
+	return t.t.Wait()
 }
