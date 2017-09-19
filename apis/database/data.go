@@ -485,16 +485,6 @@ type TrendingTags struct {
 	Comments              *types.Int `json:"comments"`
 }
 
-type OpsInBlock struct {
-	TrxID      string         `json:"trx_id"`
-	Block      *types.Int     `json:"block"`
-	TrxInBlock *types.Int     `json:"trx_in_block"`
-	OpInTrx    *types.Int     `json:"op_in_trx"`
-	VirtualOp  *types.Int     `json:"virtual_op"`
-	Timestamp  string         `json:"timestamp"`
-	Op         []*interface{} `json:"op"`
-}
-
 type Categories struct {
 	ID           *types.Int `json:"id"`
 	Name         string     `json:"name"`

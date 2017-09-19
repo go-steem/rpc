@@ -259,12 +259,12 @@ func (api *API) GetBlock(blockNum uint32) (*Block, error) {
 }
 
 //get_ops_in_block
-func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*OpsInBlock, error) {
+func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*types.OperationObject, error) {
 	raw, err := api.Raw("get_ops_in_block", []interface{}{blockNum, only_virtual})
 	if err != nil {
 		return nil, err
 	}
-	var resp []*OpsInBlock
+	var resp []*types.OperationObject
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
 		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_ops_in_block response", APIID)
 	}
