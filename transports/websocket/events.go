@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"fmt"
-	"time"
 )
 
 // ConnectingEvent is emitted when a new connection is being established.
@@ -31,15 +30,4 @@ type DisconnectedEvent struct {
 
 func (e *DisconnectedEvent) String() string {
 	return fmt.Sprintf("DISCONNECTED [url=%v, err=%v]", e.URL, e.Err)
-}
-
-// DialTimeoutEvent is emitted when establishing a new connection times out.
-type DialTimeoutEvent struct {
-	URL     string
-	Err     error
-	Timeout time.Duration
-}
-
-func (e *DialTimeoutEvent) String() string {
-	return fmt.Sprintf("DIAL_TIMEOUT [url=%v, err=%v, timeout=%v]", e.URL, e.Err, e.Timeout)
 }

@@ -36,7 +36,7 @@ type BResp struct {
 
 func initclient(url string) *rpc.Client {
 	// Инициализация Websocket
-	t, err := websocket.NewTransport(url)
+	t, err := websocket.NewTransport([]string{url})
 	if err != nil {
 		panic(errors.Wrapf(err, "Error Websocket: "))
 	}
