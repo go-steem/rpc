@@ -92,6 +92,7 @@ func (content *Content) IsStory() bool {
 
 type ContentMetadata struct {
 	Flag  bool
+	Value string
 	Users []string
 	Tags  []string
 	Image []string
@@ -119,8 +120,11 @@ func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
 	}
 
 	if len(unquoted) == 0 {
-		var value ContentMetadata
-		metadata = &value
+		return nil
+	}
+
+	if unquoted[0] == '"' {
+		metadata.Value = unquoted
 		return nil
 	}
 
