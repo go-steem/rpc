@@ -413,7 +413,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 	}
 	resp, err := api.Send_Trx(from_name, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
+		return errors.Wrapf(err, "Error Transfer: ")
 	} else {
 		log.Println("[Transfer] Block -> ", resp.BlockNum, " From user -> ", from_name, " To user -> ", to_name)
 		return nil
@@ -466,5 +466,42 @@ func (api *Client) Login(user_name, pass string) bool {
 	} else {
 		log.Println("[Login] Block -> ", resp.BlockNum, " User -> ", user_name)
 		return true
+	}
+}
+
+func (api *Client) FeedPublish(username, base, quote string) error {
+
+	ExchR := types.ExchRate{Base: base, Quote: quote}
+	tx := &types.FeedPublishOperation{
+		Publisher:    username,
+		ExchangeRate: ExchR,
+	}
+
+	resp, err := api.Send_Trx(username, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error FeedPublish: ")
+	} else {
+		log.Println("[FeedPublish] Block -> ", resp.BlockNum, " FeedPublish user -> ", username)
+		return nil
+	}
+}
+
+func (api *Client) WitnessUpdate(username, url, signKey, acfee, fee string, blocksize uint32, sbdir uint16) error {
+
+	chprop := types.ChainProperties{AccountCreationFee: acfee, MaximumBlockSize: blocksize, SBDInterestRate: sbdir}
+	tx := &types.WitnessUpdateOperation{
+		Owner:           username,
+		Url:             url,
+		BlockSigningKey: signKey,
+		Props:           &chprop,
+		Fee:             fee,
+	}
+
+	resp, err := api.Send_Trx(username, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error WitnessUpdate: ")
+	} else {
+		log.Println("[WitnessUpdate] Block -> ", resp.BlockNum, " WitnessUpdate user -> ", username)
+		return nil
 	}
 }

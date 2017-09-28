@@ -7,12 +7,20 @@ import (
 
 type StringInt64Map map[string]int64
 
-func (m StringInt64Map) MarshalJSON() ([]byte, error) {
+/*func (m StringInt64Map) MarshalJSON() ([]byte, error) {
 	xs := make([]interface{}, len(m))
 	for k, v := range m {
 		xs = append(xs, []interface{}{k, v})
 	}
 	return json.Marshal(xs)
+}*/
+
+func (m StringInt64Map) MarshalJSON() ([]byte, error) {
+	xs := make([]interface{}, len(m))
+	for k, v := range m {
+		xs = append(xs, []interface{}{k, v})
+	}
+	return JSONMarshal(xs)
 }
 
 func (m *StringInt64Map) UnmarshalJSON(data []byte) error {

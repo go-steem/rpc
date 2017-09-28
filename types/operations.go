@@ -49,11 +49,13 @@ func (op *ConvertOperation) Data() interface{} {
 //             (exchange_rate) )
 
 type FeedPublishOperation struct {
-	Publisher    string `json:"publisher"`
-	ExchangeRate struct {
-		Base  string `json:"base"`
-		Quote string `json:"quote"`
-	} `json:"exchange_rate"`
+	Publisher    string   `json:"publisher"`
+	ExchangeRate ExchRate `json:"exchange_rate"`
+}
+
+type ExchRate struct {
+	Base  string `json:"base"`
+	Quote string `json:"quote"`
 }
 
 func (op *FeedPublishOperation) Type() OpType {
@@ -62,6 +64,15 @@ func (op *FeedPublishOperation) Type() OpType {
 
 func (op *FeedPublishOperation) Data() interface{} {
 	return op
+}
+
+func (op *FeedPublishOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
+	enc.Encode(op.Publisher)
+	enc.EncodeMoney(op.ExchangeRate.Base)
+	enc.EncodeMoney(op.ExchangeRate.Quote)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::pow,
@@ -518,6 +529,17 @@ func (op *WitnessUpdateOperation) Type() OpType {
 
 func (op *WitnessUpdateOperation) Data() interface{} {
 	return op
+}
+
+func (op *WitnessUpdateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
+	enc.Encode(op.Owner)
+	enc.Encode(op.Url)
+	enc.Encode(op.BlockSigningKey)
+	enc.Encode(op.Props)
+	enc.Encode(op.Fee)
+	return enc.Err()
 }
 
 type CustomOperation struct {

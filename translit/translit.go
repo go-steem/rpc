@@ -28,12 +28,13 @@ func EncodeTag(tag string) string {
 }
 
 func EncodeTitle(title string) string {
-	reg, err := regexp.Compile("[^a-zA-Z0-9а-яА-Я.]+")
+	reg, err := regexp.Compile("[^a-zA-Z0-9а-яА-Я.,]+")
 	if err != nil {
 		log.Fatal(err)
 	}
 	processedString := reg.ReplaceAllString(title, "-")
-	str, _ := encode(processedString)
+	s1, _ := encode(processedString)
+	str := strings.Replace(s1, ".", "", -1)
 	return str
 }
 
