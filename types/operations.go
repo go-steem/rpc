@@ -70,8 +70,8 @@ func (op *FeedPublishOperation) MarshalTransaction(encoder *transaction.Encoder)
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
 	enc.Encode(op.Publisher)
-	enc.EncodeMoney(op.ExchangeRate.Base)
 	enc.EncodeMoney(op.ExchangeRate.Quote)
+	enc.EncodeMoney(op.ExchangeRate.Base)
 	return enc.Err()
 }
 
@@ -248,13 +248,6 @@ func (op *WithdrawVestingOperation) Data() interface{} {
 //             (to_account)
 //             (percent)
 //             (auto_vest) )
-
-// FC_REFLECT( steemit::chain::witness_update_operation,
-//             (owner)
-//             (url)
-//             (block_signing_key)
-//             (props)
-//             (fee) )
 
 // FC_REFLECT( steemit::chain::account_witness_vote_operation,
 //             (account)
@@ -514,7 +507,12 @@ func (op *UnknownOperation) Data() interface{} {
 	return op.data
 }
 
-// test
+// FC_REFLECT( steemit::chain::witness_update_operation,
+//             (owner)
+//             (url)
+//             (block_signing_key)
+//             (props)
+//             (fee) )
 type WitnessUpdateOperation struct {
 	Owner           string           `json:"owner"`
 	Url             string           `json:"url"`
@@ -572,12 +570,12 @@ func (op *SetWithdrawVestingRouteOperation) Data() interface{} {
 }
 
 type LimitOrderCreate2Operation struct {
-	Qwner        string `json:"owner"`
-	Orderid      uint32 `json:"orderid"`
-	AmountToSell string `json:"amount_to_sell"`
-	ExchangeRate string `json:"exchange_rate"`
-	FillOrKill   bool   `json:"fill_or_kill"`
-	Expiration   uint32 `json:"expiration"`
+	Qwner        string   `json:"owner"`
+	Orderid      uint32   `json:"orderid"`
+	AmountToSell string   `json:"amount_to_sell"`
+	ExchangeRate ExchRate `json:"exchange_rate"`
+	FillOrKill   bool     `json:"fill_or_kill"`
+	Expiration   uint32   `json:"expiration"`
 }
 
 func (op *LimitOrderCreate2Operation) Type() OpType {
@@ -771,7 +769,7 @@ func (op *TransferToSavingsOperation) MarshalTransaction(encoder *transaction.En
 	enc.EncodeUVarint(uint64(TypeTransferToSavings.Code()))
 	enc.Encode(op.From)
 	enc.Encode(op.To)
-	enc.Encode(op.Amount)
+	enc.EncodeMoney(op.Amount)
 	enc.Encode(op.Memo)
 	return enc.Err()
 }

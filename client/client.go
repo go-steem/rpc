@@ -34,9 +34,9 @@ type BResp struct {
 	Expired  bool
 }
 
-func initclient(url string) *rpc.Client {
+func initclient(url []string) *rpc.Client {
 	// Инициализация Websocket
-	t, err := websocket.NewTransport([]string{url})
+	t, err := websocket.NewTransport(url)
 	if err != nil {
 		panic(errors.Wrapf(err, "Error Websocket: "))
 	}
@@ -62,7 +62,7 @@ func initChainId(str string) *transactions.Chain {
 	return &ChainId
 }
 
-func NewApi(url, chain string) *Client {
+func NewApi(url []string, chain string) *Client {
 	return &Client{
 		Rpc:   initclient(url),
 		Chain: initChainId(chain),

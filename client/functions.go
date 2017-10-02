@@ -420,7 +420,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 	}
 }
 
-func (api *Client) Login(user_name, pass string) bool {
+func (api *Client) Login(user_name, key string) bool {
 	json_string := "[\"login\",{\"account\":\"" + user_name + "\",\"app\":\"golos-go(go-steem)\"}]"
 
 	strx := &types.CustomJSONOperation{
@@ -450,7 +450,7 @@ func (api *Client) Login(user_name, pass string) bool {
 
 	// Получаем необходимый для подписи ключ
 	var keys [][]byte
-	privKey, _ := wif.Decode(string([]byte(pass)))
+	privKey, _ := wif.Decode(string([]byte(key)))
 	keys = append(keys, privKey)
 
 	// Подписываем транзакцию

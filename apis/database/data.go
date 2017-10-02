@@ -493,3 +493,13 @@ type Categories struct {
 	Discussions  *types.Int `json:"discussions"`
 	LastUpdate   string     `json:"last_update"`
 }
+
+type AccountHistory struct {
+	TrxID      string        `json:"trx_id"`
+	Block      int           `json:"block"`
+	TrxInBlock int           `json:"trx_in_block"`
+	OpInTrx    int           `json:"op_in_trx"`
+	VirtualOp  int           `json:"virtual_op"`
+	Timestamp  string        `json:"timestamp"`
+	Op         []interface{} `json:"op"`
+}

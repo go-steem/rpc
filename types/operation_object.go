@@ -9,6 +9,7 @@ type OperationObject struct {
 	TransactionID          string    `json:"trx_id"`
 	TransactionInBlock     uint32    `json:"trx_in_block"`
 	Operation              Operation `json:"op"`
+	OperationType          OpType    `json:"-"`
 	OperationInTransaction uint16    `json:"op_in_trx"`
 	VirtualOperation       uint64    `json:"virtual_op"`
 	Timestamp              *Time     `json:"timestamp"`
@@ -34,6 +35,7 @@ func (op *OperationObject) UnmarshalJSON(p []byte) error {
 	op.TransactionID = raw.TransactionID
 	op.TransactionInBlock = raw.TransactionInBlock
 	op.Operation = raw.Operation.Data
+	op.OperationType = raw.Operation.Type
 	op.OperationInTransaction = raw.OperationInTransaction
 	op.VirtualOperation = raw.VirtualOperation
 	op.Timestamp = raw.Timestamp

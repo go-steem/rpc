@@ -476,6 +476,27 @@ func (api *API) GetAccountHistory(account string, from uint64, limit uint32) (*j
 	return api.Raw("get_account_history", []interface{}{account, from, limit})
 }
 
+/*func (api *API) GetAccountHistory(account string, from uint64, limit uint32) ([]*AccountHistory, error) {
+	raw, err := api.Raw("get_account_history", []interface{}{account, from, limit})
+	if err != nil {
+		return nil, err
+	}
+	var tmp1 [][]interface{}
+	if err := json.Unmarshal([]byte(*raw), &tmp1); err != nil {
+		return nil, err
+	}
+	var resp []*AccountHistory
+	for _, v := range tmp1 {
+		byteData, _ := json.Marshal(v[1])
+		var tmp AccountHistory
+		if err := json.Unmarshal(byteData, &tmp); err != nil {
+			return nil, err
+		}
+		resp = append(resp, &tmp)
+	}
+	return resp, nil
+}*/
+
 //get_owner_history
 func (api *API) GetOwnerHistory(accountName string) (*json.RawMessage, error) {
 	return api.Raw("get_owner_history", []interface{}{accountName})
