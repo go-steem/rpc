@@ -472,11 +472,11 @@ func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests
 }
 
 //get_account_history
-func (api *API) GetAccountHistory(account string, from uint64, limit uint32) (*json.RawMessage, error) {
+/*func (api *API) GetAccountHistory(account string, from uint64, limit uint32) (*json.RawMessage, error) {
 	return api.Raw("get_account_history", []interface{}{account, from, limit})
-}
+}*/
 
-/*func (api *API) GetAccountHistory(account string, from uint64, limit uint32) ([]*AccountHistory, error) {
+func (api *API) GetAccountHistory(account string, from uint64, limit uint32) ([]*types.OperationObject, error) {
 	raw, err := api.Raw("get_account_history", []interface{}{account, from, limit})
 	if err != nil {
 		return nil, err
@@ -485,17 +485,20 @@ func (api *API) GetAccountHistory(account string, from uint64, limit uint32) (*j
 	if err := json.Unmarshal([]byte(*raw), &tmp1); err != nil {
 		return nil, err
 	}
-	var resp []*AccountHistory
+	var resp []*types.OperationObject
 	for _, v := range tmp1 {
-		byteData, _ := json.Marshal(v[1])
-		var tmp AccountHistory
+		byteData, errm := json.Marshal(&v[1])
+		if errm != nil {
+			return nil, errm
+		}
+		var tmp *types.OperationObject
 		if err := json.Unmarshal(byteData, &tmp); err != nil {
 			return nil, err
 		}
-		resp = append(resp, &tmp)
+		resp = append(resp, tmp)
 	}
 	return resp, nil
-}*/
+}
 
 //get_owner_history
 func (api *API) GetOwnerHistory(accountName string) (*json.RawMessage, error) {

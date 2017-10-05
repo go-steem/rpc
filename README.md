@@ -22,7 +22,7 @@ This is just a code snippet. Please check the `examples` directory
 for more complete and ready to use examples.
 
 ```go
-	cls := client.NewApi()
+	cls := client.NewApi([]string{"wss://ws.golos.io"},"golos")
 	defer cls.Rpc.Close()
 	
 	// Get config.

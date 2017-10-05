@@ -198,6 +198,15 @@ func (api *Client) Post_Options(author_name, title, body string, tags []string, 
 	permlink := translit.EncodeTitle(title)
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
+	MAP := "1000000.000 GBG"
+	PSD := percent
+	if percent == 0 {
+		MAP = "0.000 GBG"
+	} else if percent == 50 {
+		PSD = 10000
+	} else {
+		PSD = 0
+	}
 
 	json_meta := "{\"tags\":["
 	for k, v := range tag {
@@ -222,8 +231,8 @@ func (api *Client) Post_Options(author_name, title, body string, tags []string, 
 	txo := &types.CommentOptionsOperation{
 		Author:               author_name,
 		Permlink:             permlink,
-		MaxAcceptedPayout:    "1000000.000 GBG",
-		PercentSteemDollars:  percent,
+		MaxAcceptedPayout:    MAP,
+		PercentSteemDollars:  PSD,
 		AllowVotes:           votes,
 		AllowCurationRewards: curation,
 		Extensions:           []interface{}{},
@@ -239,13 +248,22 @@ func (api *Client) Post_Options(author_name, title, body string, tags []string, 
 	}
 }
 
-func (api *Client) Post_Options_Vote(author_name, title, body string, tags []string, percent uint16, weight_post int, votes, curation bool) error {
+func (api *Client) Post_Options_Vote(author_name, title, body string, tags []string, weight_post int, percent uint16, votes, curation bool) error {
 	if weight_post > 10000 {
 		weight_post = 10000
 	}
 	permlink := translit.EncodeTitle(title)
 	tag := translit.EncodeTags(tags)
 	ptag := translit.EncodeTag(tags[0])
+	MAP := "1000000.000 GBG"
+	PSD := percent
+	if percent == 0 {
+		MAP = "0.000 GBG"
+	} else if percent == 50 {
+		PSD = 10000
+	} else {
+		PSD = 0
+	}
 
 	json_meta := "{\"tags\":["
 	for k, v := range tag {
@@ -271,11 +289,11 @@ func (api *Client) Post_Options_Vote(author_name, title, body string, tags []str
 	txo := &types.CommentOptionsOperation{
 		Author:               author_name,
 		Permlink:             permlink,
-		MaxAcceptedPayout:    "1000000.000 GBG",
-		PercentSteemDollars:  percent,
+		MaxAcceptedPayout:    MAP,
+		PercentSteemDollars:  PSD,
 		AllowVotes:           votes,
 		AllowCurationRewards: curation,
-		//Extensions:           "",
+		Extensions:           []interface{}{},
 	}
 	trx = append(trx, txo)
 
