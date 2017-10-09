@@ -91,12 +91,10 @@ func (api *Client) Verify_Post(author, permlink string) bool {
 		log.Println(errors.Wrapf(err, "Error Verify Post: "))
 		return false
 	} else {
-		for _, v := range ans {
-			if (v.Author == author) && (v.Permlink == permlink) {
-				return true
-			} else {
-				return false
-			}
+		if (ans.Author == author) && (ans.Permlink == permlink) {
+			return true
+		} else {
+			return false
 		}
 		return false
 	}
