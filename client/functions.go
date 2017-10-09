@@ -119,10 +119,14 @@ func (api *Client) DeleteComment(author_name, permlink string) error {
 func (api *Client) Post(author_name, title, body, permlink, ptag string, tags []string) error {
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
+	} else {
+		permlink = translit.EncodeTitle(permlink)
 	}
 	tag := translit.EncodeTags(tags)
 	if ptag == "" {
 		ptag = translit.EncodeTag(tags[0])
+	} else {
+		ptag = translit.EncodeTag(ptag)
 	}
 
 	json_meta := "{\"tags\":["
@@ -159,10 +163,14 @@ func (api *Client) Post_Vote(author_name, title, body, permlink, ptag string, ta
 	}
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
+	} else {
+		permlink = translit.EncodeTitle(permlink)
 	}
 	tag := translit.EncodeTags(tags)
 	if ptag == "" {
 		ptag = translit.EncodeTag(tags[0])
+	} else {
+		ptag = translit.EncodeTag(ptag)
 	}
 
 	json_meta := "{\"tags\":["
@@ -205,10 +213,14 @@ func (api *Client) Post_Vote(author_name, title, body, permlink, ptag string, ta
 func (api *Client) Post_Options(author_name, title, body, permlink, ptag string, tags []string, percent uint16, votes, curation bool) error {
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
+	} else {
+		permlink = translit.EncodeTitle(permlink)
 	}
 	tag := translit.EncodeTags(tags)
 	if ptag == "" {
 		ptag = translit.EncodeTag(tags[0])
+	} else {
+		ptag = translit.EncodeTag(ptag)
 	}
 	MAP := "1000000.000 GBG"
 	PSD := percent
@@ -266,10 +278,14 @@ func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag st
 	}
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
+	} else {
+		permlink = translit.EncodeTitle(permlink)
 	}
 	tag := translit.EncodeTags(tags)
 	if ptag == "" {
 		ptag = translit.EncodeTag(tags[0])
+	} else {
+		ptag = translit.EncodeTag(ptag)
 	}
 	MAP := "1000000.000 GBG"
 	PSD := percent
