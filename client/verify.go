@@ -84,3 +84,20 @@ func (api *Client) Verify_Follow(follower, following string) bool {
 		return false
 	}
 }
+
+func (api *Client) Verify_Post(author, permlink string) bool {
+	ans, err := api.Rpc.Database.GetContent(author, permlink)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "Error Verify Post: "))
+		return false
+	} else {
+		for _, v := range ans {
+			if (v.Author == author) && (v.Permlink == permlink) {
+				return true
+			} else {
+				return false
+			}
+		}
+		return false
+	}
+}
