@@ -4,7 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
-	"encoding/hex"
+	_ "encoding/hex"
 	"errors"
 	"fmt"
 	//secp256k1 "github.com/btcsuite/btcd/btcec"
@@ -29,7 +29,8 @@ func (tx *SignedTransaction) Sign_Single(priv_b []byte, data []byte) []byte {
 }
 
 func signBuffer(buf []byte, private_key *ecdsa.PrivateKey) []byte {
-	log.Println("signBuffer buf=", hex.EncodeToString(buf))
+	//Debug info
+	//log.Println("signBuffer buf=", hex.EncodeToString(buf))
 	// Hash a message.
 	alg := sha256.New()
 	alg.Write(buf)
@@ -40,7 +41,8 @@ func signBuffer(buf []byte, private_key *ecdsa.PrivateKey) []byte {
 }
 
 func signBufferSha256(buf_sha256 []byte, private_key *ecdsa.PrivateKey) []byte { // *secp256k1.Signature
-	log.Println("signBufferSha256 buf_sha256=", hex.EncodeToString(buf_sha256))
+	//Debug info
+	//log.Println("signBufferSha256 buf_sha256=", hex.EncodeToString(buf_sha256))
 
 	var buf_sha256_clone = make([]byte, len(buf_sha256))
 	copy(buf_sha256_clone, buf_sha256)
