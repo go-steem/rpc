@@ -604,3 +604,69 @@ func (api *Client) WithdrawVesting(account, vshares string) error {
 		return nil
 	}
 }
+
+func (api *Client) ChangeRecoveryAccount(accounttorecover, newrecoveryaccount string) error {
+	tx := &types.ChangeRecoveryAccountOperation{
+		AccountToRecover:   accounttorecover,
+		NewRecoveryAccount: newrecoveryaccount,
+		Extensions:         []interface{}{},
+	}
+
+	resp, err := api.Send_Trx(accounttorecover, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error ChangeRecoveryAccount: ")
+	} else {
+		log.Println("[ChangeRecoveryAccount] Block -> ", resp.BlockNum, " ChangeRecoveryAccount user -> ", accounttorecover)
+		return nil
+	}
+}
+
+func (api *Client) TransferToSavings(from, to, amount, memo string) error {
+	tx := &types.TransferToSavingsOperation{
+		From:   from,
+		To:     to,
+		Amount: amount,
+		Memo:   memo,
+	}
+
+	resp, err := api.Send_Trx(from, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error TransferToSavings: ")
+	} else {
+		log.Println("[TransferToSavings] Block -> ", resp.BlockNum, " TransferToSavings user -> ", from)
+		return nil
+	}
+}
+
+func (api *Client) TransferFromSavings(from, to, amount, memo string, requestid uint32) error {
+	tx := &types.TransferFromSavingsOperation{
+		From:      from,
+		RequestId: requestid,
+		To:        to,
+		Amount:    amount,
+		Memo:      memo,
+	}
+
+	resp, err := api.Send_Trx(from, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error TransferFromSavings: ")
+	} else {
+		log.Println("[TransferFromSavings] Block -> ", resp.BlockNum, " TransferFromSavings user -> ", from)
+		return nil
+	}
+}
+
+func (api *Client) CancelTransferFromSavings(from string, requestid uint32) error {
+	tx := &types.CancelTransferFromSavingsOperation{
+		From:      from,
+		RequestId: requestid,
+	}
+
+	resp, err := api.Send_Trx(from, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error CancelTransferFromSavings: ")
+	} else {
+		log.Println("[CancelTransferFromSavings] Block -> ", resp.BlockNum, " CancelTransferFromSavings user -> ", from)
+		return nil
+	}
+}

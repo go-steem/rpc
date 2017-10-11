@@ -50,7 +50,7 @@ const (
 	TypeSetResetAccount             OpType = "set_reset_account"
 	TypeClaimRewardBalance          OpType = "claim_reward_balance"
 	TypeDelegateVestingShares       OpType = "delegate_vesting_shares"
-	TypeAccountCreateWithSelegation OpType = "account_create_with_delegation"
+	TypeAccountCreateWithDelegation OpType = "account_create_with_delegation"
 	TypeFillConvertRequest          OpType = "fill_convert_request"
 	TypeAuthorReward                OpType = "author_reward"
 	TypeCurationReward              OpType = "curation_reward"
@@ -109,7 +109,7 @@ var opTypes = [...]OpType{
 	TypeSetResetAccount,
 	TypeClaimRewardBalance,
 	TypeDelegateVestingShares,
-	TypeAccountCreateWithSelegation,
+	TypeAccountCreateWithDelegation,
 	TypeFillConvertRequest,
 	TypeAuthorReward,
 	TypeCurationReward,

@@ -845,6 +845,17 @@ func (op *TransferFromSavingsOperation) Data() interface{} {
 	return op
 }
 
+func (op *TransferFromSavingsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeTransferFromSavings.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.RequestId)
+	enc.Encode(op.To)
+	enc.EncodeMoney(op.Amount)
+	enc.Encode(op.Memo)
+	return enc.Err()
+}
+
 type CancelTransferFromSavingsOperation struct {
 	From      string `json:"from"`
 	RequestId uint32 `json:"request_id"`
@@ -856,6 +867,14 @@ func (op *CancelTransferFromSavingsOperation) Type() OpType {
 
 func (op *CancelTransferFromSavingsOperation) Data() interface{} {
 	return op
+}
+
+func (op *CancelTransferFromSavingsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeCancelTransferFromSavings.Code()))
+	enc.Encode(op.From)
+	enc.Encode(op.RequestId)
+	return enc.Err()
 }
 
 type CustomBinaryOperation struct {
@@ -886,6 +905,14 @@ func (op *DeclineVotingRightsOperation) Type() OpType {
 
 func (op *DeclineVotingRightsOperation) Data() interface{} {
 	return op
+}
+
+func (op *DeclineVotingRightsOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeDeclineVotingRights.Code()))
+	enc.Encode(op.Account)
+	enc.Encode(op.Decline)
+	return enc.Err()
 }
 
 type ResetAccountOperation struct {
@@ -945,7 +972,7 @@ func (op *DelegateVestingSharesOperation) Data() interface{} {
 	return op
 }
 
-type AccountCreateWithSelegationOperation struct {
+type AccountCreateWithDelegationOperation struct {
 	Fee            string        `json:"fee"`
 	Delegation     string        `json:"delegation"`
 	Creator        string        `json:"creator"`
@@ -958,11 +985,11 @@ type AccountCreateWithSelegationOperation struct {
 	Extensions     []interface{} `json:"extensions"`
 }
 
-func (op *AccountCreateWithSelegationOperation) Type() OpType {
-	return TypeAccountCreateWithSelegation
+func (op *AccountCreateWithDelegationOperation) Type() OpType {
+	return TypeAccountCreateWithDelegation
 }
 
-func (op *AccountCreateWithSelegationOperation) Data() interface{} {
+func (op *AccountCreateWithDelegationOperation) Data() interface{} {
 	return op
 }
 
