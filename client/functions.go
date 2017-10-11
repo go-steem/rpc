@@ -519,39 +519,88 @@ func (api *Client) Login(user_name, key string) bool {
 	}
 }
 
-func (api *Client) FeedPublish(username, base, quote string) error {
+func (api *Client) LimitOrderCancel(owner string, orderid uint32) error {
 
-	ExchR := types.ExchRate{Base: base, Quote: quote}
-	tx := &types.FeedPublishOperation{
-		Publisher:    username,
-		ExchangeRate: ExchR,
+	tx := &types.LimitOrderCancelOperation{
+		Owner:   owner,
+		OrderID: orderid,
 	}
 
-	resp, err := api.Send_Trx(username, tx)
+	resp, err := api.Send_Trx(owner, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error FeedPublish: ")
+		return errors.Wrapf(err, "Error LimitOrderCancel: ")
 	} else {
-		log.Println("[FeedPublish] Block -> ", resp.BlockNum, " FeedPublish user -> ", username)
+		log.Println("[LimitOrderCancel] Block -> ", resp.BlockNum, " LimitOrderCancel user -> ", owner)
 		return nil
 	}
 }
 
-func (api *Client) WitnessUpdate(username, url, signKey, acfee, fee string, blocksize uint32, sbdir uint16) error {
+func (api *Client) LimitOrderCreate(owner, sell, buy string, orderid uint32) error {
 
-	chprop := types.ChainProperties{AccountCreationFee: acfee, MaximumBlockSize: blocksize, SBDInterestRate: sbdir}
-	tx := &types.WitnessUpdateOperation{
-		Owner:           username,
-		Url:             url,
-		BlockSigningKey: signKey,
-		Props:           &chprop,
-		Fee:             fee,
+	expiration := time.Now().Add(3600000 * time.Second).UTC()
+	fok := false
+
+	tx := &types.LimitOrderCreateOperation{
+		Owner:        owner,
+		OrderID:      orderid,
+		AmountToSell: sell,
+		MinToReceive: buy,
+		FillOrKill:   fok,
+		Expiration:   &types.Time{&expiration},
 	}
 
-	resp, err := api.Send_Trx(username, tx)
+	resp, err := api.Send_Trx(owner, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error WitnessUpdate: ")
+		return errors.Wrapf(err, "Error LimitOrderCreate: ")
 	} else {
-		log.Println("[WitnessUpdate] Block -> ", resp.BlockNum, " WitnessUpdate user -> ", username)
+		log.Println("[LimitOrderCreate] Block -> ", resp.BlockNum, " LimitOrderCreate user -> ", owner)
+		return nil
+	}
+}
+
+func (api *Client) Convert(owner, amount string, requestid uint32) error {
+	tx := &types.ConvertOperation{
+		Owner:     owner,
+		RequestID: requestid,
+		Amount:    amount,
+	}
+
+	resp, err := api.Send_Trx(owner, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Convert: ")
+	} else {
+		log.Println("[Convert] Block -> ", resp.BlockNum, " Convert user -> ", owner)
+		return nil
+	}
+}
+
+func (api *Client) TransferToVesting(from, to, amount string) error {
+	tx := &types.TransferToVestingOperation{
+		From:   from,
+		To:     to,
+		Amount: amount,
+	}
+
+	resp, err := api.Send_Trx(from, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error TransferToVesting: ")
+	} else {
+		log.Println("[TransferToVesting] Block -> ", resp.BlockNum, " TransferToVesting user -> ", from)
+		return nil
+	}
+}
+
+func (api *Client) WithdrawVesting(account, vshares string) error {
+	tx := &types.WithdrawVestingOperation{
+		Account:       account,
+		VestingShares: vshares,
+	}
+
+	resp, err := api.Send_Trx(account, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error WithdrawVesting: ")
+	} else {
+		log.Println("[WithdrawVesting] Block -> ", resp.BlockNum, " WithdrawVesting user -> ", account)
 		return nil
 	}
 }

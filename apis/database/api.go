@@ -740,7 +740,7 @@ func (api *API) GetWitnessByAccount(author string) (*Witness, error) {
 //get_witnesses_by_vote
 func (api *API) GetWitnessByVote(author string, limit uint) ([]*Witness, error) {
 	if limit > 1000 {
-		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+		return nil, errors.New("GetWitnessByVote: limit must not exceed 1000")
 	}
 	raw, err := api.Raw("get_witnesses_by_vote", []interface{}{author, limit})
 	if err != nil {
@@ -756,7 +756,7 @@ func (api *API) GetWitnessByVote(author string, limit uint) ([]*Witness, error) 
 //lookup_witness_accounts
 func (api *API) LookupWitnessAccounts(author string, limit uint) ([]string, error) {
 	if limit > 1000 {
-		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+		return nil, errors.New("LookupWitnessAccounts: limit must not exceed 1000")
 	}
 	raw, err := api.Raw("lookup_witness_accounts", []interface{}{author, limit})
 	if err != nil {
