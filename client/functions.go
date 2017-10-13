@@ -439,7 +439,7 @@ func (api *Client) Reblog(user_name, author_name, permlink string) error {
 	}
 }
 
-func (api *Client) Witness_Vote(user_name, witness_name string, approv bool) error {
+func (api *Client) AccountWitnessVote(user_name, witness_name string, approv bool) error {
 	tx := &types.AccountWitnessVoteOperation{
 		Account: user_name,
 		Witness: witness_name,
@@ -447,9 +447,23 @@ func (api *Client) Witness_Vote(user_name, witness_name string, approv bool) err
 	}
 	resp, err := api.Send_Trx(user_name, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
+		return errors.Wrapf(err, "Error AccountWitnessVote: ")
 	} else {
-		log.Println("[Witness Vote] Block -> ", resp.BlockNum, " User -> ", user_name, " Witness user -> ", witness_name)
+		log.Println("[AccountWitnessVote] Block -> ", resp.BlockNum, " User -> ", user_name)
+		return nil
+	}
+}
+
+func (api *Client) AccountWitnessProxy(user_name, proxy string) error {
+	tx := &types.AccountWitnessProxyOperation{
+		Account: user_name,
+		Proxy:   proxy,
+	}
+	resp, err := api.Send_Trx(user_name, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error AccountWitnessProxy: ")
+	} else {
+		log.Println("[AccountWitnessProxy] Block -> ", resp.BlockNum, " User -> ", user_name)
 		return nil
 	}
 }
@@ -667,6 +681,21 @@ func (api *Client) CancelTransferFromSavings(from string, requestid uint32) erro
 		return errors.Wrapf(err, "Error CancelTransferFromSavings: ")
 	} else {
 		log.Println("[CancelTransferFromSavings] Block -> ", resp.BlockNum, " CancelTransferFromSavings user -> ", from)
+		return nil
+	}
+}
+
+func (api *Client) DeclineVotingRights(account string, decline bool) error {
+	tx := &types.DeclineVotingRightsOperation{
+		Account: account,
+		Decline: decline,
+	}
+
+	resp, err := api.Send_Trx(account, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error DeclineVotingRights: ")
+	} else {
+		log.Println("[DeclineVotingRights] Block -> ", resp.BlockNum, " DeclineVotingRights user -> ", account)
 		return nil
 	}
 }

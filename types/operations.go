@@ -75,15 +75,6 @@ func (op *FeedPublishOperation) Data() interface{} {
 	return op
 }
 
-func (op *FeedPublishOperation) MarshalTransaction(encoder *transaction.Encoder) error {
-	enc := transaction.NewRollingEncoder(encoder)
-	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
-	enc.Encode(op.Publisher)
-	enc.EncodeMoney(op.ExchangeRate.Quote)
-	enc.EncodeMoney(op.ExchangeRate.Base)
-	return enc.Err()
-}
-
 // FC_REFLECT( steemit::chain::pow,
 //             (worker)
 //             (input)
@@ -317,6 +308,14 @@ func (op *AccountWitnessProxyOperation) Type() OpType {
 
 func (op *AccountWitnessProxyOperation) Data() interface{} {
 	return op
+}
+
+func (op *AccountWitnessProxyOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeAccountWitnessProxy.Code()))
+	enc.Encode(op.Account)
+	enc.Encode(op.Proxy)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::comment_operation,
@@ -575,17 +574,6 @@ func (op *WitnessUpdateOperation) Data() interface{} {
 	return op
 }
 
-func (op *WitnessUpdateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
-	enc := transaction.NewRollingEncoder(encoder)
-	enc.EncodeUVarint(uint64(TypeTransfer.Code()))
-	enc.Encode(op.Owner)
-	enc.Encode(op.Url)
-	enc.Encode(op.BlockSigningKey)
-	enc.Encode(op.Props)
-	enc.Encode(op.Fee)
-	return enc.Err()
-}
-
 type CustomOperation struct {
 	RequiredAuths []string `json:"required_auths"`
 	Id            uint16   `json:"id"`
@@ -613,6 +601,16 @@ func (op *SetWithdrawVestingRouteOperation) Type() OpType {
 
 func (op *SetWithdrawVestingRouteOperation) Data() interface{} {
 	return op
+}
+
+func (op *SetWithdrawVestingRouteOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeSetWithdrawVestingRoute.Code()))
+	enc.Encode(op.FromAccount)
+	enc.Encode(op.ToAccount)
+	enc.Encode(op.Percent)
+	enc.EncodeBool(op.AutoVest)
+	return enc.Err()
 }
 
 type LimitOrderCreate2Operation struct {
@@ -911,7 +909,7 @@ func (op *DeclineVotingRightsOperation) MarshalTransaction(encoder *transaction.
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeDeclineVotingRights.Code()))
 	enc.Encode(op.Account)
-	enc.Encode(op.Decline)
+	enc.EncodeBool(op.Decline)
 	return enc.Err()
 }
 

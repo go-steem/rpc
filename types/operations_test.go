@@ -33,3 +33,28 @@ func TestVoteOperation_MarshalTransaction(t *testing.T) {
 		t.Errorf("expected %v, got %v", expectedHex, serializedHex)
 	}
 }
+
+/*func TestFeedPublishOperation_MarshalTransaction(t *testing.T) {
+	op := &FeedPublishOperation{
+		Publisher: "xeroc",
+		ExchangeRate: ExchRate{
+			Base:  "1.000 SBD",
+			Quote: "4.123 STEEM",
+		},
+	}
+
+	expectedHex := "f68585abf4dce7c804570107057865726f63e803000000000"
+
+	var b bytes.Buffer
+	encoder := transaction.NewEncoder(&b)
+
+	if err := encoder.Encode(op); err != nil {
+		t.Error(err)
+	}
+
+	serializedHex := hex.EncodeToString(b.Bytes())
+
+	if serializedHex != expectedHex {
+		t.Errorf("expected %v, got %v", expectedHex, serializedHex)
+	}
+}*/
