@@ -4,7 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/sha256"
-	"encoding/hex"
+	_ "encoding/hex"
 	"errors"
 	"fmt"
 	//secp256k1 "github.com/btcsuite/btcd/btcec"
