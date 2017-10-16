@@ -44,7 +44,7 @@ func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error)
 }
 
 //login
-func (api *API) Login(username, password string) (bool, error) {
+/*func (api *API) Login(username, password string) (bool, error) {
 	raw, err := api.Raw("login", []interface{}{username, password})
 	if err != nil {
 		return false, err
@@ -54,7 +54,7 @@ func (api *API) Login(username, password string) (bool, error) {
 		return false, errors.Wrap(err, "golos-go: login_api: failed to unmarshal login response")
 	}
 	return resp, nil
-}
+}*/
 
 //get_api_by_name
 func (api *API) GetAPIByName(apiName string) (int, error) {
