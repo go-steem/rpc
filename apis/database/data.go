@@ -417,7 +417,7 @@ type Account struct {
 	PostHistory                   []interface{} `json:"post_history"`
 	VoteHistory                   []interface{} `json:"vote_history"`
 	OtherHistory                  []interface{} `json:"other_history"`
-	WitnessVotes                  []interface{} `json:"witness_votes"`
+	WitnessVotes                  []string      `json:"witness_votes"`
 	TagsUsage                     []interface{} `json:"tags_usage"`
 	GuestBloggers                 []interface{} `json:"guest_bloggers"`
 	BlogCategory                  interface{}   `json:"blog_category"`

@@ -38,6 +38,10 @@ func EncodeTitle(title string) string {
 	return str
 }
 
+func Tsenc(text string) (string, int) {
+	return encode(text)
+}
+
 func encode(text string) (string, int) {
 	if text == "" {
 		return "", 0

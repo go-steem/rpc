@@ -116,7 +116,7 @@ func (api *Client) DeleteComment(author_name, permlink string) error {
 	}
 }
 
-func (api *Client) Post(author_name, title, body, permlink, ptag string, tags []string) error {
+func (api *Client) Post(author_name, title, body, permlink, ptag, post_image string, tags []string) error {
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
 	} else {
@@ -134,9 +134,13 @@ func (api *Client) Post(author_name, title, body, permlink, ptag string, tags []
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
 		} else {
-			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+			json_meta = json_meta + "\"" + v + "\"]"
 		}
 	}
+	if post_image != "" {
+		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+	}
+	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
 
 	tx := &types.CommentOperation{
 		ParentAuthor:   "",
@@ -157,7 +161,7 @@ func (api *Client) Post(author_name, title, body, permlink, ptag string, tags []
 	}
 }
 
-func (api *Client) Post_Vote(author_name, title, body, permlink, ptag string, tags []string, weight_post int) error {
+func (api *Client) Post_Vote(author_name, title, body, permlink, ptag, post_image string, tags []string, weight_post int) error {
 	if weight_post > 10000 {
 		weight_post = 10000
 	}
@@ -178,9 +182,14 @@ func (api *Client) Post_Vote(author_name, title, body, permlink, ptag string, ta
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
 		} else {
-			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+			json_meta = json_meta + "\"" + v + "\"]"
 		}
 	}
+	if post_image != "" {
+		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+	}
+	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
+
 	var trx []types.Operation
 	txp := &types.CommentOperation{
 		ParentAuthor:   "",
@@ -210,7 +219,7 @@ func (api *Client) Post_Vote(author_name, title, body, permlink, ptag string, ta
 	}
 }
 
-func (api *Client) Post_Options(author_name, title, body, permlink, ptag string, tags []string, percent uint16, votes, curation bool) error {
+func (api *Client) Post_Options(author_name, title, body, permlink, ptag, post_image string, tags []string, percent uint16, votes, curation bool) error {
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
 	} else {
@@ -237,9 +246,14 @@ func (api *Client) Post_Options(author_name, title, body, permlink, ptag string,
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
 		} else {
-			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+			json_meta = json_meta + "\"" + v + "\"]"
 		}
 	}
+	if post_image != "" {
+		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+	}
+	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
+
 	var trx []types.Operation
 	txp := &types.CommentOperation{
 		ParentAuthor:   "",
@@ -272,7 +286,7 @@ func (api *Client) Post_Options(author_name, title, body, permlink, ptag string,
 	}
 }
 
-func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag string, tags []string, weight_post int, percent uint16, votes, curation bool) error {
+func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag, post_image string, tags []string, weight_post int, percent uint16, votes, curation bool) error {
 	if weight_post > 10000 {
 		weight_post = 10000
 	}
@@ -302,9 +316,14 @@ func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag st
 		if k != len(tags)-1 {
 			json_meta = json_meta + "\"" + v + "\","
 		} else {
-			json_meta = json_meta + "\"" + v + "\"],\"app\":\"golos-go(go-steem)\"}"
+			json_meta = json_meta + "\"" + v + "\"]"
 		}
 	}
+	if post_image != "" {
+		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+	}
+	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
+
 	var trx []types.Operation
 
 	txp := &types.CommentOperation{
