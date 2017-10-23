@@ -516,7 +516,7 @@ func (api *API) GetEscrow(from string, escrow_id uint32) (*json.RawMessage, erro
 }
 
 //get_withdraw_routes
-func (api *API) GetWuthdrawRoutes(accountName string, withdraw_route_type string) (*json.RawMessage, error) {
+func (api *API) GetWithdrawRoutes(accountName string, withdraw_route_type string) (*json.RawMessage, error) {
 	return api.Raw("get_withdraw_routes", []interface{}{accountName, withdraw_route_type})
 }
 
