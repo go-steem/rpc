@@ -138,7 +138,7 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 		}
 	}
 	if post_image != "" {
-		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
 	}
 	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
 
@@ -186,7 +186,7 @@ func (api *Client) Post_Vote(author_name, title, body, permlink, ptag, post_imag
 		}
 	}
 	if post_image != "" {
-		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
 	}
 	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
 
@@ -250,7 +250,7 @@ func (api *Client) Post_Options(author_name, title, body, permlink, ptag, post_i
 		}
 	}
 	if post_image != "" {
-		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
 	}
 	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
 
@@ -320,7 +320,7 @@ func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag, p
 		}
 	}
 	if post_image != "" {
-		json_meta = json_meta + ",\"image\":\"" + post_image + "\""
+		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
 	}
 	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
 
