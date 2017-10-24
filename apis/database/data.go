@@ -411,7 +411,7 @@ type Account struct {
 	NewAverageBandwidth           string        `json:"new_average_bandwidth"`
 	NewAverageMarketBandwidth     *types.Int64  `json:"new_average_market_bandwidth"`
 	VestingBalance                string        `json:"vesting_balance"`
-	Reputation                    json.Number   `json:"reputation"`
+	Reputation                    *types.Int64  `json:"reputation"`
 	TransferHistory               []interface{} `json:"transfer_history"`
 	MarketHistory                 []interface{} `json:"market_history"`
 	PostHistory                   []interface{} `json:"post_history"`
