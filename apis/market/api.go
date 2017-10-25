@@ -9,7 +9,7 @@ import (
 	"github.com/asuleymanov/golos-go/internal/rpc"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 const APIID = "market_history_api"

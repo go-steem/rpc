@@ -5,7 +5,7 @@ import (
 	"log"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 //We check whether there is a voter on the list of those who have already voted

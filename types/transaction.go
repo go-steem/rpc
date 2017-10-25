@@ -5,7 +5,7 @@ import (
 	"github.com/asuleymanov/golos-go/encoding/transaction"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 // Transaction represents a blockchain transaction.

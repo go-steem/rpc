@@ -8,9 +8,9 @@ import (
 	"time"
 
 	// Vendor
+	"github.com/asuleymanov/errors"
 	"github.com/asuleymanov/jsonrpc2"
 	"github.com/gorilla/websocket"
-	"github.com/pkg/errors"
 	tomb "gopkg.in/tomb.v2"
 )
 

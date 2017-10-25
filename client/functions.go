@@ -7,7 +7,7 @@ import (
 	"time"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 
 	// RPC
 	"github.com/asuleymanov/golos-go/encoding/wif"
@@ -715,6 +715,46 @@ func (api *Client) DeclineVotingRights(account string, decline bool) error {
 		return errors.Wrapf(err, "Error DeclineVotingRights: ")
 	} else {
 		log.Println("[DeclineVotingRights] Block -> ", resp.BlockNum, " DeclineVotingRights user -> ", account)
+		return nil
+	}
+}
+
+func (api *Client) FeedPublish(publisher, base, quote string) error {
+	tx := &types.FeedPublishOperation{
+		Publisher: publisher,
+		ExchangeRate: types.ExchRate{
+			Base:  base,
+			Quote: quote,
+		},
+	}
+
+	resp, err := api.Send_Trx(publisher, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error FeedPublish: ")
+	} else {
+		log.Println("[FeedPublish] Block -> ", resp.BlockNum, " FeedPublish user -> ", publisher)
+		return nil
+	}
+}
+
+func (api *Client) WitnessUpdate(owner, url, blocksigningkey, accountcreationfee string, maximumblocksize uint32, sbdinterestrate uint16) error {
+	tx := &types.WitnessUpdateOperation{
+		Owner:           owner,
+		Url:             url,
+		BlockSigningKey: blocksigningkey,
+		Props: types.ChainProperties{
+			AccountCreationFee: accountcreationfee,
+			MaximumBlockSize:   maximumblocksize,
+			SBDInterestRate:    sbdinterestrate,
+		},
+		Fee: "0.000 GOLOS",
+	}
+
+	resp, err := api.Send_Trx(owner, tx)
+	if err != nil {
+		return errors.Wrapf(err, "Error WitnessUpdate: ")
+	} else {
+		log.Println("[WitnessUpdate] Block -> ", resp.BlockNum, " WitnessUpdate user -> ", owner)
 		return nil
 	}
 }

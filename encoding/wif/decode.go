@@ -4,7 +4,7 @@ import (
 	// Vendor
 	//"github.com/btcsuite/btcutil"
 	"github.com/asuleymanov/btc/btcutil"
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 // Decode can be used to turn WIF into a raw private key (32 bytes).

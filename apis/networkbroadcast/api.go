@@ -10,7 +10,7 @@ import (
 	"github.com/asuleymanov/golos-go/types"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 const APIID = "network_broadcast_api"

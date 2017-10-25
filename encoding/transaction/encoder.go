@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 type Encoder struct {

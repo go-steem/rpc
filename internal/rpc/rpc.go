@@ -8,7 +8,7 @@ import (
 	"github.com/asuleymanov/golos-go/interfaces"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 func GetNumericAPIID(caller interfaces.Caller, apiName string) (int, error) {

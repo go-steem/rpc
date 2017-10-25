@@ -2,7 +2,7 @@ package client
 
 import (
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 
 	// RPC
 	"github.com/asuleymanov/golos-go"

@@ -10,7 +10,7 @@ import (
 	"github.com/asuleymanov/golos-go/client"
 
 	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/errors"
 )
 
 var cls = client.NewApi()
