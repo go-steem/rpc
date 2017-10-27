@@ -3,8 +3,10 @@ package types
 import (
 	// Stdlib
 	"encoding/json"
+	_ "strings"
 
 	// RPC
+	_ "github.com/asuleymanov/btc/btcutil/base58"
 	"github.com/asuleymanov/golos-go/encoding/transaction"
 )
 
@@ -581,19 +583,6 @@ func (op *WitnessUpdateOperation) Type() OpType {
 
 func (op *WitnessUpdateOperation) Data() interface{} {
 	return op
-}
-
-func (op *WitnessUpdateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
-	enc := transaction.NewRollingEncoder(encoder)
-	enc.EncodeUVarint(uint64(TypeWitnessUpdate.Code()))
-	enc.Encode(op.Owner)
-	enc.Encode(op.Url)
-	enc.Encode(op.BlockSigningKey)
-	enc.EncodeMoney(op.Props.AccountCreationFee)
-	enc.Encode(op.Props.MaximumBlockSize)
-	enc.Encode(op.Props.SBDInterestRate)
-	enc.EncodeMoney(op.Fee)
-	return enc.Err()
 }
 
 type CustomOperation struct {

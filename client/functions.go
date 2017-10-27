@@ -4,6 +4,7 @@ import (
 	// Stdlib
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	// Vendor
@@ -15,6 +16,33 @@ import (
 	"github.com/asuleymanov/golos-go/translit"
 	"github.com/asuleymanov/golos-go/types"
 )
+
+func (api *Client) SteemPerMvest() (float64, error) {
+	dgp, errdgp := api.Rpc.Database.GetDynamicGlobalProperties()
+	if errdgp != nil {
+		return 0, errdgp
+	}
+
+	tvfs, errtvfs := strconv.ParseFloat(strings.Split(dgp.TotalVersingFundSteem, " ")[0], 64)
+	if errtvfs != nil {
+		return 0, errtvfs
+	}
+
+	tvs, errtvs := strconv.ParseFloat(strings.Split(dgp.TotalVestingShares, " ")[0], 64)
+	if errtvs != nil {
+		return 0, errtvs
+	}
+
+	spmtmp := (tvfs / tvs) * 1000000
+	str := strconv.FormatFloat(spmtmp, 'f', 3, 64)
+
+	spm, errspm := strconv.ParseFloat(str, 64)
+	if errspm != nil {
+		return 0, errspm
+	}
+
+	return spm, nil
+}
 
 func (api *Client) Vote(user_name, author_name, permlink string, weight int) error {
 	if weight > 10000 {
@@ -733,28 +761,6 @@ func (api *Client) FeedPublish(publisher, base, quote string) error {
 		return errors.Wrapf(err, "Error FeedPublish: ")
 	} else {
 		log.Println("[FeedPublish] Block -> ", resp.BlockNum, " FeedPublish user -> ", publisher)
-		return nil
-	}
-}
-
-func (api *Client) WitnessUpdate(owner, url, blocksigningkey, accountcreationfee string, maximumblocksize uint32, sbdinterestrate uint16) error {
-	tx := &types.WitnessUpdateOperation{
-		Owner:           owner,
-		Url:             url,
-		BlockSigningKey: blocksigningkey,
-		Props: types.ChainProperties{
-			AccountCreationFee: accountcreationfee,
-			MaximumBlockSize:   maximumblocksize,
-			SBDInterestRate:    sbdinterestrate,
-		},
-		Fee: "0.000 GOLOS",
-	}
-
-	resp, err := api.Send_Trx(owner, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error WitnessUpdate: ")
-	} else {
-		log.Println("[WitnessUpdate] Block -> ", resp.BlockNum, " WitnessUpdate user -> ", owner)
 		return nil
 	}
 }
