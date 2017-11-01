@@ -259,10 +259,16 @@ func (api *Client) Post_Options(author_name, title, body, permlink, ptag, post_i
 	} else {
 		ptag = translit.EncodeTag(ptag)
 	}
-	MAP := "1000000.000 GBG"
+	symbol := ""
+	if api.Chain == transactions.SteemChain {
+		symbol = "SBD"
+	} else {
+		symbol = "GBG"
+	}
+	MAP := "1000000.000 " + symbol
 	PSD := percent
 	if percent == 0 {
-		MAP = "0.000 GBG"
+		MAP = "0.000 " + symbol
 	} else if percent == 50 {
 		PSD = 10000
 	} else {
@@ -329,10 +335,16 @@ func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag, p
 	} else {
 		ptag = translit.EncodeTag(ptag)
 	}
-	MAP := "1000000.000 GBG"
+	symbol := ""
+	if api.Chain == transactions.SteemChain {
+		symbol = "SBD"
+	} else {
+		symbol = "GBG"
+	}
+	MAP := "1000000.000 " + symbol
 	PSD := percent
 	if percent == 0 {
-		MAP = "0.000 GBG"
+		MAP = "0.000 " + symbol
 	} else if percent == 50 {
 		PSD = 10000
 	} else {
