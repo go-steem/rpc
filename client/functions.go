@@ -260,7 +260,7 @@ func (api *Client) Post_Options(author_name, title, body, permlink, ptag, post_i
 		ptag = translit.EncodeTag(ptag)
 	}
 	symbol := ""
-	if api.Chain == transactions.SteemChain {
+	if *api.Chain == *transactions.SteemChain {
 		symbol = "SBD"
 	} else {
 		symbol = "GBG"
@@ -336,7 +336,7 @@ func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag, p
 		ptag = translit.EncodeTag(ptag)
 	}
 	symbol := ""
-	if api.Chain == transactions.SteemChain {
+	if *api.Chain == *transactions.SteemChain {
 		symbol = "SBD"
 	} else {
 		symbol = "GBG"
