@@ -2,7 +2,7 @@ package types
 
 import (
 	// RPC
-	"github.com/asuleymanov/golos-go/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 
 	// Vendor
 	"github.com/asuleymanov/errors"

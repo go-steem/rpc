@@ -7,7 +7,7 @@ import (
 
 	// RPC
 	_ "github.com/asuleymanov/btc/btcutil/base58"
-	"github.com/asuleymanov/golos-go/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 )
 
 // FC_REFLECT( steemit::chain::report_over_production_operation,

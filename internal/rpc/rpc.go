@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	// RPC
-	"github.com/asuleymanov/golos-go/interfaces"
+	"github.com/asuleymanov/rpc/interfaces"
 
 	// Vendor
 	"github.com/asuleymanov/errors"

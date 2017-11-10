@@ -7,8 +7,8 @@ import (
 	"time"
 
 	// RPC
-	"github.com/asuleymanov/golos-go/encoding/wif"
-	"github.com/asuleymanov/golos-go/types"
+	"github.com/asuleymanov/rpc/encoding/wif"
+	"github.com/asuleymanov/rpc/types"
 )
 
 var tx *types.Transaction

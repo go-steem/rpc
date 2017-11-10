@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	// RPC
-	"github.com/asuleymanov/golos-go/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 )
 
 func TestVoteOperation_MarshalTransaction(t *testing.T) {

@@ -2,12 +2,12 @@ package rpc
 
 import (
 	// RPC
-	"github.com/asuleymanov/golos-go/apis/database"
-	"github.com/asuleymanov/golos-go/apis/follow"
-	"github.com/asuleymanov/golos-go/apis/login"
-	"github.com/asuleymanov/golos-go/apis/market"
-	"github.com/asuleymanov/golos-go/apis/networkbroadcast"
-	"github.com/asuleymanov/golos-go/interfaces"
+	"github.com/asuleymanov/rpc/apis/database"
+	"github.com/asuleymanov/rpc/apis/follow"
+	"github.com/asuleymanov/rpc/apis/login"
+	"github.com/asuleymanov/rpc/apis/market"
+	"github.com/asuleymanov/rpc/apis/networkbroadcast"
+	"github.com/asuleymanov/rpc/interfaces"
 )
 
 // Client can be used to access Steem remote APIs.

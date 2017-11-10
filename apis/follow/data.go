@@ -2,7 +2,7 @@ package follow
 
 import (
 	"encoding/json"
-	"github.com/asuleymanov/golos-go/types"
+	"github.com/asuleymanov/rpc/types"
 	"strconv"
 	"strings"
 )

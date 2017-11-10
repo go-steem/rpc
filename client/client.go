@@ -5,10 +5,10 @@ import (
 	"github.com/asuleymanov/errors"
 
 	// RPC
-	"github.com/asuleymanov/golos-go"
-	"github.com/asuleymanov/golos-go/transactions"
-	"github.com/asuleymanov/golos-go/transports/websocket"
-	"github.com/asuleymanov/golos-go/types"
+	"github.com/asuleymanov/rpc"
+	"github.com/asuleymanov/rpc/transactions"
+	"github.com/asuleymanov/rpc/transports/websocket"
+	"github.com/asuleymanov/rpc/types"
 )
 
 const fdt = `"20060102t150405"`

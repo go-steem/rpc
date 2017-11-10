@@ -8,7 +8,7 @@ import (
 	"time"
 
 	// RPC
-	"github.com/asuleymanov/golos-go/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 )
 
 func TestTransaction_MarshalTransaction(t *testing.T) {

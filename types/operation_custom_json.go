@@ -12,7 +12,7 @@ import (
 	"github.com/asuleymanov/errors"
 
 	// RPC
-	"github.com/asuleymanov/golos-go/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 )
 
 const (
