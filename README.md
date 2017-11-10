@@ -6,7 +6,6 @@ Golang RPC client library for [Golos](https://golos.io).
 
 ## Compatibility
 
-`golosd 0.16.0`
 `steemd 0.18.0`
 
 ## Usage
