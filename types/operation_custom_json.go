@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 
 	// RPC
 	"github.com/asuleymanov/rpc/encoding/transaction"

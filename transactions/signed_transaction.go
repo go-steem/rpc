@@ -14,7 +14,7 @@ import (
 	"github.com/asuleymanov/rpc/types"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 type SignedTransaction struct {

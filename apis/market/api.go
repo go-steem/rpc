@@ -9,7 +9,7 @@ import (
 	"github.com/asuleymanov/rpc/internal/rpc"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 const APIID = "market_history_api"

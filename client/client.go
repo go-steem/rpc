@@ -2,7 +2,7 @@ package client
 
 import (
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 
 	// RPC
 	"github.com/asuleymanov/rpc"
@@ -56,8 +56,6 @@ func initChainId(str string) *transactions.Chain {
 	switch str {
 	case "steem":
 		ChainId = *transactions.SteemChain
-	case "golos":
-		ChainId = *transactions.GolosChain
 	}
 	return &ChainId
 }

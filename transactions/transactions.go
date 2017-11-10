@@ -10,7 +10,7 @@ import (
 	"github.com/asuleymanov/rpc/types"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 func RefBlockNum(blockNumber uint32) types.UInt16 {

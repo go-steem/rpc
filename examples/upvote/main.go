@@ -10,7 +10,7 @@ import (
 	"github.com/asuleymanov/rpc/client"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 var cls = client.NewApi()

@@ -8,7 +8,7 @@ import (
 	"github.com/asuleymanov/rpc/interfaces"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 func GetNumericAPIID(caller interfaces.Caller, apiName string) (int, error) {

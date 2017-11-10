@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 // dataObjects keeps mapping operation type -> operation data object.

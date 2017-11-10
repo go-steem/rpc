@@ -8,7 +8,7 @@ import (
 	"time"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 
 	// RPC
 	"github.com/asuleymanov/rpc/encoding/wif"
@@ -259,12 +259,7 @@ func (api *Client) Post_Options(author_name, title, body, permlink, ptag, post_i
 	} else {
 		ptag = translit.EncodeTag(ptag)
 	}
-	symbol := ""
-	if *api.Chain == *transactions.SteemChain {
-		symbol = "SBD"
-	} else {
-		symbol = "GBG"
-	}
+	symbol := "SBD"
 	MAP := "1000000.000 " + symbol
 	PSD := percent
 	if percent == 0 {
@@ -335,12 +330,7 @@ func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag, p
 	} else {
 		ptag = translit.EncodeTag(ptag)
 	}
-	symbol := ""
-	if *api.Chain == *transactions.SteemChain {
-		symbol = "SBD"
-	} else {
-		symbol = "GBG"
-	}
+	symbol := "SBD"
 	MAP := "1000000.000 " + symbol
 	PSD := percent
 	if percent == 0 {

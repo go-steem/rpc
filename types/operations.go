@@ -3,10 +3,8 @@ package types
 import (
 	// Stdlib
 	"encoding/json"
-	_ "strings"
 
 	// RPC
-	_ "github.com/asuleymanov/btc/btcutil/base58"
 	"github.com/asuleymanov/rpc/encoding/transaction"
 )
 

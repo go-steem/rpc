@@ -9,7 +9,7 @@ import (
 	"github.com/asuleymanov/rpc/encoding/transaction"
 
 	// Vendor
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 func unmarshalInt(data []byte) (int64, error) {

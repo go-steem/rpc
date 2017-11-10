@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 )
 
 type StringSlice []string

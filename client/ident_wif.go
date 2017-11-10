@@ -3,7 +3,7 @@ package client
 import (
 	"log"
 
-	"github.com/asuleymanov/errors"
+	"github.com/pkg/errors"
 
 	"github.com/asuleymanov/rpc/encoding/wif"
 	"github.com/asuleymanov/rpc/types"
