@@ -48,7 +48,7 @@ func (api *Client) Vote(user_name, author_name, permlink string, weight int) err
 	if weight > 10000 {
 		weight = 10000
 	}
-	if api.Verify_Voter(author_name, permlink, user_name) {
+	if api.Verify_Voter_Weight(author_name, permlink, user_name, weight) {
 		return errors.New("The voter is on the list")
 	}
 	tx := &types.VoteOperation{
@@ -105,7 +105,7 @@ func (api *Client) Comment_Vote(user_name, author_name, ppermlink, body string, 
 	}
 	trx = append(trx, txc)
 
-	if !api.Verify_Voter(author_name, permlink, user_name) {
+	if !api.Verify_Voter_Weight(author_name, permlink, user_name, weight_post) {
 		txv := &types.VoteOperation{
 			Voter:    user_name,
 			Author:   author_name,
