@@ -2,7 +2,7 @@
 
 [![GoDoc](https://godoc.org/github.com/asuleymanov/rpc?status.svg)](https://godoc.org/github.com/asuleymanov/rpc)
 
-Golang RPC client library for [Golos](https://golos.io).
+Golang RPC client library for [Steem](https://steemit.com).
 
 ## Compatibility
 
@@ -21,7 +21,7 @@ This is just a code snippet. Please check the `examples` directory
 for more complete and ready to use examples.
 
 ```go
-	cls := client.NewApi([]string{"wss://ws.golos.io"},"golos")
+	cls := client.NewApi([]string{"ws://localhost:8090"},"steem")
 	defer cls.Rpc.Close()
 	
 	// Get config.
@@ -82,7 +82,7 @@ You need to create a `Client` object to be able to do anything.
 Then you just need to call `NewApi()`.
 
 Once you create a `Client` object, you can start calling the methods exported
-via `golosd(steemd)`'s RPC endpoint by invoking associated methods on the client object.
+via `steemd`'s RPC endpoint by invoking associated methods on the client object.
 There are multiple APIs that can be exported, e.g. `database_api` and `login_api`,
 so the methods on the Client object are also namespaced accoding to these APIs.
 For example, to call `get_block` from `database_api`, you need to use
