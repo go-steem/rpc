@@ -124,7 +124,7 @@ func (api *Client) Comment(user_name, author_name, ppermlink, body string, v *PC
 		trx = append(trx, txo)
 	}
 
-	if v != nil {
+	if v != nil && v.Weight != 0 {
 		txv := &types.VoteOperation{
 			Voter:    user_name,
 			Author:   user_name,
@@ -242,7 +242,7 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 		trx = append(trx, txo)
 	}
 
-	if v != nil {
+	if v != nil && v.Weight != 0 {
 		txv := &types.VoteOperation{
 			Voter:    author_name,
 			Author:   author_name,
