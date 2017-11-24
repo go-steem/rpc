@@ -66,9 +66,12 @@ func (api *Client) Vote(user_name, author_name, permlink string, weight int) err
 	}
 }
 
-func (api *Client) Comment(user_name, author_name, ppermlink, body string) error {
+func (api *Client) Comment(user_name, author_name, ppermlink, body string, v *PC_Vote, o *PC_Options) error {
+	var trx []types.Operation
+
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
 	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
+
 	tx := &types.CommentOperation{
 		ParentAuthor:   author_name,
 		ParentPermlink: ppermlink,
@@ -76,50 +79,66 @@ func (api *Client) Comment(user_name, author_name, ppermlink, body string) error
 		Permlink:       permlink,
 		Title:          "",
 		Body:           body,
-		JsonMetadata:   "{\"app\":\"golos-go(go-steem)\"}",
+		JsonMetadata:   "{\"app\":\"steem-go\"}",
 	}
-	resp, err := api.Send_Trx(user_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Comment: ")
-	} else {
-		log.Println("[Comment] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return nil
-	}
-}
+	trx = append(trx, tx)
 
-func (api *Client) Comment_Vote(user_name, author_name, ppermlink, body string, weight_post int) error {
-	if weight_post > 10000 {
-		weight_post = 10000
-	}
-	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
-	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
-	var trx []types.Operation
-	txc := &types.CommentOperation{
-		ParentAuthor:   author_name,
-		ParentPermlink: ppermlink,
-		Author:         user_name,
-		Permlink:       permlink,
-		Title:          "",
-		Body:           body,
-		JsonMetadata:   "{\"app\":\"golos-go(go-steem)\"}",
-	}
-	trx = append(trx, txc)
+	if o != nil {
+		symbol := "GBG"
+		MAP := "1000000.000 " + symbol
+		PSD := o.Percent
+		if o.Percent == 0 {
+			MAP = "0.000 " + symbol
+			PSD = 10000
+		} else if o.Percent == 50 {
+			PSD = 10000
+		} else {
+			PSD = 0
+		}
 
-	if !api.Verify_Voter_Weight(author_name, permlink, user_name, weight_post) {
+		var ext []interface{}
+		if len(o.BenefList) > 0 {
+			var ben_list []types.Beneficiarie
+			var benef types.CommentPayoutBeneficiaries
+			for _, val := range o.BenefList {
+				ben_list = append(ben_list, types.Beneficiarie{val.Account, val.Weight})
+			}
+			benef.Beneficiaries = ben_list
+			ext = append(ext, 0)
+			ext = append(ext, benef)
+		}
+		Extens := []interface{}{}
+		if len(ext) > 0 {
+			Extens = []interface{}{ext}
+		}
+
+		txo := &types.CommentOptionsOperation{
+			Author:               user_name,
+			Permlink:             permlink,
+			MaxAcceptedPayout:    MAP,
+			PercentSteemDollars:  PSD,
+			AllowVotes:           true,
+			AllowCurationRewards: true,
+			Extensions:           Extens,
+		}
+		trx = append(trx, txo)
+	}
+
+	if v != nil {
 		txv := &types.VoteOperation{
 			Voter:    user_name,
-			Author:   author_name,
-			Permlink: ppermlink,
-			Weight:   types.Int16(weight_post),
+			Author:   user_name,
+			Permlink: permlink,
+			Weight:   types.Int16(v.Weight),
 		}
 		trx = append(trx, txv)
 	}
 
 	resp, err := api.Send_Arr_Trx(user_name, trx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Comment and Vote: ")
+		return errors.Wrapf(err, "Error Comment : ")
 	} else {
-		log.Println("[Comment and Vote] Block -> ", resp.BlockNum, " User -> ", user_name)
+		log.Println("[Comment] Block -> ", resp.BlockNum, " User -> ", user_name)
 		return nil
 	}
 }
@@ -144,7 +163,7 @@ func (api *Client) DeleteComment(author_name, permlink string) error {
 	}
 }
 
-func (api *Client) Post(author_name, title, body, permlink, ptag, post_image string, tags []string) error {
+func (api *Client) Post(author_name, title, body, permlink, ptag, post_image string, tags []string, v *PC_Vote, o *PC_Options) error {
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
 	} else {
@@ -168,9 +187,10 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 	if post_image != "" {
 		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
 	}
-	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
+	json_meta = json_meta + ",\"app\":\"steem-go\"}"
 
-	tx := &types.CommentOperation{
+	var trx []types.Operation
+	txp := &types.CommentOperation{
 		ParentAuthor:   "",
 		ParentPermlink: ptag,
 		Author:         author_name,
@@ -179,218 +199,64 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 		Body:           body,
 		JsonMetadata:   json_meta,
 	}
+	trx = append(trx, txp)
 
-	resp, err := api.Send_Trx(author_name, tx)
+	if o != nil {
+		symbol := "GBG"
+		MAP := "1000000.000 " + symbol
+		PSD := o.Percent
+		if o.Percent == 0 {
+			MAP = "0.000 " + symbol
+			PSD = 10000
+		} else if o.Percent == 50 {
+			PSD = 10000
+		} else {
+			PSD = 0
+		}
+
+		var ext []interface{}
+		if len(o.BenefList) > 0 {
+			var ben_list []types.Beneficiarie
+			var benef types.CommentPayoutBeneficiaries
+			for _, val := range o.BenefList {
+				ben_list = append(ben_list, types.Beneficiarie{val.Account, val.Weight})
+			}
+			benef.Beneficiaries = ben_list
+			ext = append(ext, 0)
+			ext = append(ext, benef)
+		}
+		Extens := []interface{}{}
+		if len(ext) > 0 {
+			Extens = []interface{}{ext}
+		}
+
+		txo := &types.CommentOptionsOperation{
+			Author:               author_name,
+			Permlink:             permlink,
+			MaxAcceptedPayout:    MAP,
+			PercentSteemDollars:  PSD,
+			AllowVotes:           true,
+			AllowCurationRewards: true,
+			Extensions:           Extens,
+		}
+		trx = append(trx, txo)
+	}
+
+	if v != nil {
+		txv := &types.VoteOperation{
+			Voter:    author_name,
+			Author:   author_name,
+			Permlink: permlink,
+			Weight:   types.Int16(v.Weight),
+		}
+		trx = append(trx, txv)
+	}
+
+	resp, err := api.Send_Arr_Trx(author_name, trx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Post: ")
+		return errors.Wrapf(err, "Error Post : ")
 	} else {
 		log.Println("[Post] Block -> ", resp.BlockNum, " User -> ", author_name)
-		return nil
-	}
-}
-
-func (api *Client) Post_Vote(author_name, title, body, permlink, ptag, post_image string, tags []string, weight_post int) error {
-	if weight_post > 10000 {
-		weight_post = 10000
-	}
-	if permlink == "" {
-		permlink = translit.EncodeTitle(title)
-	} else {
-		permlink = translit.EncodeTitle(permlink)
-	}
-	tag := translit.EncodeTags(tags)
-	if ptag == "" {
-		ptag = translit.EncodeTag(tags[0])
-	} else {
-		ptag = translit.EncodeTag(ptag)
-	}
-
-	json_meta := "{\"tags\":["
-	for k, v := range tag {
-		if k != len(tags)-1 {
-			json_meta = json_meta + "\"" + v + "\","
-		} else {
-			json_meta = json_meta + "\"" + v + "\"]"
-		}
-	}
-	if post_image != "" {
-		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
-	}
-	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
-
-	var trx []types.Operation
-	txp := &types.CommentOperation{
-		ParentAuthor:   "",
-		ParentPermlink: ptag,
-		Author:         author_name,
-		Permlink:       permlink,
-		Title:          title,
-		Body:           body,
-		JsonMetadata:   json_meta,
-	}
-	trx = append(trx, txp)
-
-	txv := &types.VoteOperation{
-		Voter:    author_name,
-		Author:   author_name,
-		Permlink: permlink,
-		Weight:   types.Int16(weight_post),
-	}
-	trx = append(trx, txv)
-
-	resp, err := api.Send_Arr_Trx(author_name, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Post and Vote: ")
-	} else {
-		log.Println("[Post and Vote] Block -> ", resp.BlockNum, " User -> ", author_name)
-		return nil
-	}
-}
-
-func (api *Client) Post_Options(author_name, title, body, permlink, ptag, post_image string, tags []string, percent uint16, votes, curation bool) error {
-	if permlink == "" {
-		permlink = translit.EncodeTitle(title)
-	} else {
-		permlink = translit.EncodeTitle(permlink)
-	}
-	tag := translit.EncodeTags(tags)
-	if ptag == "" {
-		ptag = translit.EncodeTag(tags[0])
-	} else {
-		ptag = translit.EncodeTag(ptag)
-	}
-	symbol := "SBD"
-	MAP := "1000000.000 " + symbol
-	PSD := percent
-	if percent == 0 {
-		MAP = "0.000 " + symbol
-	} else if percent == 50 {
-		PSD = 10000
-	} else {
-		PSD = 0
-	}
-
-	json_meta := "{\"tags\":["
-	for k, v := range tag {
-		if k != len(tags)-1 {
-			json_meta = json_meta + "\"" + v + "\","
-		} else {
-			json_meta = json_meta + "\"" + v + "\"]"
-		}
-	}
-	if post_image != "" {
-		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
-	}
-	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
-
-	var trx []types.Operation
-	txp := &types.CommentOperation{
-		ParentAuthor:   "",
-		ParentPermlink: ptag,
-		Author:         author_name,
-		Permlink:       permlink,
-		Title:          title,
-		Body:           body,
-		JsonMetadata:   json_meta,
-	}
-	trx = append(trx, txp)
-
-	txo := &types.CommentOptionsOperation{
-		Author:               author_name,
-		Permlink:             permlink,
-		MaxAcceptedPayout:    MAP,
-		PercentSteemDollars:  PSD,
-		AllowVotes:           votes,
-		AllowCurationRewards: curation,
-		Extensions:           []interface{}{},
-	}
-	trx = append(trx, txo)
-
-	resp, err := api.Send_Arr_Trx(author_name, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Post and Vote: ")
-	} else {
-		log.Println("[Post and Options] Block -> ", resp.BlockNum, " User -> ", author_name)
-		return nil
-	}
-}
-
-func (api *Client) Post_Options_Vote(author_name, title, body, permlink, ptag, post_image string, tags []string, weight_post int, percent uint16, votes, curation bool) error {
-	if weight_post > 10000 {
-		weight_post = 10000
-	}
-	if permlink == "" {
-		permlink = translit.EncodeTitle(title)
-	} else {
-		permlink = translit.EncodeTitle(permlink)
-	}
-	tag := translit.EncodeTags(tags)
-	if ptag == "" {
-		ptag = translit.EncodeTag(tags[0])
-	} else {
-		ptag = translit.EncodeTag(ptag)
-	}
-	symbol := "SBD"
-	MAP := "1000000.000 " + symbol
-	PSD := percent
-	if percent == 0 {
-		MAP = "0.000 " + symbol
-	} else if percent == 50 {
-		PSD = 10000
-	} else {
-		PSD = 0
-	}
-
-	json_meta := "{\"tags\":["
-	for k, v := range tag {
-		if k != len(tags)-1 {
-			json_meta = json_meta + "\"" + v + "\","
-		} else {
-			json_meta = json_meta + "\"" + v + "\"]"
-		}
-	}
-	if post_image != "" {
-		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
-	}
-	json_meta = json_meta + ",\"app\":\"golos-go(go-steem)\"}"
-
-	var trx []types.Operation
-
-	txp := &types.CommentOperation{
-		ParentAuthor:   "",
-		ParentPermlink: ptag,
-		Author:         author_name,
-		Permlink:       permlink,
-		Title:          title,
-		Body:           body,
-		JsonMetadata:   json_meta,
-	}
-	trx = append(trx, txp)
-
-	txo := &types.CommentOptionsOperation{
-		Author:               author_name,
-		Permlink:             permlink,
-		MaxAcceptedPayout:    MAP,
-		PercentSteemDollars:  PSD,
-		AllowVotes:           votes,
-		AllowCurationRewards: curation,
-		Extensions:           []interface{}{},
-	}
-	trx = append(trx, txo)
-
-	txv := &types.VoteOperation{
-		Voter:    author_name,
-		Author:   author_name,
-		Permlink: permlink,
-		Weight:   types.Int16(weight_post),
-	}
-	trx = append(trx, txv)
-
-	resp, err := api.Send_Arr_Trx(author_name, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Post and Vote: ")
-	} else {
-		log.Println("[Post and Options] Block -> ", resp.BlockNum, " User -> ", author_name)
 		return nil
 	}
 }
@@ -534,7 +400,7 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 }
 
 func (api *Client) Login(user_name, key string) bool {
-	json_string := "[\"login\",{\"account\":\"" + user_name + "\",\"app\":\"golos-go(go-steem)\"}]"
+	json_string := "[\"login\",{\"account\":\"" + user_name + "\",\"app\":\"steem-go\"}]"
 
 	strx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},

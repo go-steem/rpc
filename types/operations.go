@@ -1198,3 +1198,12 @@ func (op *CommentBenefactorRewardOperation) Type() OpType {
 func (op *CommentBenefactorRewardOperation) Data() interface{} {
 	return op
 }
+
+type Beneficiarie struct {
+	Account string `json:"account"`
+	Weight  uint16 `json:"weight"`
+}
+
+type CommentPayoutBeneficiaries struct {
+	Beneficiaries []Beneficiarie `json:"beneficiaries"`
+}
