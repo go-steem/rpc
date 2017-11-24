@@ -272,7 +272,7 @@ type VoteState struct {
 	Voter   string      `json:"voter"`
 	Weight  *types.Int  `json:"weight"`
 	Rshares *types.Int  `json:"rshares"`
-	Percent *types.Int  `json:"percent"`
+	Percent int         `json:"percent"`
 	Time    *types.Time `json:"time"`
 }
 
