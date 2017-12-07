@@ -29,9 +29,9 @@ type Feeds struct {
 }
 
 type FollowCount struct {
-	Account        string     `json:"account"`
-	FollowerCount  *types.Int `json:"follower_count"`
-	FollowingCount *types.Int `json:"following_count"`
+	Account        string `json:"account"`
+	FollowerCount  int    `json:"follower_count"`
+	FollowingCount int    `json:"following_count"`
 }
 
 type BlogEntries struct {

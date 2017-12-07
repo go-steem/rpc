@@ -38,7 +38,7 @@ func NewAPI(caller interfaces.Caller) (*API, error) {
 func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
 	if err := api.caller.Call("call", []interface{}{api.id, method, params}, &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to call %v\n", APIID, method)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to call %v\n", APIID, method)
 	}
 	return &resp, nil
 }
@@ -51,7 +51,7 @@ func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error)
 	}
 	var resp bool
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return false, errors.Wrap(err, "golos-go: login_api: failed to unmarshal login response")
+		return false, errors.Wrap(err, "steem-go: login_api: failed to unmarshal login response")
 	}
 	return resp, nil
 }*/
@@ -64,7 +64,7 @@ func (api *API) GetAPIByName(apiName string) (int, error) {
 	}
 	var resp int
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return 0, errors.Wrap(err, "golos-go: login_api: failed to unmarshal get_api_by_name response")
+		return 0, errors.Wrap(err, "steem-go: login_api: failed to unmarshal get_api_by_name response")
 	}
 	return resp, nil
 }
@@ -77,7 +77,7 @@ func (api *API) GetVersion() (*Version, error) {
 	}
 	var resp *Version
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "golos-go: login_api: failed to unmarshal get_version response")
+		return nil, errors.Wrap(err, "steem-go: login_api: failed to unmarshal get_version response")
 	}
 	return resp, nil
 }

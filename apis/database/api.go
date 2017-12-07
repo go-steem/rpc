@@ -30,7 +30,7 @@ var EmptyParams = []string{}
 func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
 	if err := api.caller.Call(method, params, &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to call %v\n", APIID, method)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to call %v\n", APIID, method)
 	}
 	return &resp, nil
 }
@@ -51,7 +51,7 @@ func (api *API) GetTrendingTags(afterTag string, limit uint32) ([]*TrendingTags,
 	}
 	var resp []*TrendingTags
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_trending_tags response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_trending_tags response", APIID)
 	}
 	return resp, nil
 }
@@ -69,7 +69,7 @@ func (api *API) GetDiscussionsByTrending(query *DiscussionQuery) ([]*Content, er
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_trending response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_trending response", APIID)
 	}
 	return resp, nil
 }
@@ -82,7 +82,7 @@ func (api *API) GetDiscussionsByTrending30(query *DiscussionQuery) ([]*Content, 
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_trending30 response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_trending30 response", APIID)
 	}
 	return resp, nil
 }
@@ -95,7 +95,7 @@ func (api *API) GetDiscussionsByCreated(query *DiscussionQuery) ([]*Content, err
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_created response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_created response", APIID)
 	}
 	return resp, nil
 }
@@ -108,7 +108,7 @@ func (api *API) GetDiscussionsByActive(query *DiscussionQuery) ([]*Content, erro
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_active response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_active response", APIID)
 	}
 	return resp, nil
 }
@@ -121,7 +121,7 @@ func (api *API) GetDiscussionsByCashout(query *DiscussionQuery) ([]*Content, err
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_cashout response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_cashout response", APIID)
 	}
 	return resp, nil
 }
@@ -134,7 +134,7 @@ func (api *API) GetDiscussionsByPayout(query *DiscussionQuery) ([]*Content, erro
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_payout response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_payout response", APIID)
 	}
 	return resp, nil
 }
@@ -147,7 +147,7 @@ func (api *API) GetDiscussionsByVotes(query *DiscussionQuery) ([]*Content, error
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_votes response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_votes response", APIID)
 	}
 	return resp, nil
 }
@@ -160,7 +160,7 @@ func (api *API) GetDiscussionsByChildren(query *DiscussionQuery) ([]*Content, er
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_children response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_children response", APIID)
 	}
 	return resp, nil
 }
@@ -173,7 +173,7 @@ func (api *API) GetDiscussionsByHot(query *DiscussionQuery) ([]*Content, error) 
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_hot response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_hot response", APIID)
 	}
 	return resp, nil
 }
@@ -186,7 +186,7 @@ func (api *API) GetDiscussionsByFeed(query *DiscussionQuery) ([]*Content, error)
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_feed response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_feed response", APIID)
 	}
 	return resp, nil
 }
@@ -199,7 +199,7 @@ func (api *API) GetDiscussionsByBlog(query *DiscussionQuery) ([]*Content, error)
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_blog response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_blog response", APIID)
 	}
 	return resp, nil
 }
@@ -212,7 +212,7 @@ func (api *API) GetDiscussionsByComments(query *DiscussionQuery) ([]*Content, er
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_comments response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_comments response", APIID)
 	}
 	return resp, nil
 }
@@ -225,7 +225,7 @@ func (api *API) GetDiscussionsByPromoted(query *DiscussionQuery) ([]*Content, er
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_promoted response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_promoted response", APIID)
 	}
 	return resp, nil
 }
@@ -238,7 +238,7 @@ func (api *API) GetBlockHeader(blockNum uint32) (*BlockHeader, error) {
 	}
 	var resp BlockHeader
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_block_header response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_block_header response", APIID)
 	}
 	resp.Number = blockNum
 	return &resp, nil
@@ -252,7 +252,7 @@ func (api *API) GetBlock(blockNum uint32) (*Block, error) {
 	}
 	var resp Block
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_block response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_block response", APIID)
 	}
 	resp.Number = blockNum
 	return &resp, nil
@@ -266,7 +266,7 @@ func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*types.Oper
 	}
 	var resp []*types.OperationObject
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_ops_in_block response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_ops_in_block response", APIID)
 	}
 	return resp, nil
 }
@@ -284,7 +284,7 @@ func (api *API) GetTrendingCategories(after string, limit uint32) ([]*Categories
 	}
 	var resp []*Categories
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_trending_categories response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_trending_categories response", APIID)
 	}
 	return resp, nil
 }
@@ -312,7 +312,7 @@ func (api *API) GetConfig() (*Config, error) {
 	}
 	var resp Config
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_config response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_config response", APIID)
 	}
 	return &resp, nil
 }
@@ -325,7 +325,7 @@ func (api *API) GetDynamicGlobalProperties() (*DynamicGlobalProperties, error) {
 	}
 	var resp DynamicGlobalProperties
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_dynamic_global_properties response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_dynamic_global_properties response", APIID)
 	}
 	return &resp, nil
 }
@@ -338,7 +338,7 @@ func (api *API) GetChainProperties() (*ChainProperties, error) {
 	}
 	var resp ChainProperties
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_chain_properties response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_chain_properties response", APIID)
 	}
 	return &resp, nil
 }
@@ -351,7 +351,7 @@ func (api *API) GetFeedHistory() (*FeedHistory, error) {
 	}
 	var resp FeedHistory
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_feed_history response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_feed_history response", APIID)
 	}
 	return &resp, nil
 }
@@ -364,7 +364,7 @@ func (api *API) GetCurrentMedianHistoryPrice() (*CurrentMedianHistoryPrice, erro
 	}
 	var resp CurrentMedianHistoryPrice
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_current_median_history_price response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_current_median_history_price response", APIID)
 	}
 	return &resp, nil
 }
@@ -377,7 +377,7 @@ func (api *API) GetWitnessSchedule() (*WitnessSchedule, error) {
 	}
 	var resp WitnessSchedule
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_witness_schedule response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witness_schedule response", APIID)
 	}
 	return &resp, nil
 }
@@ -390,7 +390,7 @@ func (api *API) GetHardforkVersion() (string, error) {
 	}
 	var resp string
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return "", errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_hardfork_version response", APIID)
+		return "", errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_hardfork_version response", APIID)
 	}
 	return resp, nil
 }
@@ -403,7 +403,7 @@ func (api *API) GetNextScheduledHardfork() (*NextScheduledHardfork, error) {
 	}
 	var resp NextScheduledHardfork
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_next_scheduled_hardfork response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_next_scheduled_hardfork response", APIID)
 	}
 	return &resp, nil
 }
@@ -419,7 +419,7 @@ func (api *API) GetAccounts(accountNames []string) ([]*Account, error) {
 	}
 	var resp []*Account
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_accounts response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_accounts response", APIID)
 	}
 	return resp, nil
 }
@@ -440,7 +440,7 @@ func (api *API) LookupAccounts(lowerBoundName string, limit uint32) ([]string, e
 	}
 	var resp []string
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal lookup_accounts response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal lookup_accounts response", APIID)
 	}
 	return resp, nil
 }
@@ -453,7 +453,7 @@ func (api *API) GetAccountCount() (uint32, error) {
 	}
 	var resp uint32
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return 0, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_account_count response", APIID)
+		return 0, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_account_count response", APIID)
 	}
 	return resp, nil
 }
@@ -466,7 +466,7 @@ func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests
 	}
 	var resp []*ConversionRequests
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_conversion_requests response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_conversion_requests response", APIID)
 	}
 	return resp, nil
 }
@@ -533,7 +533,7 @@ func (api *API) GetSavingsWithdrawFrom(accountName string) ([]*SavingsWithdraw, 
 	}
 	var resp []*SavingsWithdraw
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_savings_withdraw_from response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_savings_withdraw_from response", APIID)
 	}
 	return resp, nil
 }
@@ -546,7 +546,7 @@ func (api *API) GetSavingsWithdrawTo(accountName string) ([]*SavingsWithdraw, er
 	}
 	var resp []*SavingsWithdraw
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_savings_withdraw_to response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_savings_withdraw_to response", APIID)
 	}
 	return resp, nil
 }
@@ -562,7 +562,7 @@ func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 	}
 	var resp *OrderBook
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_order_book response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_order_book response", APIID)
 	}
 	return resp, nil
 }
@@ -575,7 +575,7 @@ func (api *API) GetOpenOrders(accountName string) ([]*OpenOrders, error) {
 	}
 	var resp []*OpenOrders
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_open_orders response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_open_orders response", APIID)
 	}
 	return resp, nil
 }
@@ -598,7 +598,7 @@ func (api *API) GetTransaction(id string) (*types.Transaction, error) {
 	}
 	var resp types.Transaction
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_transaction response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_transaction response", APIID)
 	}
 	return &resp, nil
 }
@@ -613,7 +613,7 @@ func (api *API) GetPotentialSignatures(trx *types.Transaction) ([]string, error)
 	}
 	var resp []string
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_potential_signatures response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_potential_signatures response", APIID)
 	}
 	return resp, nil
 }
@@ -626,7 +626,7 @@ func (api *API) GetVerifyAuthoruty(trx *types.Transaction) (bool, error) {
 	}
 	var resp bool
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return false, errors.Wrapf(err, "golos-go: %v: failed to unmarshal verify_authority response", APIID)
+		return false, errors.Wrapf(err, "steem-go: %v: failed to unmarshal verify_authority response", APIID)
 	}
 	return resp, nil
 }
@@ -641,7 +641,7 @@ func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
 	}
 	var resp []*VoteState
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_active_votes response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_active_votes response", APIID)
 	}
 	return resp, nil
 }
@@ -654,7 +654,7 @@ func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
 	}
 	var resp []*Votes
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_account_votes response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_account_votes response", APIID)
 	}
 	return resp, nil
 }
@@ -667,7 +667,7 @@ func (api *API) GetContent(author, permlink string) (*Content, error) {
 	}
 	var resp Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_content response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_content response", APIID)
 	}
 	return &resp, nil
 }
@@ -680,7 +680,7 @@ func (api *API) GetContentReplies(parentAuthor, parentPermlink string) ([]*Conte
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_content_replies response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_content_replies response", APIID)
 	}
 	return resp, nil
 }
@@ -693,7 +693,7 @@ func (api *API) GetDiscussionsByAuthorBeforeDate(Author, Permlink, Date string, 
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_discussions_by_author_before_date response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_author_before_date response", APIID)
 	}
 	return resp, nil
 }
@@ -706,7 +706,7 @@ func (api *API) GetRepliesByLastUpdate(startAuthor, startPermlink string, limit 
 	}
 	var resp []*Content
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_replies_by_last_update response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_replies_by_last_update response", APIID)
 	}
 	return resp, nil
 }
@@ -719,7 +719,7 @@ func (api *API) GetWitnesses(id []uint32) ([]*Witness, error) {
 	}
 	var resp []*Witness
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_witnesses response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witnesses response", APIID)
 	}
 	return resp, nil
 }
@@ -732,7 +732,7 @@ func (api *API) GetWitnessByAccount(author string) (*Witness, error) {
 	}
 	var resp Witness
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_witness_by_account response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witness_by_account response", APIID)
 	}
 	return &resp, nil
 }
@@ -748,7 +748,7 @@ func (api *API) GetWitnessByVote(author string, limit uint) ([]*Witness, error) 
 	}
 	var resp []*Witness
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_witnesses_by_vote response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witnesses_by_vote response", APIID)
 	}
 	return resp, nil
 }
@@ -764,7 +764,7 @@ func (api *API) LookupWitnessAccounts(author string, limit uint) ([]string, erro
 	}
 	var resp []string
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal lookup_witness_accounts response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal lookup_witness_accounts response", APIID)
 	}
 	return resp, nil
 }
@@ -777,7 +777,7 @@ func (api *API) GetWitnessCount() (uint32, error) {
 	}
 	var resp uint32
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return 0, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_witness_count response", APIID)
+		return 0, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witness_count response", APIID)
 	}
 	return resp, nil
 }
@@ -790,7 +790,7 @@ func (api *API) GetActiveWitnesses() ([]string, error) {
 	}
 	var resp []string
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_active_witnesses response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_active_witnesses response", APIID)
 	}
 	return resp, nil
 }
@@ -803,7 +803,7 @@ func (api *API) GetMinerQueue() ([]string, error) {
 	}
 	var resp []string
 	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "golos-go: %v: failed to unmarshal get_miner_queue response", APIID)
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_miner_queue response", APIID)
 	}
 	return resp, nil
 }
