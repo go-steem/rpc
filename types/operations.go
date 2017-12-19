@@ -984,9 +984,9 @@ type AccountCreateWithDelegationOperation struct {
 	Delegation     string        `json:"delegation"`
 	Creator        string        `json:"creator"`
 	NewAccountName string        `json:"new_account_name"`
-	Owner          string        `json:"owner"`
-	Active         string        `json:"active"`
-	Posting        string        `json:"posting"`
+	Owner          *Authority    `json:"owner"`
+	Active         *Authority    `json:"active"`
+	Posting        *Authority    `json:"posting"`
 	MemoKey        string        `json:"memo_key"`
 	JsonMetadata   string        `json:"json_metadata"`
 	Extensions     []interface{} `json:"extensions"`

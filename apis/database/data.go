@@ -56,7 +56,7 @@ type Config struct {
 	SteemitHardforkRequiredWitnesses      *types.Int `json:"STEEMIT_HARDFORK_REQUIRED_WITNESSES"`
 	SteemitInitMinerName                  string     `json:"STEEMIT_INIT_MINER_NAME"`
 	SteemitInitPublicKeyStr               string     `json:"STEEMIT_INIT_PUBLIC_KEY_STR"`
-	SteemitInitSupply                     string     `json:"STEEMIT_INIT_SUPPLY"`
+	SteemitInitSupply                     *types.Int `json:"STEEMIT_INIT_SUPPLY"`
 	SteemitInitTime                       string     `json:"STEEMIT_INIT_TIME"`
 	SteemitIrreversibleThreshold          *types.Int `json:"STEEMIT_IRREVERSIBLE_THRESHOLD"`
 	SteemitLiquidityAprPercent            *types.Int `json:"STEEMIT_LIQUIDITY_APR_PERCENT"`
