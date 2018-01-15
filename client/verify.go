@@ -3,6 +3,7 @@ package client
 import (
 	// Stdlib
 	"log"
+	"time"
 
 	// Vendor
 	"github.com/pkg/errors"
@@ -112,5 +113,40 @@ func (api *Client) Verify_Post(author, permlink string) bool {
 			return false
 		}
 		return false
+	}
+}
+
+func (api *Client) Verify_First_Post(username string) bool {
+	d := time.Now()
+	cont, err := api.Rpc.Database.GetDiscussionsByAuthorBeforeDate(username, "", d.Format("2006-01-02T00:00:00"), 100)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "Error Verify First Post: "))
+		return false
+	} else {
+		if len(cont) > 1 {
+			return false
+		} else {
+			return true
+		}
+		return false
+	}
+}
+
+func (api *Client) Verify_Comment_U(username, author, permlink string) bool {
+	ans, err := api.Rpc.Database.GetContentReplies(author, permlink)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "Error Verify Comments: "))
+		return false
+	} else {
+		if len(ans) > 0 {
+			for _, v := range ans {
+				if v.Author == username {
+					return true
+				}
+			}
+			return false
+		} else {
+			return false
+		}
 	}
 }

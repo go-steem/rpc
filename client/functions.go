@@ -71,6 +71,7 @@ func (api *Client) Comment(user_name, author_name, ppermlink, body string, v *PC
 
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
 	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
+	permlink = strings.Replace(permlink, ".", "-", -1)
 
 	tx := &types.CommentOperation{
 		ParentAuthor:   author_name,
@@ -84,7 +85,7 @@ func (api *Client) Comment(user_name, author_name, ppermlink, body string, v *PC
 	trx = append(trx, tx)
 
 	if o != nil {
-		symbol := "GBG"
+		symbol := "SBD"
 		MAP := "1000000.000 " + symbol
 		PSD := o.Percent
 		if o.Percent == 0 {
@@ -202,7 +203,7 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 	trx = append(trx, txp)
 
 	if o != nil {
-		symbol := "GBG"
+		symbol := "SBD"
 		MAP := "1000000.000 " + symbol
 		PSD := o.Percent
 		if o.Percent == 0 {
@@ -272,7 +273,7 @@ func (api *Client) Follow(follower, following string) error {
 	}
 	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
+		return errors.Wrapf(err, "Error Follow: ")
 	} else {
 		log.Println("[Follow] Block -> ", resp.BlockNum, " Follower user -> ", follower, " Following user -> ", following)
 		return nil
@@ -290,7 +291,7 @@ func (api *Client) Unfollow(follower, following string) error {
 	}
 	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
+		return errors.Wrapf(err, "Error Unfollow: ")
 	} else {
 		log.Println("[Unfollow] Block -> ", resp.BlockNum, " Unfollower user -> ", follower, " Unfollowing user -> ", following)
 		return nil
@@ -308,7 +309,7 @@ func (api *Client) Ignore(follower, following string) error {
 	}
 	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
+		return errors.Wrapf(err, "Error Ignore: ")
 	} else {
 		log.Println("[Ignore] Block -> ", resp.BlockNum, " Ignore user -> ", follower, " Ignoring user -> ", following)
 		return nil
@@ -326,7 +327,7 @@ func (api *Client) Notice(follower, following string) error {
 	}
 	resp, err := api.Send_Trx(follower, tx)
 	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
+		return errors.Wrapf(err, "Error Notice: ")
 	} else {
 		log.Println("[Notice] Block -> ", resp.BlockNum, " Notice user -> ", follower, " Noticing user -> ", following)
 		return nil
@@ -337,7 +338,7 @@ func (api *Client) Reblog(user_name, author_name, permlink string) error {
 	if api.Verify_Reblogs(author_name, permlink, user_name) {
 		return errors.New("The user already did repost")
 	}
-	json_string := "[\"reblog\",{\"account\":\"" + user_name + "\",\"author\":\"" + author_name + "\",\"permlink\":\"" + permlink + "\"]"
+	json_string := "[\"reblog\",{\"account\":\"" + user_name + "\",\"author\":\"" + author_name + "\",\"permlink\":\"" + permlink + "\"}]"
 
 	tx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
@@ -395,6 +396,28 @@ func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
 		return errors.Wrapf(err, "Error Transfer: ")
 	} else {
 		log.Println("[Transfer] Block -> ", resp.BlockNum, " From user -> ", from_name, " To user -> ", to_name)
+		return nil
+	}
+}
+
+func (api *Client) Multi_Transfer(username string, arrtrans []ArrTransfer) error {
+	var trx []types.Operation
+
+	for _, val := range arrtrans {
+		txt := &types.TransferOperation{
+			From:   username,
+			To:     val.To,
+			Amount: val.Ammount,
+			Memo:   val.Memo,
+		}
+		trx = append(trx, txt)
+	}
+
+	resp, err := api.Send_Arr_Trx(username, trx)
+	if err != nil {
+		return errors.Wrapf(err, "Error Multi_Transfer: ")
+	} else {
+		log.Println("[Multi_Transfer] Block -> ", resp.BlockNum, " From user -> ", username)
 		return nil
 	}
 }
@@ -630,5 +653,83 @@ func (api *Client) FeedPublish(publisher, base, quote string) error {
 	} else {
 		log.Println("[FeedPublish] Block -> ", resp.BlockNum, " FeedPublish user -> ", publisher)
 		return nil
+	}
+}
+
+func (api *Client) Comment_Link(user_name, author_name, ppermlink, body string, v *PC_Vote, o *PC_Options) (string, error) {
+	var trx []types.Operation
+
+	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
+	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
+	permlink = strings.Replace(permlink, ".", "-", -1)
+
+	tx := &types.CommentOperation{
+		ParentAuthor:   author_name,
+		ParentPermlink: ppermlink,
+		Author:         user_name,
+		Permlink:       permlink,
+		Title:          "",
+		Body:           body,
+		JsonMetadata:   "{\"app\":\"steem-go\"}",
+	}
+	trx = append(trx, tx)
+
+	if o != nil {
+		symbol := "SBD"
+		MAP := "1000000.000 " + symbol
+		PSD := o.Percent
+		if o.Percent == 0 {
+			MAP = "0.000 " + symbol
+			PSD = 10000
+		} else if o.Percent == 50 {
+			PSD = 10000
+		} else {
+			PSD = 0
+		}
+
+		var ext []interface{}
+		if len(o.BenefList) > 0 {
+			var ben_list []types.Beneficiarie
+			var benef types.CommentPayoutBeneficiaries
+			for _, val := range o.BenefList {
+				ben_list = append(ben_list, types.Beneficiarie{val.Account, val.Weight})
+			}
+			benef.Beneficiaries = ben_list
+			ext = append(ext, 0)
+			ext = append(ext, benef)
+		}
+		Extens := []interface{}{}
+		if len(ext) > 0 {
+			Extens = []interface{}{ext}
+		}
+
+		txo := &types.CommentOptionsOperation{
+			Author:               user_name,
+			Permlink:             permlink,
+			MaxAcceptedPayout:    MAP,
+			PercentSteemDollars:  PSD,
+			AllowVotes:           true,
+			AllowCurationRewards: true,
+			Extensions:           Extens,
+		}
+		trx = append(trx, txo)
+	}
+
+	if v != nil && v.Weight != 0 {
+		txv := &types.VoteOperation{
+			Voter:    user_name,
+			Author:   user_name,
+			Permlink: permlink,
+			Weight:   types.Int16(v.Weight),
+		}
+		trx = append(trx, txv)
+	}
+
+	resp, err := api.Send_Arr_Trx(user_name, trx)
+	if err != nil {
+		return "", errors.Wrapf(err, "Error Comment : ")
+	} else {
+		log.Println("[Comment] Block -> ", resp.BlockNum, " User -> ", user_name)
+		return permlink, nil
 	}
 }

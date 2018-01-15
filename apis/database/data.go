@@ -377,7 +377,7 @@ type Account struct {
 	LifetimeVoteCount             *types.Int    `json:"lifetime_vote_count"`
 	PostCount                     *types.Int    `json:"post_count"`
 	CanVote                       bool          `json:"can_vote"`
-	VotingPower                   *types.Int    `json:"voting_power"`
+	VotingPower                   int           `json:"voting_power"`
 	LastVoteTime                  *types.Time   `json:"last_vote_time"`
 	Balance                       string        `json:"balance"`
 	SavingsBalance                string        `json:"savings_balance"`
