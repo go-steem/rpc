@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
-	"github.com/asuleymanov/rpc/encoding/wif"
-	"github.com/asuleymanov/rpc/transactions"
-	"github.com/asuleymanov/rpc/translit"
-	"github.com/asuleymanov/rpc/types"
+	"github.com/go-steem/rpc/encoding/wif"
+	"github.com/go-steem/rpc/transactions"
+	"github.com/go-steem/rpc/translit"
+	"github.com/go-steem/rpc/types"
 )
 
 func (api *Client) SteemPerMvest() (float64, error) {
@@ -434,12 +434,14 @@ func (api *Client) Login(user_name, key string) bool {
 
 	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
 	if err != nil {
+		log.Println("GDP")
 		return false
 	}
 
 	// Создание транзакции
 	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
 	if err != nil {
+		log.Println("Create")
 		return false
 	}
 	tx := transactions.NewSignedTransaction(&types.Transaction{
@@ -457,6 +459,7 @@ func (api *Client) Login(user_name, key string) bool {
 
 	// Подписываем транзакцию
 	if err := tx.Sign(keys, api.Chain); err != nil {
+		log.Println("Sign")
 		return false
 	}
 
@@ -464,6 +467,7 @@ func (api *Client) Login(user_name, key string) bool {
 	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
+		log.Println(err)
 		return false
 	} else {
 		log.Println("[Login] Block -> ", resp.BlockNum, " User -> ", user_name)

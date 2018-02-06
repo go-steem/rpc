@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	// RPC
-	"github.com/asuleymanov/rpc/types"
+	"github.com/go-steem/rpc/types"
 )
 
 type DiscussionQuery struct {

@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
-	"github.com/asuleymanov/rpc/encoding/transaction"
+	"github.com/go-steem/rpc/encoding/transaction"
 )
 
 const (

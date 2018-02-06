@@ -1,7 +1,7 @@
 package market
 
 import (
-	"github.com/asuleymanov/rpc/types"
+	"github.com/go-steem/rpc/types"
 )
 
 type Ticker struct {

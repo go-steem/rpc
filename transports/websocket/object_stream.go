@@ -3,7 +3,7 @@ package websocket
 import (
 	"time"
 
-	jsonrpc2websocket "github.com/asuleymanov/jsonrpc2/websocket"
+	jsonrpc2websocket "github.com/go-steem/jsonrpc2/websocket"
 	"github.com/gorilla/websocket"
 )
 

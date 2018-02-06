@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	// RPC
-	"github.com/asuleymanov/rpc/interfaces"
+	"github.com/go-steem/rpc/interfaces"
 
 	// Vendor
 	"github.com/pkg/errors"

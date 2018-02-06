@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/asuleymanov/rpc/client"
-	"github.com/asuleymanov/rpc/types"
+	"github.com/go-steem/rpc/client"
+	"github.com/go-steem/rpc/types"
 )
 
 var cls = client.NewApi()
