@@ -8,9 +8,9 @@ import (
 	"time"
 
 	// Vendor
-	"github.com/go-steem/jsonrpc2"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
+	"github.com/sourcegraph/jsonrpc2"
 	tomb "gopkg.in/tomb.v2"
 )
 

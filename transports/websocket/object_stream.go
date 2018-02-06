@@ -3,8 +3,8 @@ package websocket
 import (
 	"time"
 
-	jsonrpc2websocket "github.com/go-steem/jsonrpc2/websocket"
 	"github.com/gorilla/websocket"
+	jsonrpc2websocket "github.com/sourcegraph/jsonrpc2/websocket"
 )
 
 // ObjectStream implements jsonrpc2.ObjectStream that uses a WebSocket.
