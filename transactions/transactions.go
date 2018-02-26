@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 
 	// RPC
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc/types"
 
 	// Vendor
 	"github.com/pkg/errors"

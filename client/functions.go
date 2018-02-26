@@ -11,10 +11,10 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
-	"github.com/go-steem/rpc/encoding/wif"
-	"github.com/go-steem/rpc/transactions"
-	"github.com/go-steem/rpc/translit"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc/encoding/wif"
+	"github.com/asuleymanov/rpc/transactions"
+	"github.com/asuleymanov/rpc/translit"
+	"github.com/asuleymanov/rpc/types"
 )
 
 func (api *Client) SteemPerMvest() (float64, error) {

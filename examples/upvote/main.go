@@ -7,7 +7,7 @@ import (
 	"log"
 
 	// RPC
-	"github.com/go-steem/rpc/client"
+	"github.com/asuleymanov/rpc/client"
 
 	// Vendor
 	"github.com/pkg/errors"

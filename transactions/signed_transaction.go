@@ -10,8 +10,8 @@ import (
 	"time"
 
 	// RPC
-	"github.com/go-steem/rpc/encoding/transaction"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc/encoding/transaction"
+	"github.com/asuleymanov/rpc/types"
 
 	// Vendor
 	"github.com/pkg/errors"

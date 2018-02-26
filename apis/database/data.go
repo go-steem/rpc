@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	// RPC
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc/types"
 )
 
 type DiscussionQuery struct {
@@ -24,7 +24,7 @@ type Config struct {
 	SteemitBuildTestnet                   bool       `json:"STEEMIT_BUILD_TESTNET"`
 	GrapheneCurrentDBVersion              string     `json:"GRAPHENE_CURRENT_DB_VERSION"`
 	SbdSymbol                             *types.Int `json:"SBD_SYMBOL"`
-	Steemit100Percent                     *types.Int `json:"STEEMIT_100_PERCENT"`
+	Steemit100Percent                     int        `json:"STEEMIT_100_PERCENT"`
 	Steemit1Percent                       *types.Int `json:"STEEMIT_1_PERCENT"`
 	SteemitAddressPrefix                  string     `json:"STEEMIT_ADDRESS_PREFIX"`
 	SteemitAprPercentMultiplyPerBlock     string     `json:"STEEMIT_APR_PERCENT_MULTIPLY_PER_BLOCK"`
@@ -124,7 +124,7 @@ type Config struct {
 	SteemitVestingWithdrawIntervals       *types.Int `json:"STEEMIT_VESTING_WITHDRAW_INTERVALS"`
 	SteemitVestingWithdrawIntervalSeconds *types.Int `json:"STEEMIT_VESTING_WITHDRAW_INTERVAL_SECONDS"`
 	SteemitVoteChangeLockoutPeriod        *types.Int `json:"STEEMIT_VOTE_CHANGE_LOCKOUT_PERIOD"`
-	SteemitVoteRegenerationSeconds        *types.Int `json:"STEEMIT_VOTE_REGENERATION_SECONDS"`
+	SteemitVoteRegenerationSeconds        int        `json:"STEEMIT_VOTE_REGENERATION_SECONDS"`
 	SteemSymbol                           string     `json:"STEEM_SYMBOL"`
 	VestsSymbol                           string     `json:"VESTS_SYMBOL"`
 	BlockchainName                        string     `json:"BLOCKCHAIN_NAME"`

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	// RPC
-	"github.com/go-steem/rpc/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 
 	// Vendor
 	"github.com/pkg/errors"

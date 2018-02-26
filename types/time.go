@@ -5,7 +5,7 @@ import (
 	"time"
 
 	// RPC
-	"github.com/go-steem/rpc/encoding/transaction"
+	"github.com/asuleymanov/rpc/encoding/transaction"
 )
 
 const Layout = `"2006-01-02T15:04:05"`

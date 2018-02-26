@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/go-steem/rpc/encoding/wif"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc/encoding/wif"
+	"github.com/asuleymanov/rpc/types"
 )
 
 var (

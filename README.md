@@ -1,6 +1,6 @@
-# go-steem/rpc
+# asuleymanov/rpc
 
-[![GoDoc](https://godoc.org/github.com/go-steem/rpc?status.svg)](https://godoc.org/github.com/go-steem/rpc)
+[![GoDoc](https://godoc.org/github.com/asuleymanov/rpc?status.svg)](https://godoc.org/github.com/asuleymanov/rpc)
 
 Golang RPC client library for [Steem](https://steemit.com).
 
@@ -11,7 +11,7 @@ Golang RPC client library for [Steem](https://steemit.com).
 ## Usage
 
 ```go
-import "github.com/go-steem/rpc/client"
+import "github.com/asuleymanov/rpc/client"
 ```
 
 

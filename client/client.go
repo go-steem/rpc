@@ -5,10 +5,10 @@ import (
 	"github.com/pkg/errors"
 
 	// RPC
-	"github.com/go-steem/rpc"
-	"github.com/go-steem/rpc/transactions"
-	"github.com/go-steem/rpc/transports/websocket"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc"
+	"github.com/asuleymanov/rpc/transactions"
+	"github.com/asuleymanov/rpc/transports/websocket"
+	"github.com/asuleymanov/rpc/types"
 )
 
 const fdt = `"20060102t150405"`

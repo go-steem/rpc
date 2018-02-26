@@ -7,7 +7,7 @@ import (
 	_ "encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/go-steem/rpc/rfc6979"
+	"github.com/asuleymanov/rpc/rfc6979"
 	secp256k1 "github.com/btcsuite/btcd/btcec"
 	"github.com/tendermint/go-crypto"
 	"log"
