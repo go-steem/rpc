@@ -737,3 +737,22 @@ func (api *Client) Comment_Link(user_name, author_name, ppermlink, body string, 
 		return permlink, nil
 	}
 }
+
+func (api *Client) DelegateVestingShares(from, to, share string) error {
+	var trx []types.Operation
+
+	tx := &types.DelegateVestingSharesOperation{
+		Delegator:     from,
+		Delegatee:     to,
+		VestingShares: share,
+	}
+	trx = append(trx, tx)
+
+	resp, err := api.Send_Arr_Trx(from, trx)
+	if err != nil {
+		return errors.Wrapf(err, "Error DelegateVestingShares: ")
+	} else {
+		log.Println("[DelegateVestingShares] Block -> ", resp.BlockNum, " DelegateVestingShares user -> ", from)
+		return nil
+	}
+}

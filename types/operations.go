@@ -997,6 +997,15 @@ func (op *DelegateVestingSharesOperation) Data() interface{} {
 	return op
 }
 
+func (op *DelegateVestingSharesOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeDelegateVestingShares.Code()))
+	enc.Encode(op.Delegator)
+	enc.Encode(op.Delegatee)
+	enc.EncodeMoney(op.VestingShares)
+	return enc.Err()
+}
+
 type AccountCreateWithDelegationOperation struct {
 	Fee            string        `json:"fee"`
 	Delegation     string        `json:"delegation"`
