@@ -150,3 +150,15 @@ func (api *Client) Verify_Comment_U(username, author, permlink string) bool {
 		}
 	}
 }
+
+func (api *Client) VerifyUser(username string) bool {
+	acc, err := api.Rpc.Database.GetAccounts([]string{username})
+	if err != nil {
+		log.Println(errors.Wrapf(err, "Error Verify User: "))
+		return false
+	} else if len(acc) == 1 {
+		return true
+	} else {
+		return false
+	}
+}
