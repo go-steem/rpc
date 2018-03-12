@@ -702,7 +702,7 @@ func (op *RequestAccountRecoveryOperation) Data() interface{} {
 type RecoverAccountOperation struct {
 	AccountToRecover     string        `json:"account_to_recover"`
 	NewOwnerAuthority    *Authority    `json:"new_owner_authority"`
-	RecentOwnerAuthority string        `json:"recent_owner_authority"`
+	RecentOwnerAuthority *Authority    `json:"recent_owner_authority"`
 	Extensions           []interface{} `json:"extensions"`
 }
 

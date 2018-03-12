@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"github.com/asuleymanov/rpc/rfc6979"
 	secp256k1 "github.com/btcsuite/btcd/btcec"
-	"github.com/tendermint/go-crypto"
 	"log"
 	"math/big"
 )
@@ -19,8 +18,7 @@ func (tx *SignedTransaction) Sign_Single(priv_b []byte, data []byte) []byte {
 	copy(privKeyBytes[:], priv_b)
 
 	////////////
-	privKey := crypto.PrivKeySecp256k1(privKeyBytes)
-	priv__, _ := secp256k1.PrivKeyFromBytes(secp256k1.S256(), privKey[:])
+	priv__, _ := secp256k1.PrivKeyFromBytes(secp256k1.S256(), privKeyBytes[:])
 	pri_ecdsa := priv__.ToECDSA()
 	sigBytes := signBuffer(data, pri_ecdsa)
 

@@ -22,7 +22,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/sha256"
 	"encoding/binary"
-	"github.com/tendermint/go-crypto"
 	"math/rand"
 )
 
@@ -100,7 +99,9 @@ func generateSecret(priv *ecdsa.PrivateKey /*q, x *big.Int,*/, alg func() hash.H
 		binary.BigEndian.PutUint32(nonce_a, uint32(nonce))
 		hash_clone = append(hash_clone, nonce_a...)
 		//log.Println("(before hash) hash_clone=", hex.EncodeToString(hash_clone), "nonce_str=", hex.EncodeToString(nonce_a))
-		hash_clone = crypto.Sha256(hash_clone)
+		hs := sha256.New()
+		hs.Write(hash_clone)
+		hash_clone = hs.Sum(nil)
 	}
 	//log.Println("hash_clone=", hex.EncodeToString(hash_clone))
 
