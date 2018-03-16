@@ -43,7 +43,7 @@ func (op *OperationObject) UnmarshalJSON(p []byte) error {
 }
 
 func (op *OperationObject) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&rawOperationObject{
+	return JSONMarshal(&rawOperationObject{
   	BlockNumber:            op.BlockNumber,
 		TransactionID:          op.TransactionID,
 		TransactionInBlock:     op.TransactionInBlock,
