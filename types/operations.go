@@ -746,7 +746,7 @@ type EscrowTransferOperation struct {
 	Agent                string `json:"agent"`
 	Fee                  string `json:"fee"`
 	JsonMeta             string `json:"json_meta"`
-	RatificationDeadline uint32 `json:"ratification_deadline"`
+	RatificationDeadline string `json:"ratification_deadline"`
 	EscrowExpiration     uint32 `json:"escrow_expiration"`
 }
 
