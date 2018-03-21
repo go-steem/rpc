@@ -42,21 +42,9 @@ func (op *OperationObject) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
-/*func (op *OperationObject) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&rawOperationObject{
-		BlockNumber:            op.BlockNumber,
-		TransactionID:          op.TransactionID,
-		TransactionInBlock:     op.TransactionInBlock,
-		Operation:              &operationTuple{op.Operation.Type(), op.Operation},
-		OperationInTransaction: op.OperationInTransaction,
-		VirtualOperation:       op.VirtualOperation,
-		Timestamp:              op.Timestamp,
-	})
-}*/
-
 func (op *OperationObject) MarshalJSON() ([]byte, error) {
 	return JSONMarshal(&rawOperationObject{
-		BlockNumber:            op.BlockNumber,
+  	BlockNumber:            op.BlockNumber,
 		TransactionID:          op.TransactionID,
 		TransactionInBlock:     op.TransactionInBlock,
 		Operation:              &operationTuple{op.Operation.Type(), op.Operation},
