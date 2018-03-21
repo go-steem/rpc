@@ -4,12 +4,11 @@ import (
 	// Stdlib
 	"encoding/json"
 
-  // Vendor
+	// Vendor
 	"github.com/pkg/errors"
 
-	"github.com/go-steem/rpc/interfaces"
-	"github.com/go-steem/rpc/internal/call"
-	"github.com/go-steem/rpc/types"
+	"github.com/asuleymanov/rpc/interfaces"
+	"github.com/asuleymanov/rpc/types"
 )
 
 const (
@@ -807,6 +806,7 @@ func (api *API) GetMinerQueue() ([]string, error) {
 	}
 	return resp, nil
 }
+
 /*
    // Witnesses
    (get_witnesses)
@@ -821,15 +821,3 @@ func (api *API) GetMinerQueue() ([]string, error) {
 //
 // Some randomly added functions.
 //
-
-func (api *API) GetOpsInBlockRaw(blockNum uint32, onlyVirtual bool) (*json.RawMessage, error) {
-	return call.Raw(
-		api.caller, "get_ops_in_block", []interface{}{blockNum, onlyVirtual})
-}
-
-func (api *API) GetOpsInBlock(blockNum uint32, onlyVirtual bool) ([]*types.OperationObject, error) {
-	var resp []*types.OperationObject
-	err := api.caller.Call("get_ops_in_block", []interface{}{blockNum, onlyVirtual}, &resp)
-	if err != nil {
-		return nil, err
-	}
