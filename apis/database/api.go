@@ -476,7 +476,7 @@ func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests
 	return api.Raw("get_account_history", []interface{}{account, from, limit})
 }*/
 
-func (api *API) GetAccountHistory(account string, from uint64, limit uint32) ([]*types.OperationObject, error) {
+func (api *API) GetAccountHistory(account string, from int64, limit uint32) ([]*types.OperationObject, error) {
 	raw, err := api.Raw("get_account_history", []interface{}{account, from, limit})
 	if err != nil {
 		return nil, err
