@@ -1,4 +1,4 @@
-package client
+package rpc
 
 import (
 	// Stdlib
@@ -18,7 +18,7 @@ import (
 )
 
 func (api *Client) SteemPerMvest() (float64, error) {
-	dgp, errdgp := api.Rpc.Database.GetDynamicGlobalProperties()
+	dgp, errdgp := api.Database.GetDynamicGlobalProperties()
 	if errdgp != nil {
 		return 0, errdgp
 	}
@@ -262,7 +262,7 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 	}
 }
 
-func (api *Client) Follow(follower, following string) error {
+func (api *Client) Follows(follower, following string) error {
 	json_string := "[\"follow\",{\"follower\":\"" + follower + "\",\"following\":\"" + following + "\",\"what\":[\"blog\"]}]"
 
 	tx := &types.CustomJSONOperation{
@@ -432,7 +432,7 @@ func (api *Client) Login(user_name, key string) bool {
 		JSON:                 json_string,
 	}
 
-	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	props, err := api.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		log.Println("GDP")
 		return false
@@ -464,7 +464,7 @@ func (api *Client) Login(user_name, key string) bool {
 	}
 
 	// Отправка транзакции
-	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+	resp, err := api.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
 		log.Println(err)

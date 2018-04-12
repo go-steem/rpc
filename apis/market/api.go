@@ -5,41 +5,35 @@ import (
 	"encoding/json"
 
 	// RPC
-	"github.com/asuleymanov/rpc/interfaces"
-	"github.com/asuleymanov/rpc/internal/rpc"
+	"github.com/asuleymanov/rpc/transports"
 
 	// Vendor
 	"github.com/pkg/errors"
 )
 
-const APIID = "market_history_api"
-
-var EmptyParams = []string{}
+const apiID = "market_history_api"
 
 type API struct {
-	id     int
-	caller interfaces.Caller
+	caller transports.Caller
 }
 
-func NewAPI(caller interfaces.Caller) (*API, error) {
-	id, err := rpc.GetNumericAPIID(caller, APIID)
-	if err != nil {
-		return nil, err
-	}
-	return &API{id, caller}, nil
+func NewAPI(caller transports.Caller) *API {
+	return &API{caller}
 }
 
-func (api *API) Raw(method string, params interface{}) (*json.RawMessage, error) {
+var emptyParams = []string{}
+
+func (api *API) raw(method string, params interface{}) (*json.RawMessage, error) {
 	var resp json.RawMessage
-	if err := api.caller.Call("call", []interface{}{api.id, method, params}, &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to call %v\n", APIID, method)
+	if err := api.caller.Call("call", []interface{}{apiID, method, params}, &resp); err != nil {
+		return nil, errors.Wrapf(err, "steem-go: %v: failed to call %v\n", apiID, method)
 	}
 	return &resp, nil
 }
 
 //get_ticker
 func (api *API) GetTicker() (*Ticker, error) {
-	raw, err := api.Raw("get_ticker", EmptyParams)
+	raw, err := api.raw("get_ticker", emptyParams)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +46,7 @@ func (api *API) GetTicker() (*Ticker, error) {
 
 //get_volume
 func (api *API) GetVolume() (*Volume, error) {
-	raw, err := api.Raw("get_volume", EmptyParams)
+	raw, err := api.raw("get_volume", emptyParams)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +62,7 @@ func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 	if limit > 1000 {
 		return nil, errors.New("steem-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	raw, err := api.Raw("get_order_book", []interface{}{limit})
+	raw, err := api.raw("get_order_book", []interface{}{limit})
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +78,7 @@ func (api *API) GetTradeHistory(start, end string, limit uint32) ([]*Trades, err
 	if limit > 1000 {
 		return nil, errors.New("steem-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	raw, err := api.Raw("get_trade_history", []interface{}{start, end, limit})
+	raw, err := api.raw("get_trade_history", []interface{}{start, end, limit})
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +94,7 @@ func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
 	if limit > 1000 {
 		return nil, errors.New("steem-go: market_history_api: get_order_book -> limit must not exceed 1000")
 	}
-	raw, err := api.Raw("get_recent_trades", []interface{}{limit})
+	raw, err := api.raw("get_recent_trades", []interface{}{limit})
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +107,7 @@ func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
 
 //get_market_history
 func (api *API) GetMarketHistory(b_sec uint32, start, end string) ([]*MarketHistory, error) {
-	raw, err := api.Raw("get_market_history", []interface{}{b_sec, start, end})
+	raw, err := api.raw("get_market_history", []interface{}{b_sec, start, end})
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +120,7 @@ func (api *API) GetMarketHistory(b_sec uint32, start, end string) ([]*MarketHist
 
 //get_market_history_buckets
 func (api *API) GetMarketHistoryBuckets() ([]uint32, error) {
-	raw, err := api.Raw("get_market_history_buckets", EmptyParams)
+	raw, err := api.raw("get_market_history_buckets", emptyParams)
 	if err != nil {
 		return nil, err
 	}

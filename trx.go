@@ -1,75 +1,72 @@
-package client
+package rpc
 
 import (
-	// Vendor
-	"github.com/pkg/errors"
-
-	// RPC
-	"github.com/asuleymanov/rpc"
 	"github.com/asuleymanov/rpc/transactions"
-	"github.com/asuleymanov/rpc/transports/websocket"
 	"github.com/asuleymanov/rpc/types"
+	"github.com/pkg/errors"
+	_ "time"
 )
 
-const fdt = `"20060102t150405"`
-
-var Key_List = make(map[string]Keys)
-
-type Keys struct {
-	PKey string
-	AKey string
-	OKey string
-	MKey string
-}
-
-type Client struct {
-	Rpc   *rpc.Client
-	Chain *transactions.Chain
-}
-
-type BResp struct {
-	ID       string
-	BlockNum uint32
-	TrxNum   uint32
-	Expired  bool
-}
-
-func initclient(url []string) *rpc.Client {
-	// Инициализация Websocket
-	t, err := websocket.NewTransport(url)
+/*//SendTrx generates and sends an array of transactions to GOLOS.
+func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, error) {
+	// Получение необходимых параметров
+	props, err := client.Database.GetDynamicGlobalProperties()
 	if err != nil {
-		panic(errors.Wrapf(err, "Error Websocket: "))
+		return nil, err
 	}
 
-	// Инициализация RPC клиента
-	client, err := rpc.NewClient(t)
+	// Создание транзакции
+	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
 	if err != nil {
-		panic(errors.Wrapf(err, "Error RPC: "))
+		return nil, err
 	}
-	//defer client.Close()
-	return client
-}
+	tx := transactions.NewSignedTransaction(&types.Transaction{
+		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
+		RefBlockPrefix: refBlockPrefix,
+	})
 
-func initChainId(str string) *transactions.Chain {
-	var ChainId transactions.Chain
-	// Определяем ChainId
-	switch str {
-	case "steem":
-		ChainId = *transactions.SteemChain
+	// Добавление операций в транзакцию
+	for _, val := range strx {
+		tx.PushOperation(val)
 	}
-	return &ChainId
-}
 
-func NewApi(url []string, chain string) *Client {
-	return &Client{
-		Rpc:   initclient(url),
-		Chain: initChainId(chain),
+	// Получаем необходимый для подписи ключ
+	privKeys, err := client.SigningKeys(strx[0])
+	if err != nil {
+		return nil, err
 	}
-}
 
+	expTime := time.Now().Add(59 * time.Minute).UTC()
+	tm := types.Time{
+		Time: &expTime,
+	}
+	tx.Expiration = &tm
+
+	// Подписываем транзакцию
+	if err := tx.Sign(privKeys, client.Chain); err != nil {
+		return nil, err
+	}
+
+	// Отправка транзакции
+	resp, err := client.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+
+	if err != nil {
+		return nil, err
+	}
+	var bresp BResp
+
+	bresp.ID = resp.ID
+	bresp.BlockNum = resp.BlockNum
+	bresp.TrxNum = resp.TrxNum
+	bresp.Expired = resp.Expired
+
+	return &bresp, nil
+}*/
+
+//Старые методы надо разобраться с ними
 func (api *Client) Send_Trx(username string, strx types.Operation) (*BResp, error) {
 	// Получение необходимых параметров
-	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	props, err := api.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		return nil, errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
 	}
@@ -96,7 +93,7 @@ func (api *Client) Send_Trx(username string, strx types.Operation) (*BResp, erro
 	}
 
 	// Отправка транзакции
-	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+	resp, err := api.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
@@ -114,7 +111,7 @@ func (api *Client) Send_Trx(username string, strx types.Operation) (*BResp, erro
 
 func (api *Client) Send_Arr_Trx(username string, strx []types.Operation) (*BResp, error) {
 	// Получение необходимых параметров
-	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	props, err := api.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		return nil, errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
 	}
@@ -143,7 +140,7 @@ func (api *Client) Send_Arr_Trx(username string, strx []types.Operation) (*BResp
 	}
 
 	// Отправка транзакции
-	resp, err := api.Rpc.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+	resp, err := api.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")
@@ -161,7 +158,7 @@ func (api *Client) Send_Arr_Trx(username string, strx []types.Operation) (*BResp
 
 func (api *Client) Verify_Trx(username string, strx types.Operation) (bool, error) {
 	// Получение необходимых параметров
-	props, err := api.Rpc.Database.GetDynamicGlobalProperties()
+	props, err := api.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		return false, errors.Wrapf(err, "Error get DynamicGlobalProperties: ")
 	}
@@ -188,7 +185,7 @@ func (api *Client) Verify_Trx(username string, strx types.Operation) (bool, erro
 	}
 
 	// Отправка транзакции
-	resp, err := api.Rpc.Database.GetVerifyAuthoruty(tx.Transaction)
+	resp, err := api.Database.GetVerifyAuthoruty(tx.Transaction)
 
 	if err != nil {
 		return false, errors.Wrapf(err, "Error BroadcastTransactionSynchronous: ")

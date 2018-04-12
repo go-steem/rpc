@@ -1,4 +1,4 @@
-package client
+package rpc
 
 import (
 	// Stdlib
@@ -11,7 +11,7 @@ import (
 
 //We check whether there is a voter on the list of those who have already voted
 func (api *Client) Verify_Voter_Weight(author, permlink, voter string, weight int) bool {
-	ans, err := api.Rpc.Database.GetActiveVotes(author, permlink)
+	ans, err := api.Database.GetActiveVotes(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Voter: "))
 		return false
@@ -26,7 +26,7 @@ func (api *Client) Verify_Voter_Weight(author, permlink, voter string, weight in
 }
 
 func (api *Client) Verify_Voter(author, permlink, voter string) bool {
-	ans, err := api.Rpc.Database.GetActiveVotes(author, permlink)
+	ans, err := api.Database.GetActiveVotes(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Voter: "))
 		return false
@@ -42,7 +42,7 @@ func (api *Client) Verify_Voter(author, permlink, voter string) bool {
 
 //We check whether there are voted
 func (api *Client) Verify_Votes(author, permlink string) bool {
-	ans, err := api.Rpc.Database.GetActiveVotes(author, permlink)
+	ans, err := api.Database.GetActiveVotes(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Votes: "))
 		return false
@@ -56,7 +56,7 @@ func (api *Client) Verify_Votes(author, permlink string) bool {
 }
 
 func (api *Client) Verify_Comments(author, permlink string) bool {
-	ans, err := api.Rpc.Database.GetContentReplies(author, permlink)
+	ans, err := api.Database.GetContentReplies(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Comments: "))
 		return false
@@ -70,7 +70,7 @@ func (api *Client) Verify_Comments(author, permlink string) bool {
 }
 
 func (api *Client) Verify_Reblogs(author, permlink, rebloger string) bool {
-	ans, err := api.Rpc.Follow.GetRebloggedBy(author, permlink)
+	ans, err := api.Follow.GetRebloggedBy(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Reblogs: "))
 		return false
@@ -85,7 +85,7 @@ func (api *Client) Verify_Reblogs(author, permlink, rebloger string) bool {
 }
 
 func (api *Client) Verify_Follow(follower, following string) bool {
-	ans, err := api.Rpc.Follow.GetFollowing(follower, following, "blog", 1)
+	ans, err := api.Follow.GetFollowing(follower, following, "blog", 1)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Follow: "))
 		return false
@@ -102,7 +102,7 @@ func (api *Client) Verify_Follow(follower, following string) bool {
 }
 
 func (api *Client) Verify_Post(author, permlink string) bool {
-	ans, err := api.Rpc.Database.GetContent(author, permlink)
+	ans, err := api.Database.GetContent(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Post: "))
 		return false
@@ -118,7 +118,7 @@ func (api *Client) Verify_Post(author, permlink string) bool {
 
 func (api *Client) Verify_First_Post(username string) bool {
 	d := time.Now()
-	cont, err := api.Rpc.Database.GetDiscussionsByAuthorBeforeDate(username, "", d.Format("2006-01-02T00:00:00"), 100)
+	cont, err := api.Database.GetDiscussionsByAuthorBeforeDate(username, "", d.Format("2006-01-02T00:00:00"), 100)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify First Post: "))
 		return false
@@ -133,7 +133,7 @@ func (api *Client) Verify_First_Post(username string) bool {
 }
 
 func (api *Client) Verify_Comment_U(username, author, permlink string) bool {
-	ans, err := api.Rpc.Database.GetContentReplies(author, permlink)
+	ans, err := api.Database.GetContentReplies(author, permlink)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify Comments: "))
 		return false
@@ -152,7 +152,7 @@ func (api *Client) Verify_Comment_U(username, author, permlink string) bool {
 }
 
 func (api *Client) VerifyUser(username string) bool {
-	acc, err := api.Rpc.Database.GetAccounts([]string{username})
+	acc, err := api.Database.GetAccounts([]string{username})
 	if err != nil {
 		log.Println(errors.Wrapf(err, "Error Verify User: "))
 		return false

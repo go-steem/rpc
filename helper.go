@@ -1,4 +1,4 @@
-package client
+package rpc
 
 import (
 	"errors"
@@ -9,14 +9,14 @@ import (
 
 func (api *Client) Followers_List(username string) ([]string, error) {
 	var followers []string
-	fc, errfc := api.Rpc.Follow.GetFollowCount(username)
+	fc, errfc := api.Follow.GetFollowCount(username)
 	if errfc != nil {
 		return followers, errfc
 	} else {
 		fccount := fc.FollowerCount
 		i := 0
 		for i < fccount {
-			req, err := api.Rpc.Follow.GetFollowers(username, "", "blog", 1000)
+			req, err := api.Follow.GetFollowers(username, "", "blog", 1000)
 			if err != nil {
 				return followers, err
 			}
@@ -33,14 +33,14 @@ func (api *Client) Followers_List(username string) ([]string, error) {
 
 func (api *Client) Following_List(username string) ([]string, error) {
 	var following []string
-	fc, errfc := api.Rpc.Follow.GetFollowCount(username)
+	fc, errfc := api.Follow.GetFollowCount(username)
 	if errfc != nil {
 		return following, errfc
 	} else {
 		fccount := fc.FollowingCount
 		i := 0
 		for i < fccount {
-			req, err := api.Rpc.Follow.GetFollowing(username, "", "blog", 100)
+			req, err := api.Follow.GetFollowing(username, "", "blog", 100)
 			if err != nil {
 				return following, err
 			}
@@ -56,12 +56,12 @@ func (api *Client) Following_List(username string) ([]string, error) {
 }
 
 func (api *Client) GetVotingPower(username string) (int, error) {
-	conf, errc := api.Rpc.Database.GetConfig()
+	conf, errc := api.Database.GetConfig()
 	if errc != nil {
 		return 0, errc
 	}
 
-	acc, erra := api.Rpc.Database.GetAccounts([]string{username})
+	acc, erra := api.Database.GetAccounts([]string{username})
 	if erra != nil {
 		return 0, erra
 	}
@@ -80,7 +80,7 @@ func (api *Client) GetVotingPower(username string) (int, error) {
 
 func (api *Client) GetAuthorReward(username, permlink string, full bool) (*types.AuthorRewardOperation, error) {
 	if !full {
-		resp, err := api.Rpc.Database.GetAccountHistory(username, -1, 1000)
+		resp, err := api.Database.GetAccountHistory(username, -1, 1000)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +98,7 @@ func (api *Client) GetAuthorReward(username, permlink string, full bool) (*types
 		limit := 1000
 		var lastBlock uint32 = 0
 		for {
-			ans, err := api.Rpc.Database.GetAccountHistory(username, int64(from), uint32(limit))
+			ans, err := api.Database.GetAccountHistory(username, int64(from), uint32(limit))
 			if err != nil {
 				return nil, err
 			}

@@ -5,31 +5,25 @@ import (
 	"encoding/json"
 
 	// RPC
-	"github.com/asuleymanov/rpc/interfaces"
-	"github.com/asuleymanov/rpc/internal/rpc"
+	"github.com/asuleymanov/rpc/transports"
 	"github.com/asuleymanov/rpc/types"
 
 	// Vendor
 	"github.com/pkg/errors"
 )
 
-const APIID = "network_broadcast_api"
+const apiID = "network_broadcast_api"
 
 type API struct {
-	id     int
-	caller interfaces.Caller
+	caller transports.Caller
 }
 
-func NewAPI(caller interfaces.Caller) (*API, error) {
-	id, err := rpc.GetNumericAPIID(caller, APIID)
-	if err != nil {
-		return nil, err
-	}
-	return &API{id, caller}, nil
+func NewAPI(caller transports.Caller) *API {
+	return &API{caller}
 }
 
 func (api *API) call(method string, params, resp interface{}) error {
-	return api.caller.Call("call", []interface{}{api.id, method, params}, resp)
+	return api.caller.Call("call", []interface{}{apiID, method, params}, resp)
 }
 
 /*

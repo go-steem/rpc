@@ -198,7 +198,7 @@ type Content struct {
 	TotalPayoutValue        string           `json:"total_payout_value"`
 	CuratorPayoutValue      string           `json:"curator_payout_value"`
 	AuthorRewards           *types.Int       `json:"author_rewards"`
-	NetVotes                *types.Int       `json:"net_votes"`
+	NetVotes                int              `json:"net_votes"`
 	RootComment             *types.Int       `json:"root_comment"`
 	Mode                    string           `json:"mode"`
 	MaxAcceptedPayout       string           `json:"max_accepted_payout"`
@@ -273,11 +273,11 @@ func (metadata *ContentMetadata) UnmarshalJSON(data []byte) error {
 }
 
 type VoteState struct {
-	Voter   string      `json:"voter"`
-	Weight  *types.Int  `json:"weight"`
-	Rshares *types.Int  `json:"rshares"`
-	Percent int         `json:"percent"`
-	Time    *types.Time `json:"time"`
+	Voter   string       `json:"voter"`
+	Weight  *types.Int   `json:"weight"`
+	Rshares *types.Int64 `json:"rshares"`
+	Percent int          `json:"percent"`
+	Time    *types.Time  `json:"time"`
 }
 
 type ChainProperties struct {
@@ -358,22 +358,22 @@ type AccountKeys struct {
 }
 
 type Account struct {
-	ID                            *types.Int    `json:"id"`
-	Name                          string        `json:"name"`
-	Owner                         *AccountKeys  `json:"owner"`
-	Active                        *AccountKeys  `json:"active"`
-	Posting                       *AccountKeys  `json:"posting"`
-	MemoKey                       string        `json:"memo_key"`
-	JSONMetadata                  string        `json:"json_metadata"`
-	Proxy                         string        `json:"proxy"`
-	LastOwnerUpdate               *types.Time   `json:"last_owner_update"`
-	LastAccountUpdate             *types.Time   `json:"last_account_update"`
-	Created                       *types.Time   `json:"created"`
-	Mined                         bool          `json:"mined"`
-	OwnerChallenged               bool          `json:"owner_challenged"`
-	ActiveChallenged              bool          `json:"active_challenged"`
-	LastOwnerProved               *types.Time   `json:"last_owner_proved"`
-	LastActiveProved              *types.Time   `json:"last_active_proved"`
+	ID                *types.Int   `json:"id"`
+	Name              string       `json:"name"`
+	Owner             *AccountKeys `json:"owner"`
+	Active            *AccountKeys `json:"active"`
+	Posting           *AccountKeys `json:"posting"`
+	MemoKey           string       `json:"memo_key"`
+	JSONMetadata      string       `json:"json_metadata"`
+	Proxy             string       `json:"proxy"`
+	LastOwnerUpdate   *types.Time  `json:"last_owner_update"`
+	LastAccountUpdate *types.Time  `json:"last_account_update"`
+	Created           *types.Time  `json:"created"`
+	Mined             bool         `json:"mined"`
+	OwnerChallenged   bool         `json:"owner_challenged"`
+	ActiveChallenged  bool         `json:"active_challenged"`
+	//LastOwnerProved               *types.Time   `json:"last_owner_proved"`
+	//LastActiveProved              *types.Time   `json:"last_active_proved"`
 	RecoveryAccount               string        `json:"recovery_account"`
 	LastAccountRecovery           *types.Time   `json:"last_account_recovery"`
 	ResetAccount                  string        `json:"reset_account"`
@@ -405,7 +405,7 @@ type Account struct {
 	ProxiedVsfVotes               []*types.Int  `json:"proxied_vsf_votes"`
 	WitnessesVotedFor             *types.Int    `json:"witnesses_voted_for"`
 	AverageBandwidth              *types.Int    `json:"average_bandwidth"`
-	LifetimeBandwidth             string        `json:"lifetime_bandwidth"`
+	LifetimeBandwidth             *types.Int    `json:"lifetime_bandwidth"`
 	LastBandwidthUpdate           *types.Time   `json:"last_bandwidth_update"`
 	AverageMarketBandwidth        *types.Int    `json:"average_market_bandwidth"`
 	LastMarketBandwidthUpdate     *types.Time   `json:"last_market_bandwidth_update"`
