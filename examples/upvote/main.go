@@ -7,7 +7,7 @@ import (
 	"log"
 
 	// RPC
-	client "github.com/asuleymanov/rpc"
+	"github.com/asuleymanov/golos-go"
 
 	// Vendor
 	"github.com/pkg/errors"
@@ -26,7 +26,7 @@ func main() {
 
 	defer cls.Close()
 
-	client.Key_List[voter] = client.Keys{PKey: key}
+	cls.SetKeys(&client.Keys{PKey: []string{key}})
 
 	if err := run(cls); err != nil {
 		log.Fatalln("Error:", err)
