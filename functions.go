@@ -17,154 +17,92 @@ import (
 	"github.com/asuleymanov/rpc/types"
 )
 
-func (api *Client) SteemPerMvest() (float64, error) {
-	dgp, errdgp := api.Database.GetDynamicGlobalProperties()
-	if errdgp != nil {
-		return 0, errdgp
-	}
+const fdt = `"20060102t150405"`
 
-	tvfs, errtvfs := strconv.ParseFloat(strings.Split(dgp.TotalVersingFundSteem, " ")[0], 64)
-	if errtvfs != nil {
-		return 0, errtvfs
-	}
-
-	tvs, errtvs := strconv.ParseFloat(strings.Split(dgp.TotalVestingShares, " ")[0], 64)
-	if errtvs != nil {
-		return 0, errtvs
-	}
-
-	spmtmp := (tvfs / tvs) * 1000000
-	str := strconv.FormatFloat(spmtmp, 'f', 3, 64)
-
-	spm, errspm := strconv.ParseFloat(str, 64)
-	if errspm != nil {
-		return 0, errspm
-	}
-
-	return spm, nil
-}
-
-func (api *Client) Vote(user_name, author_name, permlink string, weight int) error {
+//Vote for publication
+func (client *Client) Vote(username, authorname, permlink string, weight int) (*OperResp, error) {
 	if weight > 10000 {
 		weight = 10000
 	}
-	if api.Verify_Voter_Weight(author_name, permlink, user_name, weight) {
-		return errors.New("The voter is on the list")
+	if client.VerifyVoterWeight(authorname, permlink, username, weight) {
+		return nil, errors.New("The voter is on the list")
 	}
+
+	var trx []types.Operation
+
 	tx := &types.VoteOperation{
-		Voter:    user_name,
-		Author:   author_name,
+		Voter:    username,
+		Author:   authorname,
 		Permlink: permlink,
 		Weight:   types.Int16(weight),
 	}
-	resp, err := api.Send_Trx(user_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Vote: ")
-	} else {
-		log.Println("[Vote] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return nil
-	}
+	trx = append(trx, tx)
+
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "Vote", Bresp: resp}, err
 }
 
-func (api *Client) Comment(user_name, author_name, ppermlink, body string, v *PC_Vote, o *PC_Options) error {
+//MultiVote mass voting for publication.
+//Using the opportunity to delegate the rights to sign.
+func (client *Client) MultiVote(username, author, permlink string, arrvote []ArrVote) (*OperResp, error) {
+	var trx []types.Operation
+	var arrvotes []ArrVote
+
+	for _, v := range arrvote {
+		if client.VerifyDelegatePostingKeySign(v.User, username) && !client.VerifyVoter(author, permlink, v.User) {
+			arrvotes = append(arrvotes, v)
+		}
+	}
+
+	if len(arrvotes) == 0 {
+		return nil, errors.New("Error Multi_Vote : All users from the list have already voted")
+	}
+
+	for _, val := range arrvotes {
+		txt := &types.VoteOperation{
+			Voter:    val.User,
+			Author:   author,
+			Permlink: permlink,
+			Weight:   types.Int16(val.Weight),
+		}
+		trx = append(trx, txt)
+	}
+
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "MultiVote", Bresp: resp}, err
+}
+
+//Comment for publication
+func (client *Client) Comment(username, authorname, ppermlink, body string, o *PCOptions) (*OperResp, error) {
 	var trx []types.Operation
 
 	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
-	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
+	permlink := "re-" + authorname + "-" + ppermlink + "-" + times
 	permlink = strings.Replace(permlink, ".", "-", -1)
 
+	jsonMeta := &types.ContentMetadata{"lib": "steem-go"}
+
 	tx := &types.CommentOperation{
-		ParentAuthor:   author_name,
+		ParentAuthor:   authorname,
 		ParentPermlink: ppermlink,
-		Author:         user_name,
+		Author:         username,
 		Permlink:       permlink,
 		Title:          "",
 		Body:           body,
-		JsonMetadata:   "{\"app\":\"steem-go\"}",
+		JSONMetadata:   jsonMeta,
 	}
 	trx = append(trx, tx)
 
 	if o != nil {
-		symbol := "SBD"
-		MAP := "1000000.000 " + symbol
-		PSD := o.Percent
-		if o.Percent == 0 {
-			MAP = "0.000 " + symbol
-			PSD = 10000
-		} else if o.Percent == 50 {
-			PSD = 10000
-		} else {
-			PSD = 0
-		}
-
-		var ext []interface{}
-		if len(o.BenefList) > 0 {
-			var ben_list []types.Beneficiarie
-			var benef types.CommentPayoutBeneficiaries
-			for _, val := range o.BenefList {
-				ben_list = append(ben_list, types.Beneficiarie{val.Account, val.Weight})
-			}
-			benef.Beneficiaries = ben_list
-			ext = append(ext, 0)
-			ext = append(ext, benef)
-		}
-		Extens := []interface{}{}
-		if len(ext) > 0 {
-			Extens = []interface{}{ext}
-		}
-
-		txo := &types.CommentOptionsOperation{
-			Author:               user_name,
-			Permlink:             permlink,
-			MaxAcceptedPayout:    MAP,
-			PercentSteemDollars:  PSD,
-			AllowVotes:           true,
-			AllowCurationRewards: true,
-			Extensions:           Extens,
-		}
-		trx = append(trx, txo)
+		trx = append(trx, GetCommentOptionsOperation(username, permlink, *o))
 	}
 
-	if v != nil && v.Weight != 0 {
-		txv := &types.VoteOperation{
-			Voter:    user_name,
-			Author:   user_name,
-			Permlink: permlink,
-			Weight:   types.Int16(v.Weight),
-		}
-		trx = append(trx, txv)
-	}
-
-	resp, err := api.Send_Arr_Trx(user_name, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Comment : ")
-	} else {
-		log.Println("[Comment] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return nil
-	}
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "Comment", PermLink: permlink, Bresp: resp}, err
 }
 
-func (api *Client) DeleteComment(author_name, permlink string) error {
-	if api.Verify_Votes(author_name, permlink) {
-		return errors.New("You can not delete already there are voted")
-	}
-	if api.Verify_Comments(author_name, permlink) {
-		return errors.New("You can not delete already have comments")
-	}
-	tx := &types.DeleteCommentOperation{
-		Author:   author_name,
-		Permlink: permlink,
-	}
-	resp, err := api.Send_Trx(author_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Delete Comment: ")
-	} else {
-		log.Println("[Delete Comment] Block -> ", resp.BlockNum, " User -> ", author_name)
-		return nil
-	}
-}
-
-func (api *Client) Post(author_name, title, body, permlink, ptag, post_image string, tags []string, v *PC_Vote, o *PC_Options) error {
+//Post creating a publication
+func (client *Client) Post(authorname, title, body, permlink, ptag, postImage string, tags []string, o *PCOptions) (*OperResp, error) {
 	if permlink == "" {
 		permlink = translit.EncodeTitle(title)
 	} else {
@@ -177,230 +115,171 @@ func (api *Client) Post(author_name, title, body, permlink, ptag, post_image str
 		ptag = translit.EncodeTag(ptag)
 	}
 
-	json_meta := "{\"tags\":["
-	for k, v := range tag {
-		if k != len(tags)-1 {
-			json_meta = json_meta + "\"" + v + "\","
-		} else {
-			json_meta = json_meta + "\"" + v + "\"]"
-		}
+	jsonMeta := &types.ContentMetadata{
+		"tags":  tag,
+		"image": []string{postImage},
+		"lib":   "steem-go",
 	}
-	if post_image != "" {
-		json_meta = json_meta + ",\"image\":[\"" + post_image + "\"]"
-	}
-	json_meta = json_meta + ",\"app\":\"steem-go\"}"
 
 	var trx []types.Operation
 	txp := &types.CommentOperation{
 		ParentAuthor:   "",
 		ParentPermlink: ptag,
-		Author:         author_name,
+		Author:         authorname,
 		Permlink:       permlink,
 		Title:          title,
 		Body:           body,
-		JsonMetadata:   json_meta,
+		JSONMetadata:   jsonMeta,
 	}
 	trx = append(trx, txp)
 
 	if o != nil {
-		symbol := "SBD"
-		MAP := "1000000.000 " + symbol
-		PSD := o.Percent
-		if o.Percent == 0 {
-			MAP = "0.000 " + symbol
-			PSD = 10000
-		} else if o.Percent == 50 {
-			PSD = 10000
-		} else {
-			PSD = 0
-		}
-
-		var ext []interface{}
-		if len(o.BenefList) > 0 {
-			var ben_list []types.Beneficiarie
-			var benef types.CommentPayoutBeneficiaries
-			for _, val := range o.BenefList {
-				ben_list = append(ben_list, types.Beneficiarie{val.Account, val.Weight})
-			}
-			benef.Beneficiaries = ben_list
-			ext = append(ext, 0)
-			ext = append(ext, benef)
-		}
-		Extens := []interface{}{}
-		if len(ext) > 0 {
-			Extens = []interface{}{ext}
-		}
-
-		txo := &types.CommentOptionsOperation{
-			Author:               author_name,
-			Permlink:             permlink,
-			MaxAcceptedPayout:    MAP,
-			PercentSteemDollars:  PSD,
-			AllowVotes:           true,
-			AllowCurationRewards: true,
-			Extensions:           Extens,
-		}
-		trx = append(trx, txo)
+		trx = append(trx, GetCommentOptionsOperation(authorname, permlink, *o))
 	}
 
-	if v != nil && v.Weight != 0 {
-		txv := &types.VoteOperation{
-			Voter:    author_name,
-			Author:   author_name,
-			Permlink: permlink,
-			Weight:   types.Int16(v.Weight),
-		}
-		trx = append(trx, txv)
-	}
-
-	resp, err := api.Send_Arr_Trx(author_name, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Post : ")
-	} else {
-		log.Println("[Post] Block -> ", resp.BlockNum, " User -> ", author_name)
-		return nil
-	}
+	resp, err := client.SendTrx(authorname, trx)
+	return &OperResp{NameOper: "Post", PermLink: permlink, Bresp: resp}, err
 }
 
-func (api *Client) Follows(follower, following string) error {
-	json_string := "[\"follow\",{\"follower\":\"" + follower + "\",\"following\":\"" + following + "\",\"what\":[\"blog\"]}]"
+//DeleteComment deleting a publication or comment
+func (client *Client) DeleteComment(authorname, permlink string) (*OperResp, error) {
+	if client.VerifyVotes(authorname, permlink) {
+		return nil, errors.New("You can not delete already there are voted")
+	}
+	if client.VerifyComments(authorname, permlink) {
+		return nil, errors.New("You can not delete already have comments")
+	}
+	var trx []types.Operation
+
+	tx := &types.DeleteCommentOperation{
+		Author:   authorname,
+		Permlink: permlink,
+	}
+
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(authorname, trx)
+	return &OperResp{NameOper: "Delete Comment/Post", Bresp: resp}, err
+}
+
+//Follows subscribe(unsubscribe,ignore) to the user
+/*
+what:
+blog
+ignore
+empty value
+*/
+func (client *Client) Follows(follower, following, what string) (*OperResp, error) {
+	var trx []types.Operation
+	js := types.FollowOperation{
+		Follower:  follower,
+		Following: following,
+		What:      []string{what},
+	}
+
+	jsonString, errj := types.MarshalCustomJSON(js)
+	if errj != nil {
+		return nil, errj
+	}
 
 	tx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
 		RequiredPostingAuths: []string{follower},
 		ID:                   "follow",
-		JSON:                 json_string,
+		JSON:                 jsonString,
 	}
-	resp, err := api.Send_Trx(follower, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Follow: ")
-	} else {
-		log.Println("[Follow] Block -> ", resp.BlockNum, " Follower user -> ", follower, " Following user -> ", following)
-		return nil
+
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(follower, trx)
+	respOper := ""
+	switch what {
+	case "":
+		respOper = "Neutrality"
+	case "blog":
+		respOper = "Follows"
+	case "ignore":
+		respOper = "Ignore"
 	}
+	return &OperResp{NameOper: respOper, Bresp: resp}, err
 }
 
-func (api *Client) Unfollow(follower, following string) error {
-	json_string := "[\"follow\",{\"follower\":\"" + follower + "\",\"following\":\"" + following + "\",\"what\":[]}]"
+//Reblog repost records
+func (client *Client) Reblog(username, authorname, permlink string) (*OperResp, error) {
+	if client.VerifyReblogs(authorname, permlink, username) {
+		return nil, errors.New("The user already did repost")
+	}
+
+	js := types.ReblogOperation{
+		Account:  username,
+		Author:   authorname,
+		Permlink: permlink,
+	}
+
+	jsonString, errj := types.MarshalCustomJSON(js)
+	if errj != nil {
+		return nil, errj
+	}
+
+	var trx []types.Operation
 
 	tx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{follower},
+		RequiredPostingAuths: []string{username},
 		ID:                   "follow",
-		JSON:                 json_string,
+		JSON:                 jsonString,
 	}
-	resp, err := api.Send_Trx(follower, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Unfollow: ")
-	} else {
-		log.Println("[Unfollow] Block -> ", resp.BlockNum, " Unfollower user -> ", follower, " Unfollowing user -> ", following)
-		return nil
-	}
+
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "Reblog", Bresp: resp}, err
 }
 
-func (api *Client) Ignore(follower, following string) error {
-	json_string := "[\"follow\",{\"follower\":\"" + follower + "\",\"following\":\"" + following + "\",\"what\":[\"ignore\"]}]"
+//AccountWitnessVote of voting for the delegate.
+func (client *Client) AccountWitnessVote(username, witnessName string, approv bool) (*OperResp, error) {
+	var trx []types.Operation
 
-	tx := &types.CustomJSONOperation{
-		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{follower},
-		ID:                   "follow",
-		JSON:                 json_string,
-	}
-	resp, err := api.Send_Trx(follower, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Ignore: ")
-	} else {
-		log.Println("[Ignore] Block -> ", resp.BlockNum, " Ignore user -> ", follower, " Ignoring user -> ", following)
-		return nil
-	}
-}
-
-func (api *Client) Notice(follower, following string) error {
-	json_string := "[\"follow\",{\"follower\":\"" + follower + "\",\"following\":\"" + following + "\",\"what\":[]}]"
-
-	tx := &types.CustomJSONOperation{
-		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{follower},
-		ID:                   "follow",
-		JSON:                 json_string,
-	}
-	resp, err := api.Send_Trx(follower, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Notice: ")
-	} else {
-		log.Println("[Notice] Block -> ", resp.BlockNum, " Notice user -> ", follower, " Noticing user -> ", following)
-		return nil
-	}
-}
-
-func (api *Client) Reblog(user_name, author_name, permlink string) error {
-	if api.Verify_Reblogs(author_name, permlink, user_name) {
-		return errors.New("The user already did repost")
-	}
-	json_string := "[\"reblog\",{\"account\":\"" + user_name + "\",\"author\":\"" + author_name + "\",\"permlink\":\"" + permlink + "\"}]"
-
-	tx := &types.CustomJSONOperation{
-		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{user_name},
-		ID:                   "follow",
-		JSON:                 json_string,
-	}
-	resp, err := api.Send_Trx(user_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Reblog: ")
-	} else {
-		log.Println("[Reblog] Block -> ", resp.BlockNum, " Reblog user -> ", user_name, " Rebloging -> ", author_name, "/", permlink)
-		return nil
-	}
-}
-
-func (api *Client) AccountWitnessVote(user_name, witness_name string, approv bool) error {
 	tx := &types.AccountWitnessVoteOperation{
-		Account: user_name,
-		Witness: witness_name,
+		Account: username,
+		Witness: witnessName,
 		Approve: approv,
 	}
-	resp, err := api.Send_Trx(user_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error AccountWitnessVote: ")
-	} else {
-		log.Println("[AccountWitnessVote] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return nil
-	}
+
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "AccountWitnessVote", Bresp: resp}, err
 }
 
-func (api *Client) AccountWitnessProxy(user_name, proxy string) error {
+//AccountWitnessProxy transfer of the right to vote for delegates to another user.
+func (client *Client) AccountWitnessProxy(username, proxy string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.AccountWitnessProxyOperation{
-		Account: user_name,
+		Account: username,
 		Proxy:   proxy,
 	}
-	resp, err := api.Send_Trx(user_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error AccountWitnessProxy: ")
-	} else {
-		log.Println("[AccountWitnessProxy] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return nil
-	}
+
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "AccountWitnessProxy", Bresp: resp}, err
 }
 
-func (api *Client) Transfer(from_name, to_name, memo, ammount string) error {
+//Transfer of funds to any user.
+func (client *Client) Transfer(fromName, toName, memo, ammount string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.TransferOperation{
-		From:   from_name,
-		To:     to_name,
+		From:   fromName,
+		To:     toName,
 		Amount: ammount,
 		Memo:   memo,
 	}
-	resp, err := api.Send_Trx(from_name, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Transfer: ")
-	} else {
-		log.Println("[Transfer] Block -> ", resp.BlockNum, " From user -> ", from_name, " To user -> ", to_name)
-		return nil
-	}
+
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(fromName, trx)
+	return &OperResp{NameOper: "Transfer", Bresp: resp}, err
 }
 
-func (api *Client) Multi_Transfer(username string, arrtrans []ArrTransfer) error {
+//MultiTransfer multiple funds transfer in one transaction.
+func (client *Client) MultiTransfer(username string, arrtrans []ArrTransfer) (*OperResp, error) {
 	var trx []types.Operation
 
 	for _, val := range arrtrans {
@@ -413,35 +292,29 @@ func (api *Client) Multi_Transfer(username string, arrtrans []ArrTransfer) error
 		trx = append(trx, txt)
 	}
 
-	resp, err := api.Send_Arr_Trx(username, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Multi_Transfer: ")
-	} else {
-		log.Println("[Multi_Transfer] Block -> ", resp.BlockNum, " From user -> ", username)
-		return nil
-	}
+	resp, err := client.SendTrx(username, trx)
+	return &OperResp{NameOper: "MultiTransfer", Bresp: resp}, err
 }
 
-func (api *Client) Login(user_name, key string) bool {
-	json_string := "[\"login\",{\"account\":\"" + user_name + "\",\"app\":\"steem-go\"}]"
+//Login checking the user's key for the possibility of operations in GOLOS.
+func (client *Client) Login(username, key string) bool {
+	jsonString := "[\"login\",{\"account\":\"" + username + "\",\"app\":\"steem-go\"}]"
 
 	strx := &types.CustomJSONOperation{
 		RequiredAuths:        []string{},
-		RequiredPostingAuths: []string{user_name},
+		RequiredPostingAuths: []string{username},
 		ID:                   "login",
-		JSON:                 json_string,
+		JSON:                 jsonString,
 	}
 
-	props, err := api.Database.GetDynamicGlobalProperties()
+	props, err := client.Database.GetDynamicGlobalProperties()
 	if err != nil {
-		log.Println("GDP")
 		return false
 	}
 
 	// Создание транзакции
 	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
 	if err != nil {
-		log.Println("Create")
 		return false
 	}
 	tx := transactions.NewSignedTransaction(&types.Transaction{
@@ -458,40 +331,37 @@ func (api *Client) Login(user_name, key string) bool {
 	keys = append(keys, privKey)
 
 	// Подписываем транзакцию
-	if err := tx.Sign(keys, api.Chain); err != nil {
-		log.Println("Sign")
+	if err := tx.Sign(keys, client.Chain); err != nil {
 		return false
 	}
 
 	// Отправка транзакции
-	resp, err := api.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+	resp, err := client.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
 
 	if err != nil {
-		log.Println(err)
 		return false
-	} else {
-		log.Println("[Login] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return true
 	}
+	log.Println("[Login] Block -> ", resp.BlockNum, " User -> ", username)
+	return true
 }
 
-func (api *Client) LimitOrderCancel(owner string, orderid uint32) error {
+//LimitOrderCancel restrict order Cancel
+func (client *Client) LimitOrderCancel(owner string, orderid uint32) (*OperResp, error) {
+	var trx []types.Operation
 
 	tx := &types.LimitOrderCancelOperation{
 		Owner:   owner,
 		OrderID: orderid,
 	}
 
-	resp, err := api.Send_Trx(owner, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error LimitOrderCancel: ")
-	} else {
-		log.Println("[LimitOrderCancel] Block -> ", resp.BlockNum, " LimitOrderCancel user -> ", owner)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(owner, trx)
+	return &OperResp{NameOper: "LimitOrderCancel", Bresp: resp}, err
 }
 
-func (api *Client) LimitOrderCreate(owner, sell, buy string, orderid uint32) error {
+//LimitOrderCreate Creating a limit order
+func (client *Client) LimitOrderCreate(owner, sell, buy string, orderid uint32) (*OperResp, error) {
+	var trx []types.Operation
 
 	expiration := time.Now().Add(3600000 * time.Second).UTC()
 	fok := false
@@ -505,79 +375,74 @@ func (api *Client) LimitOrderCreate(owner, sell, buy string, orderid uint32) err
 		Expiration:   &types.Time{&expiration},
 	}
 
-	resp, err := api.Send_Trx(owner, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error LimitOrderCreate: ")
-	} else {
-		log.Println("[LimitOrderCreate] Block -> ", resp.BlockNum, " LimitOrderCreate user -> ", owner)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(owner, trx)
+	return &OperResp{NameOper: "LimitOrderCreate", Bresp: resp}, err
 }
 
-func (api *Client) Convert(owner, amount string, requestid uint32) error {
+//Convert conversion
+func (client *Client) Convert(owner, amount string, requestid uint32) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.ConvertOperation{
 		Owner:     owner,
 		RequestID: requestid,
 		Amount:    amount,
 	}
 
-	resp, err := api.Send_Trx(owner, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error Convert: ")
-	} else {
-		log.Println("[Convert] Block -> ", resp.BlockNum, " Convert user -> ", owner)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(owner, trx)
+	return &OperResp{NameOper: "Convert", Bresp: resp}, err
 }
 
-func (api *Client) TransferToVesting(from, to, amount string) error {
+//TransferToVesting transfer to POWER
+func (client *Client) TransferToVesting(from, to, amount string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.TransferToVestingOperation{
 		From:   from,
 		To:     to,
 		Amount: amount,
 	}
 
-	resp, err := api.Send_Trx(from, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error TransferToVesting: ")
-	} else {
-		log.Println("[TransferToVesting] Block -> ", resp.BlockNum, " TransferToVesting user -> ", from)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(from, trx)
+	return &OperResp{NameOper: "TransferToVesting", Bresp: resp}, err
 }
 
-func (api *Client) WithdrawVesting(account, vshares string) error {
+//WithdrawVesting down POWER
+func (client *Client) WithdrawVesting(account, vshares string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.WithdrawVestingOperation{
 		Account:       account,
 		VestingShares: vshares,
 	}
 
-	resp, err := api.Send_Trx(account, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error WithdrawVesting: ")
-	} else {
-		log.Println("[WithdrawVesting] Block -> ", resp.BlockNum, " WithdrawVesting user -> ", account)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(account, trx)
+	return &OperResp{NameOper: "WithdrawVesting", Bresp: resp}, err
 }
 
-func (api *Client) ChangeRecoveryAccount(accounttorecover, newrecoveryaccount string) error {
+//ChangeRecoveryAccount change account with which you can restore access
+func (client *Client) ChangeRecoveryAccount(accounttorecover, newrecoveryaccount string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.ChangeRecoveryAccountOperation{
 		AccountToRecover:   accounttorecover,
 		NewRecoveryAccount: newrecoveryaccount,
 		Extensions:         []interface{}{},
 	}
 
-	resp, err := api.Send_Trx(accounttorecover, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error ChangeRecoveryAccount: ")
-	} else {
-		log.Println("[ChangeRecoveryAccount] Block -> ", resp.BlockNum, " ChangeRecoveryAccount user -> ", accounttorecover)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(accounttorecover, trx)
+	return &OperResp{NameOper: "ChangeRecoveryAccount", Bresp: resp}, err
 }
 
-func (api *Client) TransferToSavings(from, to, amount, memo string) error {
+//TransferToSavings transfer to safe
+func (client *Client) TransferToSavings(from, to, amount, memo string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.TransferToSavingsOperation{
 		From:   from,
 		To:     to,
@@ -585,174 +450,146 @@ func (api *Client) TransferToSavings(from, to, amount, memo string) error {
 		Memo:   memo,
 	}
 
-	resp, err := api.Send_Trx(from, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error TransferToSavings: ")
-	} else {
-		log.Println("[TransferToSavings] Block -> ", resp.BlockNum, " TransferToSavings user -> ", from)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(from, trx)
+	return &OperResp{NameOper: "TransferToSavings", Bresp: resp}, err
 }
 
-func (api *Client) TransferFromSavings(from, to, amount, memo string, requestid uint32) error {
+//TransferFromSavings transfer from safe
+func (client *Client) TransferFromSavings(from, to, amount, memo string, requestid uint32) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.TransferFromSavingsOperation{
 		From:      from,
-		RequestId: requestid,
+		RequestID: requestid,
 		To:        to,
 		Amount:    amount,
 		Memo:      memo,
 	}
 
-	resp, err := api.Send_Trx(from, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error TransferFromSavings: ")
-	} else {
-		log.Println("[TransferFromSavings] Block -> ", resp.BlockNum, " TransferFromSavings user -> ", from)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(from, trx)
+	return &OperResp{NameOper: "TransferFromSavings", Bresp: resp}, err
 }
 
-func (api *Client) CancelTransferFromSavings(from string, requestid uint32) error {
+//CancelTransferFromSavings cancel transfer to safe
+func (client *Client) CancelTransferFromSavings(from string, requestid uint32) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.CancelTransferFromSavingsOperation{
 		From:      from,
-		RequestId: requestid,
+		RequestID: requestid,
 	}
 
-	resp, err := api.Send_Trx(from, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error CancelTransferFromSavings: ")
-	} else {
-		log.Println("[CancelTransferFromSavings] Block -> ", resp.BlockNum, " CancelTransferFromSavings user -> ", from)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(from, trx)
+	return &OperResp{NameOper: "CancelTransferFromSavings", Bresp: resp}, err
 }
 
-func (api *Client) DeclineVotingRights(account string, decline bool) error {
+//DeclineVotingRights disabling the possibility of any vote.
+//It is impossible to restore the possibility of voting
+func (client *Client) DeclineVotingRights(account string, decline bool) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.DeclineVotingRightsOperation{
 		Account: account,
 		Decline: decline,
 	}
 
-	resp, err := api.Send_Trx(account, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error DeclineVotingRights: ")
-	} else {
-		log.Println("[DeclineVotingRights] Block -> ", resp.BlockNum, " DeclineVotingRights user -> ", account)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(account, trx)
+	return &OperResp{NameOper: "DeclineVotingRights", Bresp: resp}, err
 }
 
-func (api *Client) FeedPublish(publisher, base, quote string) error {
+//FeedPublish update course data
+func (client *Client) FeedPublish(publisher, base, quote string) (*OperResp, error) {
+	var trx []types.Operation
+
 	tx := &types.FeedPublishOperation{
 		Publisher: publisher,
-		ExchangeRate: types.ExchRate{
+		ExchangeRate: &types.ExchRate{
 			Base:  base,
 			Quote: quote,
 		},
 	}
 
-	resp, err := api.Send_Trx(publisher, tx)
-	if err != nil {
-		return errors.Wrapf(err, "Error FeedPublish: ")
-	} else {
-		log.Println("[FeedPublish] Block -> ", resp.BlockNum, " FeedPublish user -> ", publisher)
-		return nil
-	}
+	trx = append(trx, tx)
+	resp, err := client.SendTrx(publisher, trx)
+	return &OperResp{NameOper: "FeedPublish", Bresp: resp}, err
 }
 
-func (api *Client) Comment_Link(user_name, author_name, ppermlink, body string, v *PC_Vote, o *PC_Options) (string, error) {
+//WitnessUpdate updating delegate data
+func (client *Client) WitnessUpdate(owner, url, blocksigningkey, accountcreationfee string, maxblocksize uint32, sbdinterestrate uint16) (*OperResp, error) {
 	var trx []types.Operation
 
-	times, _ := strconv.Unquote(time.Now().Add(30 * time.Second).UTC().Format(fdt))
-	permlink := "re-" + author_name + "-" + ppermlink + "-" + times
-	permlink = strings.Replace(permlink, ".", "-", -1)
-
-	tx := &types.CommentOperation{
-		ParentAuthor:   author_name,
-		ParentPermlink: ppermlink,
-		Author:         user_name,
-		Permlink:       permlink,
-		Title:          "",
-		Body:           body,
-		JsonMetadata:   "{\"app\":\"steem-go\"}",
+	tx := &types.WitnessUpdateOperation{
+		Owner:           owner,
+		URL:             url,
+		BlockSigningKey: blocksigningkey,
+		Props: &types.ChainProperties{
+			AccountCreationFee: accountcreationfee,
+			MaximumBlockSize:   maxblocksize,
+			SBDInterestRate:    sbdinterestrate,
+		},
+		Fee: "0.000 GOLOS",
 	}
+
 	trx = append(trx, tx)
-
-	if o != nil {
-		symbol := "SBD"
-		MAP := "1000000.000 " + symbol
-		PSD := o.Percent
-		if o.Percent == 0 {
-			MAP = "0.000 " + symbol
-			PSD = 10000
-		} else if o.Percent == 50 {
-			PSD = 10000
-		} else {
-			PSD = 0
-		}
-
-		var ext []interface{}
-		if len(o.BenefList) > 0 {
-			var ben_list []types.Beneficiarie
-			var benef types.CommentPayoutBeneficiaries
-			for _, val := range o.BenefList {
-				ben_list = append(ben_list, types.Beneficiarie{val.Account, val.Weight})
-			}
-			benef.Beneficiaries = ben_list
-			ext = append(ext, 0)
-			ext = append(ext, benef)
-		}
-		Extens := []interface{}{}
-		if len(ext) > 0 {
-			Extens = []interface{}{ext}
-		}
-
-		txo := &types.CommentOptionsOperation{
-			Author:               user_name,
-			Permlink:             permlink,
-			MaxAcceptedPayout:    MAP,
-			PercentSteemDollars:  PSD,
-			AllowVotes:           true,
-			AllowCurationRewards: true,
-			Extensions:           Extens,
-		}
-		trx = append(trx, txo)
-	}
-
-	if v != nil && v.Weight != 0 {
-		txv := &types.VoteOperation{
-			Voter:    user_name,
-			Author:   user_name,
-			Permlink: permlink,
-			Weight:   types.Int16(v.Weight),
-		}
-		trx = append(trx, txv)
-	}
-
-	resp, err := api.Send_Arr_Trx(user_name, trx)
-	if err != nil {
-		return "", errors.Wrapf(err, "Error Comment : ")
-	} else {
-		log.Println("[Comment] Block -> ", resp.BlockNum, " User -> ", user_name)
-		return permlink, nil
-	}
+	resp, err := client.SendTrx(owner, trx)
+	return &OperResp{NameOper: "WitnessUpdate", Bresp: resp}, err
 }
 
-func (api *Client) DelegateVestingShares(from, to, share string) error {
+//AccountCreate creating a user in systems
+func (client *Client) AccountCreate(creator, newAccountName, password, fee string) (*OperResp, error) {
+	type Keys struct {
+		Private string
+		Public  string
+	}
+
 	var trx []types.Operation
+	var listKeys = make(map[string]Keys)
 
-	tx := &types.DelegateVestingSharesOperation{
-		Delegator:     from,
-		Delegatee:     to,
-		VestingShares: share,
+	empty := map[string]int64{}
+	roles := [4]string{"owner", "active", "posting", "memo"}
+
+	for _, val := range roles {
+		priv := GetPrivateKey(newAccountName, val, password)
+		pub := GetPublicKey("GLS", priv)
+		listKeys[val] = Keys{Private: priv, Public: pub}
 	}
+
+	owner := types.Authority{
+		WeightThreshold: 1,
+		AccountAuths:    empty,
+		KeyAuths:        map[string]int64{listKeys["owner"].Public: 1},
+	}
+
+	active := types.Authority{
+		WeightThreshold: 1,
+		AccountAuths:    empty,
+		KeyAuths:        map[string]int64{listKeys["active"].Public: 1},
+	}
+
+	posting := types.Authority{
+		WeightThreshold: 1,
+		AccountAuths:    empty,
+		KeyAuths:        map[string]int64{listKeys["posting"].Public: 1},
+	}
+
+	jsonMeta := &types.AccountMetadata{}
+
+	tx := &types.AccountCreateOperation{
+		Fee:            fee,
+		Creator:        creator,
+		NewAccountName: newAccountName,
+		Owner:          &owner,
+		Active:         &active,
+		Posting:        &posting,
+		MemoKey:        listKeys["memo"].Public,
+		JSONMetadata:   jsonMeta,
+	}
+
 	trx = append(trx, tx)
-
-	resp, err := api.Send_Arr_Trx(from, trx)
-	if err != nil {
-		return errors.Wrapf(err, "Error DelegateVestingShares: ")
-	} else {
-		log.Println("[DelegateVestingShares] Block -> ", resp.BlockNum, " DelegateVestingShares user -> ", from)
-		return nil
-	}
+	resp, err := client.SendTrx(creator, trx)
+	return &OperResp{NameOper: "AccountCreate", Bresp: resp}, err
 }

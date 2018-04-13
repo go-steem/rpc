@@ -2,6 +2,7 @@ package transaction
 
 import (
 	// Stdlib
+	"bytes"
 	"encoding/binary"
 	"io"
 	"regexp"
@@ -9,7 +10,10 @@ import (
 	"strings"
 
 	// Vendor
+	"github.com/btcsuite/btcd/btcec"
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/ripemd160"
 )
 
 type Encoder struct {
@@ -87,14 +91,14 @@ func (encoder *Encoder) Encode(v interface{}) error {
 		return encoder.EncodeNumber(v)
 
 	case string:
-		return encoder.encodeString(v)
+		return encoder.EncodeString(v)
 
 	default:
 		return errors.Errorf("encoder: unsupported type encountered")
 	}
 }
 
-func (encoder *Encoder) encodeString(v string) error {
+func (encoder *Encoder) EncodeString(v string) error {
 	if err := encoder.EncodeUVarint(uint64(len(v))); err != nil {
 		return errors.Wrapf(err, "encoder: failed to write string: %v", v)
 	}
@@ -156,4 +160,22 @@ func (encoder *Encoder) EncodeMoney(s string) error {
 	} else {
 		return errors.New("Expecting amount like '99.000 SYMBOL'")
 	}
+}
+
+func (encoder *Encoder) EncodePubKey(s string) error {
+	pkn1 := strings.Join(strings.Split(s, "")[3:], "")
+	b58 := base58.Decode(pkn1)
+	chs := b58[len(b58)-4:]
+	pkn2 := b58[:len(b58)-4]
+	chHash := ripemd160.New()
+	chHash.Write(pkn2)
+	nchs := chHash.Sum(nil)[:4]
+	if bytes.Equal(chs, nchs) {
+		pkn3, _ := btcec.ParsePubKey(pkn2, btcec.S256())
+		if _, err := encoder.w.Write(pkn3.SerializeCompressed()); err != nil {
+			return errors.Wrapf(err, "encoder: failed to write bytes: %v", pkn3.SerializeCompressed())
+		}
+		return nil
+	}
+	return errors.New("Public key is incorrect")
 }

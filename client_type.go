@@ -1,16 +1,26 @@
 package rpc
 
-const fdt = `"20060102t150405"`
+import (
+	"github.com/asuleymanov/rpc/types"
+)
 
-var Key_List = make(map[string]Keys)
+var (
+	//OptionsTrue variable for type PCOptions
+	OptionsTrue bool = true
+	//OptionsFalse variable for type PCOptions
+	OptionsFalse bool = false
+)
 
+//Keys is used as a keystroke for a specific user.
+//Only a few keys can be set.
 type Keys struct {
-	PKey string
-	AKey string
-	OKey string
-	MKey string
+	PKey []string
+	AKey []string
+	OKey []string
+	MKey []string
 }
 
+//BResp of response when sending a transaction.
 type BResp struct {
 	ID       string
 	BlockNum uint32
@@ -18,22 +28,31 @@ type BResp struct {
 	Expired  bool
 }
 
-type Beneficiarie struct {
-	Account string
-	Weight  uint16
+//OperResp type is returned when the operation is performed.
+type OperResp struct {
+	NameOper string
+	PermLink string
+	Bresp    *BResp
 }
 
-type PC_Options struct {
-	Percent   uint16
-	BenefList []Beneficiarie
+//PCOptions for the Comment and Post functions.
+//Sets the water to receive payment for a comment or post.
+type PCOptions struct {
+	Percent              uint16
+	AllowVotes           *bool
+	AllowCurationRewards *bool
+	BeneficiarieList     *[]types.Beneficiarie
 }
 
-type PC_Vote struct {
-	Weight int
-}
-
+//ArrTransfer for MultiTransfer function
 type ArrTransfer struct {
 	To      string
 	Memo    string
 	Ammount string
+}
+
+//ArrVote for MultiVote function
+type ArrVote struct {
+	User   string
+	Weight int
 }

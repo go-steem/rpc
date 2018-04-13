@@ -7,31 +7,43 @@ import (
 	"log"
 
 	// RPC
-	"github.com/asuleymanov/rpc/client"
+	client "github.com/asuleymanov/rpc"
 
 	// Vendor
 	"github.com/pkg/errors"
 )
 
-var cls = client.NewApi()
+var (
+	voter = ""
+	key   = ""
+)
 
 func main() {
-	defer cls.Rpc.Close()
-	if err := run(); err != nil {
+	cls, err = client.NewClient([]string{"wss://rpc.buildteam.io"}, "steem")
+	if err != nil {
+		log.Fatalln("Error:", err)
+	}
+
+	defer cls.Close()
+
+	client.Key_List[voter] = client.Keys{PKey: key}
+
+	if err := run(cls); err != nil {
 		log.Fatalln("Error:", err)
 	}
 }
 
-func run() (err error) {
+func run(cls *client.Client) (err error) {
 	flag.Parse()
 	// Process args.
 	args := flag.Args()
+
 	if len(args) != 2 {
 		return errors.New("2 arguments required")
 	}
 	author, permlink := args[0], args[1]
 
-	fmt.Println(cls.Vote(author, permlink, 10000))
+	fmt.Println(cls.Vote(voter, author, permlink, 10000))
 
 	return nil
 }

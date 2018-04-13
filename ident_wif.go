@@ -1,8 +1,6 @@
 package rpc
 
 import (
-	"log"
-
 	"github.com/pkg/errors"
 
 	"github.com/asuleymanov/rpc/encoding/wif"
@@ -73,40 +71,51 @@ func init() {
 
 }
 
-func (api *Client) Signing_Keys(username string, trx types.Operation) [][]byte {
+//SigningKeys returns the key from the CurrentKeys
+func (client *Client) SigningKeys(trx types.Operation) ([][]byte, error) {
 	var keys [][]byte
-	if _, ok := Key_List[username]; ok {
-		op_keys := OpTypeKey[trx.Type()]
-		for _, val := range op_keys {
-			switch {
-			case val == "posting":
-				privKey, err := wif.Decode(Key_List[username].PKey)
+
+	if client.CurrentKeys == nil {
+		return nil, errors.New("client Keys not initialized. Use SetKeys method")
+	}
+
+	opKeys := OpTypeKey[trx.Type()]
+	for _, val := range opKeys {
+		switch {
+		case val == "posting":
+			for _, keyStr := range client.CurrentKeys.PKey {
+				privKey, err := wif.Decode(keyStr)
 				if err != nil {
-					log.Println(errors.Wrapf(err, "Error decode Key: "))
+					return nil, errors.New("error decode Posting Key: " + err.Error())
 				}
 				keys = append(keys, privKey)
-			case val == "active":
-				privKey, err := wif.Decode(Key_List[username].AKey)
+			}
+		case val == "active":
+			for _, keyStr := range client.CurrentKeys.AKey {
+				privKey, err := wif.Decode(keyStr)
 				if err != nil {
-					log.Println(errors.Wrapf(err, "Error decode Key: "))
+					return nil, errors.New("error decode Active Key: " + err.Error())
 				}
 				keys = append(keys, privKey)
-			case val == "owner":
-				privKey, err := wif.Decode(Key_List[username].OKey)
+			}
+		case val == "owner":
+			for _, keyStr := range client.CurrentKeys.OKey {
+				privKey, err := wif.Decode(keyStr)
 				if err != nil {
-					log.Println(errors.Wrapf(err, "Error decode Key: "))
+					return nil, errors.New("error decode Owner Key: " + err.Error())
 				}
 				keys = append(keys, privKey)
-			case val == "memo":
-				privKey, err := wif.Decode(Key_List[username].MKey)
+			}
+		case val == "memo":
+			for _, keyStr := range client.CurrentKeys.MKey {
+				privKey, err := wif.Decode(keyStr)
 				if err != nil {
-					log.Println(errors.Wrapf(err, "Error decode Key: "))
+					return nil, errors.New("error decode Memo Key: " + err.Error())
 				}
 				keys = append(keys, privKey)
 			}
 		}
-	} else {
-		log.Println(errors.New("No user keys found"))
 	}
-	return keys
+
+	return keys, nil
 }

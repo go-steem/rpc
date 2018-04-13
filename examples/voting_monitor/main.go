@@ -4,29 +4,31 @@ import (
 	"log"
 	"time"
 
-	"github.com/asuleymanov/rpc/client"
+	client "github.com/asuleymanov/rpc"
 	"github.com/asuleymanov/rpc/types"
 )
 
-var cls = client.NewApi()
-
 func main() {
-	defer cls.Rpc.Close()
-	if err := run(); err != nil {
+	cls, _ = client.NewClient([]string{"wss://rpc.buildteam.io"}, "steem")
+	if err != nil {
+		log.Fatalln("Error:", err)
+	}
+	defer cls.Close()
+	if err := run(cls); err != nil {
 		log.Fatalln("Error:", err)
 	}
 }
 
-func run() (err error) {
+func run(cls *client.Client) (err error) {
 	// Get config.
 	log.Println("---> GetConfig()")
-	config, err := cls.Rpc.Database.GetConfig()
+	config, err := cls.Database.GetConfig()
 	if err != nil {
 		return err
 	}
 
 	// Use the last irreversible block number as the initial last block number.
-	props, err := cls.Rpc.Database.GetDynamicGlobalProperties()
+	props, err := cls.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		return err
 	}
@@ -36,14 +38,14 @@ func run() (err error) {
 	log.Printf("---> Entering the block processing loop (last block = %v)\n", lastBlock)
 	for {
 		// Get current properties.
-		props, err := cls.Rpc.Database.GetDynamicGlobalProperties()
+		props, err := cls.Database.GetDynamicGlobalProperties()
 		if err != nil {
 			return err
 		}
 
 		// Process new blocks.
 		for props.LastIrreversibleBlockNum-lastBlock > 0 {
-			block, err := cls.Rpc.Database.GetBlock(lastBlock)
+			block, err := cls.Database.GetBlock(lastBlock)
 			if err != nil {
 				return err
 			}

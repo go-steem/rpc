@@ -39,6 +39,18 @@ func (encoder *RollingEncoder) EncodeMoney(v string) {
 	}
 }
 
+func (encoder *RollingEncoder) EncodeString(v string) {
+	if encoder.err == nil {
+		encoder.err = encoder.next.EncodeString(v)
+	}
+}
+
+func (encoder *RollingEncoder) EncodePubKey(v string) {
+	if encoder.err == nil {
+		encoder.err = encoder.next.EncodePubKey(v)
+	}
+}
+
 func (encoder *RollingEncoder) EncodeArrString(v []string) {
 	if encoder.err == nil {
 		encoder.err = encoder.next.EncodeArrString(v)

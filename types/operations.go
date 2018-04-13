@@ -58,8 +58,8 @@ func (op *ConvertOperation) MarshalTransaction(encoder *transaction.Encoder) err
 //             (exchange_rate) )
 
 type FeedPublishOperation struct {
-	Publisher    string   `json:"publisher"`
-	ExchangeRate ExchRate `json:"exchange_rate"`
+	Publisher    string    `json:"publisher"`
+	ExchangeRate *ExchRate `json:"exchange_rate"`
 }
 
 type ExchRate struct {
@@ -142,14 +142,14 @@ func (op *POWOperation) Data() interface{} {
 //             (json_metadata) )
 
 type AccountCreateOperation struct {
-	Fee            string     `json:"fee"`
-	Creator        string     `json:"creator"`
-	NewAccountName string     `json:"new_account_name"`
-	Owner          *Authority `json:"owner"`
-	Active         *Authority `json:"active"`
-	Posting        *Authority `json:"posting"`
-	MemoKey        string     `json:"memo_key"`
-	JsonMetadata   string     `json:"json_metadata"`
+	Fee            string           `json:"fee"`
+	Creator        string           `json:"creator"`
+	NewAccountName string           `json:"new_account_name"`
+	Owner          *Authority       `json:"owner"`
+	Active         *Authority       `json:"active"`
+	Posting        *Authority       `json:"posting"`
+	MemoKey        string           `json:"memo_key"`
+	JSONMetadata   *AccountMetadata `json:"json_metadata"`
 }
 
 func (op *AccountCreateOperation) Type() OpType {
@@ -158,6 +158,21 @@ func (op *AccountCreateOperation) Type() OpType {
 
 func (op *AccountCreateOperation) Data() interface{} {
 	return op
+}
+
+// encode AccountCreateOperation{}
+func (op *AccountCreateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeAccountCreate.Code()))
+	enc.EncodeMoney(op.Fee)
+	enc.EncodeString(op.Creator)
+	enc.EncodeString(op.NewAccountName)
+	enc.Encode(op.Owner)
+	enc.Encode(op.Active)
+	enc.Encode(op.Posting)
+	enc.EncodePubKey(op.MemoKey)
+	enc.Encode(op.JSONMetadata)
+	return enc.Err()
 }
 
 // FC_REFLECT( steemit::chain::account_update_operation,
@@ -174,7 +189,7 @@ type AccountUpdateOperation struct {
 	Active       *Authority `json:"active"`
 	Posting      *Authority `json:"posting"`
 	MemoKey      string     `json:"memo_key"`
-	JsonMetadata string     `json:"json_metadata"`
+	JSONMetadata string     `json:"json_metadata"`
 }
 
 func (op *AccountUpdateOperation) Type() OpType {
@@ -341,13 +356,13 @@ func (op *AccountWitnessProxyOperation) MarshalTransaction(encoder *transaction.
 // In case Title is filled in and ParentAuthor is empty, it is a new post.
 // The post category can be read from ParentPermlink.
 type CommentOperation struct {
-	ParentAuthor   string `json:"parent_author"`
-	ParentPermlink string `json:"parent_permlink"`
-	Author         string `json:"author"`
-	Permlink       string `json:"permlink"`
-	Title          string `json:"title"`
-	Body           string `json:"body"`
-	JsonMetadata   string `json:"json_metadata"`
+	ParentAuthor   string           `json:"parent_author"`
+	ParentPermlink string           `json:"parent_permlink"`
+	Author         string           `json:"author"`
+	Permlink       string           `json:"permlink"`
+	Title          string           `json:"title"`
+	Body           string           `json:"body"`
+	JSONMetadata   *ContentMetadata `json:"json_metadata"`
 }
 
 func (op *CommentOperation) Type() OpType {
@@ -375,7 +390,7 @@ func (op *CommentOperation) MarshalTransaction(encoder *transaction.Encoder) err
 	enc.Encode(op.Permlink)
 	enc.Encode(op.Title)
 	enc.Encode(op.Body)
-	enc.Encode(op.JsonMetadata)
+	enc.Encode(op.JSONMetadata)
 	return enc.Err()
 }
 
@@ -586,11 +601,11 @@ func (op *UnknownOperation) Data() interface{} {
 //             (props)
 //             (fee) )
 type WitnessUpdateOperation struct {
-	Owner           string          `json:"owner"`
-	Url             string          `json:"url"`
-	BlockSigningKey string          `json:"block_signing_key"`
-	Props           ChainProperties `json:"props"`
-	Fee             string          `json:"fee"`
+	Owner           string           `json:"owner"`
+	URL             string           `json:"url"`
+	BlockSigningKey string           `json:"block_signing_key"`
+	Props           *ChainProperties `json:"props"`
+	Fee             string           `json:"fee"`
 }
 
 func (op *WitnessUpdateOperation) Type() OpType {
@@ -599,6 +614,17 @@ func (op *WitnessUpdateOperation) Type() OpType {
 
 func (op *WitnessUpdateOperation) Data() interface{} {
 	return op
+}
+
+func (op *WitnessUpdateOperation) MarshalTransaction(encoder *transaction.Encoder) error {
+	enc := transaction.NewRollingEncoder(encoder)
+	enc.EncodeUVarint(uint64(TypeWitnessUpdate.Code()))
+	enc.Encode(op.Owner)
+	enc.Encode(op.URL)
+	enc.EncodePubKey(op.BlockSigningKey)
+	enc.Encode(op.Props)
+	enc.EncodeMoney(op.Fee)
+	return enc.Err()
 }
 
 type CustomOperation struct {
@@ -856,7 +882,7 @@ func (op *TransferToSavingsOperation) MarshalTransaction(encoder *transaction.En
 
 type TransferFromSavingsOperation struct {
 	From      string `json:"from"`
-	RequestId uint32 `json:"request_id"`
+	RequestID uint32 `json:"request_id"`
 	To        string `json:"to"`
 	Amount    string `json:"amount"`
 	Memo      string `json:"memo"`
@@ -874,7 +900,7 @@ func (op *TransferFromSavingsOperation) MarshalTransaction(encoder *transaction.
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeTransferFromSavings.Code()))
 	enc.Encode(op.From)
-	enc.Encode(op.RequestId)
+	enc.Encode(op.RequestID)
 	enc.Encode(op.To)
 	enc.EncodeMoney(op.Amount)
 	enc.Encode(op.Memo)
@@ -883,7 +909,7 @@ func (op *TransferFromSavingsOperation) MarshalTransaction(encoder *transaction.
 
 type CancelTransferFromSavingsOperation struct {
 	From      string `json:"from"`
-	RequestId uint32 `json:"request_id"`
+	RequestID uint32 `json:"request_id"`
 }
 
 func (op *CancelTransferFromSavingsOperation) Type() OpType {
@@ -898,7 +924,7 @@ func (op *CancelTransferFromSavingsOperation) MarshalTransaction(encoder *transa
 	enc := transaction.NewRollingEncoder(encoder)
 	enc.EncodeUVarint(uint64(TypeCancelTransferFromSavings.Code()))
 	enc.Encode(op.From)
-	enc.Encode(op.RequestId)
+	enc.Encode(op.RequestID)
 	return enc.Err()
 }
 
@@ -1015,7 +1041,7 @@ type AccountCreateWithDelegationOperation struct {
 	Active         *Authority    `json:"active"`
 	Posting        *Authority    `json:"posting"`
 	MemoKey        string        `json:"memo_key"`
-	JsonMetadata   string        `json:"json_metadata"`
+	JSONMetadata   string        `json:"json_metadata"`
 	Extensions     []interface{} `json:"extensions"`
 }
 
@@ -1161,7 +1187,7 @@ type FillTransferFromSavingsOperation struct {
 	From      string `json:"from"`
 	To        string `json:"to"`
 	Amount    string `json:"amount"`
-	RequestId uint32 `json:"request_id"`
+	RequestID uint32 `json:"request_id"`
 	Memo      string `json:"memo"`
 }
 
