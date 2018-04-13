@@ -74,7 +74,10 @@ func (tx *SignedTransaction) Sign(privKeys [][]byte, chain *Chain) error {
 	chainid, _ := hex.DecodeString(chain.ID)
 	//fmt.Println(tx.Operations[0])
 	//fmt.Println(" ")
-	tx_raw, _ := tx.Serialize()
+	tx_raw, err := tx.Serialize()
+	if err != nil {
+		return err
+	}
 	//fmt.Println(tx_raw)
 	//fmt.Println(" ")
 	buf.Write(chainid)
