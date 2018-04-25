@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/asuleymanov/jsonrpc2"
-	tomb "gopkg.in/tomb.v2"
+	"github.com/asuleymanov/rpc/tomb"
 )
 
 const (
