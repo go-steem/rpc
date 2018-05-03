@@ -3,6 +3,7 @@ package rpc
 import (
 	"errors"
 	// RPC
+	//"github.com/asuleymanov/rpc/apis/condenser"
 	"github.com/asuleymanov/rpc/apis/database"
 	"github.com/asuleymanov/rpc/apis/follow"
 	"github.com/asuleymanov/rpc/apis/market"
@@ -21,6 +22,9 @@ type Client struct {
 
 	// Database represents database_api.
 	Database *database.API
+
+	// Condenser represents condenser_api.
+	//Condenser *condenser.API
 
 	// Follow represents follow_api.
 	Follow *follow.API
@@ -47,6 +51,8 @@ func NewClient(url []string, chain string) (*Client, error) {
 	client := &Client{cc: call}
 
 	client.Database = database.NewAPI(client.cc)
+
+	//client.Condenser = condenser.NewAPI(client.cc)
 
 	client.Follow = follow.NewAPI(client.cc)
 
