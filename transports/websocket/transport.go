@@ -8,7 +8,7 @@ import (
 	"time"
 
 	// Vendor
-	"github.com/gorilla/websocket"
+	"github.com/asuleymanov/websocket"
 	"github.com/pkg/errors"
 
 	"github.com/asuleymanov/jsonrpc2"

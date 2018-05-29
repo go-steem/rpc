@@ -35,7 +35,7 @@ func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, 
 		return nil, err
 	}
 
-	expTime := time.Now().Add(59 * time.Minute).UTC()
+	expTime := time.Now().Add(50 * time.Minute).UTC()
 	tm := types.Time{
 		Time: &expTime,
 	}
