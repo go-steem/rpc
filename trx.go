@@ -1,9 +1,10 @@
-package rpc
+package client
 
 import (
-	"github.com/asuleymanov/rpc/transactions"
-	"github.com/asuleymanov/rpc/types"
 	"time"
+	
+	"github.com/asuleymanov/steem-go/transactions"
+	"github.com/asuleymanov/steem-go/types"
 )
 
 //SendTrx generates and sends an array of transactions to GOLOS.
