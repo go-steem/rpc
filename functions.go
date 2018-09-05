@@ -1,20 +1,16 @@
-package rpc
+package client
 
 import (
-	// Stdlib
 	"log"
 	"strconv"
 	"strings"
 	"time"
 
-	// Vendor
 	"github.com/pkg/errors"
-
-	// RPC
-	"github.com/asuleymanov/rpc/encoding/wif"
-	"github.com/asuleymanov/rpc/transactions"
-	"github.com/asuleymanov/rpc/translit"
-	"github.com/asuleymanov/rpc/types"
+	"github.com/asuleymanov/steem-go/encoding/wif"
+	"github.com/asuleymanov/steem-go/transactions"
+	"github.com/asuleymanov/steem-go/translit"
+	"github.com/asuleymanov/steem-go/types"
 )
 
 const fdt = `"20060102t150405"`
