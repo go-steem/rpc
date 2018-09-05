@@ -1,10 +1,9 @@
-package rpc
+package client
 
 import (
 	"github.com/pkg/errors"
-
-	"github.com/asuleymanov/rpc/encoding/wif"
-	"github.com/asuleymanov/rpc/types"
+	"github.com/asuleymanov/steem-go/encoding/wif"
+	"github.com/asuleymanov/steem-go/types"
 )
 
 var (
