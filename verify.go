@@ -1,13 +1,11 @@
-package rpc
+package client
 
 import (
-	// Stdlib
 	"fmt"
 	"log"
 	"strings"
 	"time"
 
-	// Vendor
 	"github.com/pkg/errors"
 )
 
