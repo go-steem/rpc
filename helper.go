@@ -1,10 +1,10 @@
-package rpc
+package client
 
 import (
 	"errors"
 	"time"
 
-	"github.com/asuleymanov/rpc/types"
+	"github.com/asuleymanov/steem-go/types"
 )
 
 //FollowersList returns the subscriber's list of subscribers
