@@ -1,16 +1,16 @@
-package rpc
+package client
 
 import (
 	"errors"
-	// RPC
-	//"github.com/asuleymanov/rpc/apis/condenser"
-	"github.com/asuleymanov/rpc/apis/database"
-	"github.com/asuleymanov/rpc/apis/follow"
-	"github.com/asuleymanov/rpc/apis/market"
-	"github.com/asuleymanov/rpc/apis/networkbroadcast"
-	"github.com/asuleymanov/rpc/transactions"
-	"github.com/asuleymanov/rpc/transports"
-	"github.com/asuleymanov/rpc/transports/websocket"
+	
+	//"github.com/asuleymanov/steem-go/apis/condenser"
+	"github.com/asuleymanov/steem-go/apis/database"
+	"github.com/asuleymanov/steem-go/apis/follow"
+	"github.com/asuleymanov/steem-go/apis/market"
+	"github.com/asuleymanov/steem-go/apis/networkbroadcast"
+	"github.com/asuleymanov/steem-go/transactions"
+	"github.com/asuleymanov/steem-go/transports"
+	"github.com/asuleymanov/steem-go/transports/websocket"
 )
 
 // Client can be used to access Steem remote APIs.
