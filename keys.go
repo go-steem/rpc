@@ -1,4 +1,4 @@
-package rpc
+package client
 
 import (
 	crand "crypto/rand"
