@@ -73,7 +73,10 @@ func GetPublicKey(prefix, privatekey string) string {
 	copy(privKeyBytes[:], tpk[1:])
 	priv, _ := btcec.PrivKeyFromBytes(btcec.S256(), privKeyBytes[:])
 	chHash := ripemd160.New()
-	chHash.Write(priv.PubKey().SerializeCompressed())
+	_, errHash := chHash.Write(priv.PubKey().SerializeCompressed())
+	if errHash != nil {
+		return errHash.Error()
+	}
 	nc := chHash.Sum(nil)
 	pk := append(priv.PubKey().SerializeCompressed(), nc[:4]...)
 	return prefix + base58.Encode(pk)

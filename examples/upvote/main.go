@@ -1,15 +1,11 @@
 package main
 
 import (
-	// Stdlib
 	"flag"
 	"fmt"
 	"log"
 
-	// RPC
-	client "github.com/asuleymanov/rpc"
-
-	// Vendor
+	client "github.com/asuleymanov/steem-go"
 	"github.com/pkg/errors"
 )
 

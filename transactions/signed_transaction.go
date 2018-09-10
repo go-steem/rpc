@@ -3,33 +3,32 @@
 package transactions
 
 import (
-	// Stdlib
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"time"
 
-	// RPC
-	"github.com/asuleymanov/rpc/encoding/transaction"
-	"github.com/asuleymanov/rpc/types"
-
-	// Vendor
+	"github.com/asuleymanov/steem-go/encoding/transaction"
+	"github.com/asuleymanov/steem-go/types"
 	"github.com/pkg/errors"
 )
 
+//SignedTransaction structure of a signed transaction
 type SignedTransaction struct {
 	*types.Transaction
 }
 
+//NewSignedTransaction initialization of a new signed transaction
 func NewSignedTransaction(tx *types.Transaction) *SignedTransaction {
 	if tx.Expiration == nil {
 		expiration := time.Now().Add(30 * time.Second).UTC()
-		tx.Expiration = &types.Time{&expiration}
+		tx.Expiration = &types.Time{Time: &expiration}
 	}
 
 	return &SignedTransaction{tx}
 }
 
+//Serialize function serializes a transaction
 func (tx *SignedTransaction) Serialize() ([]byte, error) {
 	var b bytes.Buffer
 	encoder := transaction.NewEncoder(&b)
@@ -40,13 +39,14 @@ func (tx *SignedTransaction) Serialize() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (tx *SignedTransaction) Digest(chain *Chain) ([]byte, error) {
+//Digest function that returns a digest from a serialized transaction
+func (tx *SignedTransaction) Digest(chain string) ([]byte, error) {
 	var msgBuffer bytes.Buffer
 
 	// Write the chain ID.
-	rawChainID, err := hex.DecodeString(chain.ID)
+	rawChainID, err := hex.DecodeString(chain)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to decode chain ID: %v", chain.ID)
+		return nil, errors.Wrapf(err, "failed to decode chain ID: %v", chain)
 	}
 
 	if _, err := msgBuffer.Write(rawChainID); err != nil {
@@ -68,83 +68,34 @@ func (tx *SignedTransaction) Digest(chain *Chain) ([]byte, error) {
 	return digest[:], nil
 }
 
-// get rid of cgo and lsecp256k1
-func (tx *SignedTransaction) Sign(privKeys [][]byte, chain *Chain) error {
+//Sign function directly generating transaction signature
+func (tx *SignedTransaction) Sign(privKeys [][]byte, chain string) error {
 	var buf bytes.Buffer
-	chainid, _ := hex.DecodeString(chain.ID)
-	//fmt.Println(tx.Operations[0])
-	//fmt.Println(" ")
-	tx_raw, err := tx.Serialize()
+	chainid, errdec := hex.DecodeString(chain)
+	if errdec != nil {
+		return errdec
+	}
+
+	txRaw, err := tx.Serialize()
 	if err != nil {
 		return err
 	}
-	//fmt.Println(tx_raw)
-	//fmt.Println(" ")
+
 	buf.Write(chainid)
-	buf.Write(tx_raw)
+	buf.Write(txRaw)
 	data := buf.Bytes()
 	//msg_sha := crypto.Sha256(buf.Bytes())
 
 	var sigsHex []string
 
-	for _, priv_b := range privKeys {
-		sigBytes := tx.Sign_Single(priv_b, data)
+	for _, privB := range privKeys {
+		sigBytes, err := tx.SignSingle(privB, data)
+		if err != nil {
+			return err
+		}
 		sigsHex = append(sigsHex, hex.EncodeToString(sigBytes))
 	}
 
 	tx.Transaction.Signatures = sigsHex
 	return nil
 }
-
-//func (tx *SignedTransaction) Verify(pubKeys [][]byte, chain *Chain) (bool, error) {
-//	// Compute the digest, again.
-//	digest, err := tx.Digest(chain)
-//	if err != nil {
-//		return false, err
-//	}
-//
-//	cDigest := C.CBytes(digest)
-//	defer C.free(cDigest)
-//
-//	// Make sure to free memory.
-//	cSigs := make([]unsafe.Pointer, 0, len(tx.Signatures))
-//	defer func() {
-//		for _, cSig := range cSigs {
-//			C.free(cSig)
-//		}
-//	}()
-//
-//	// Collect verified public keys.
-//	pubKeysFound := make([][]byte, len(pubKeys))
-//	for i, signature := range tx.Signatures {
-//		sig, err := hex.DecodeString(signature)
-//		if err != nil {
-//			return false, errors.Wrap(err, "failed to decode signature hex")
-//		}
-//
-//		recoverParameter := sig[0] - 27 - 4
-//		sig = sig[1:]
-//
-//		cSig := C.CBytes(sig)
-//		cSigs = append(cSigs, cSig)
-//
-//		var publicKey [33]byte
-//
-//		code := C.verify_recoverable_signature(
-//			(*C.uchar)(cDigest),
-//			(*C.uchar)(cSig),
-//			(C.int)(recoverParameter),
-//			(*C.uchar)(&publicKey[0]),
-//		)
-//		if code == 1 {
-//			pubKeysFound[i] = publicKey[:]
-//		}
-//	}
-//
-//	for i := range pubKeys {
-//		if !bytes.Equal(pubKeysFound[i], pubKeys[i]) {
-//			return false, nil
-//		}
-//	}
-//	return true, nil
-//}

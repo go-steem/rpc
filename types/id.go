@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 )
 
+//ID type from parameter JSON
 type ID struct {
 	ValueInt    *Int
 	ValueString string
@@ -12,6 +13,7 @@ type ID struct {
 
 var dot = []byte{'.'}
 
+//UnmarshalJSON unpacking the JSON parameter in the ID type.
 func (id *ID) UnmarshalJSON(data []byte) error {
 	if bytes.Contains(data, dot) {
 		id.ValueString = string(data)

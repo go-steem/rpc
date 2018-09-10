@@ -1,12 +1,10 @@
 package types
 
 import (
-	// Stdlib
 	"bytes"
 	"encoding/json"
 	"reflect"
 
-	// Vendor
 	"github.com/pkg/errors"
 )
 

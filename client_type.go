@@ -4,13 +4,6 @@ import (
 	"github.com/asuleymanov/steem-go/types"
 )
 
-var (
-	//OptionsTrue variable for type PCOptions
-	OptionsTrue bool = true
-	//OptionsFalse variable for type PCOptions
-	OptionsFalse bool = false
-)
-
 //Keys is used as a keystroke for a specific user.
 //Only a few keys can be set.
 type Keys struct {
@@ -26,6 +19,7 @@ type BResp struct {
 	BlockNum uint32
 	TrxNum   uint32
 	Expired  bool
+	JSONTrx  string
 }
 
 //OperResp type is returned when the operation is performed.
@@ -41,14 +35,14 @@ type PCOptions struct {
 	Percent              uint16
 	AllowVotes           *bool
 	AllowCurationRewards *bool
-	BeneficiarieList     *[]types.Beneficiarie
+	BeneficiaryList      *[]types.Beneficiary
 }
 
 //ArrTransfer for MultiTransfer function
 type ArrTransfer struct {
-	To      string
-	Memo    string
-	Ammount string
+	To     string
+	Memo   string
+	Amount types.Asset
 }
 
 //ArrVote for MultiVote function

@@ -7,8 +7,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+//StringSlice type from parameter JSON
 type StringSlice []string
 
+//UnmarshalJSON unpacking the JSON parameter in the StringSlice type.
 func (ss *StringSlice) UnmarshalJSON(data []byte) error {
 	if len(data) == 0 {
 		return nil

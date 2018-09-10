@@ -1,69 +1,68 @@
 package client
 
 import (
-	"errors"
-	
-	//"github.com/asuleymanov/steem-go/apis/condenser"
-	"github.com/asuleymanov/steem-go/apis/database"
-	"github.com/asuleymanov/steem-go/apis/follow"
-	"github.com/asuleymanov/steem-go/apis/market"
-	"github.com/asuleymanov/steem-go/apis/networkbroadcast"
-	"github.com/asuleymanov/steem-go/transactions"
+	"github.com/asuleymanov/steem-go/api/database"
+	"github.com/asuleymanov/steem-go/api/follow"
+	"github.com/asuleymanov/steem-go/api/market_history"
+	"github.com/asuleymanov/steem-go/api/network_broadcast"
 	"github.com/asuleymanov/steem-go/transports"
 	"github.com/asuleymanov/steem-go/transports/websocket"
+	"github.com/asuleymanov/steem-go/types"
 )
 
 // Client can be used to access Steem remote APIs.
-//
 // There is a public field for every Steem API available,
 // e.g. Client.Database corresponds to database_api.
 type Client struct {
 	cc transports.CallCloser
 
+	chainID string
+
+	AsyncProtocol bool
+
+	// Fixed JSONMetadata added to posting all comments
+	DefaultContentMetadata types.ContentMetadata
+
 	// Database represents database_api.
 	Database *database.API
-
-	// Condenser represents condenser_api.
-	//Condenser *condenser.API
 
 	// Follow represents follow_api.
 	Follow *follow.API
 
 	// Follow represents market_history_api.
-	Market *market.API
+	MarketHistory *market_history.API
 
 	// NetworkBroadcast represents network_broadcast_api.
-	NetworkBroadcast *networkbroadcast.API
-
-	//Chain Id
-	Chain *transactions.Chain
+	NetworkBroadcast *network_broadcast.API
 
 	// Current keys for operations
 	CurrentKeys *Keys
 }
 
 // NewClient creates a new RPC client that use the given CallCloser internally.
-func NewClient(url []string, chain string) (*Client, error) {
-	call, err := initclient(url)
+// Initialize only server present API. Absent API initialized as nil value.
+func NewClient(url []string, options ...websocket.Option) (*Client, error) {
+	call, err := initClient(url, options...)
 	if err != nil {
 		return nil, err
 	}
 	client := &Client{cc: call}
 
-	client.Database = database.NewAPI(client.cc)
+	client.AsyncProtocol = false
 
-	//client.Condenser = condenser.NewAPI(client.cc)
+	client.Database = database.NewAPI(client.cc)
 
 	client.Follow = follow.NewAPI(client.cc)
 
-	client.Market = market.NewAPI(client.cc)
+	client.MarketHistory = market_history.NewAPI(client.cc)
 
-	client.NetworkBroadcast = networkbroadcast.NewAPI(client.cc)
+	client.NetworkBroadcast = network_broadcast.NewAPI(client.cc)
 
-	client.Chain, err = initChainID(chain)
+	chainID, err := client.Database.GetConfig()
 	if err != nil {
-		client.Chain = transactions.SteemChain
+		return nil, err
 	}
+	client.chainID = chainID.ChainID
 
 	return client, nil
 }
@@ -74,14 +73,9 @@ func (client *Client) Close() error {
 	return client.cc.Close()
 }
 
-//SetKeys you can specify keys for signing transactions.
-func (client *Client) SetKeys(keys *Keys) {
-	client.CurrentKeys = keys
-}
-
-func initclient(url []string) (*websocket.Transport, error) {
-	// Инициализация Websocket
-	t, err := websocket.NewTransport(url)
+func initClient(url []string, options ...websocket.Option) (*websocket.Transport, error) {
+	// Initializing Websocket
+	t, err := websocket.NewTransport(url, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,16 +83,16 @@ func initclient(url []string) (*websocket.Transport, error) {
 	return t, nil
 }
 
-func initChainID(str string) (*transactions.Chain, error) {
-	var ChainID transactions.Chain
-	// Определяем ChainId
-	switch str {
-	case "steem":
-		ChainID = *transactions.SteemChain
-	case "test":
-		ChainID = *transactions.TestChain
-	default:
-		return nil, errors.New("Chain not found")
+//GenCommentMetadata generate default CommentMetadata
+func (client *Client) GenCommentMetadata(meta *types.ContentMetadata) *types.ContentMetadata {
+	if client.DefaultContentMetadata != nil {
+		for k := range client.DefaultContentMetadata {
+			_, ok := (*meta)[k]
+			if !ok {
+				// Set fixed value only if value not exists
+				(*meta)[k] = client.DefaultContentMetadata[k]
+			}
+		}
 	}
-	return &ChainID, nil
+	return meta
 }

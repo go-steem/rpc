@@ -4,21 +4,27 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/asuleymanov/golos-go/encoding/transaction"
+	"github.com/asuleymanov/steem-go/encoding/transaction"
+	"github.com/pkg/errors"
 )
 
+//ContentMetadata type from parameter JSON
 type ContentMetadata map[string]interface{}
 
+//UnmarshalJSON unpacking the JSON parameter in the ContentMetadata type.
 func (op *ContentMetadata) UnmarshalJSON(p []byte) error {
 	var raw map[string]interface{}
 
-	str, _ := strconv.Unquote(string(p))
+	str, errUnq := strconv.Unquote(string(p))
+	if errUnq != nil {
+		return errUnq
+	}
 	if str == "" {
 		return nil
 	}
 
 	if err := json.Unmarshal([]byte(str), &raw); err != nil {
-		return err
+		return errors.Wrap(err, "ERROR: ContentMedata unmarshal error")
 	}
 
 	*op = raw
@@ -26,6 +32,7 @@ func (op *ContentMetadata) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
+//MarshalJSON function for packing the ContentMetadata type in JSON.
 func (op *ContentMetadata) MarshalJSON() ([]byte, error) {
 	ans, err := json.Marshal(*op)
 	if err != nil {
@@ -34,6 +41,7 @@ func (op *ContentMetadata) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.Quote(string(ans))), nil
 }
 
+//MarshalTransaction is a function of converting type ContentMetadata to bytes.
 func (op *ContentMetadata) MarshalTransaction(encoder *transaction.Encoder) error {
 	ans, err := json.Marshal(op)
 	if err != nil {

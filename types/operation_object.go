@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+//OperationObject type from parameter JSON
 type OperationObject struct {
 	BlockNumber            uint32    `json:"block"`
 	TransactionID          string    `json:"trx_id"`
@@ -25,6 +26,7 @@ type rawOperationObject struct {
 	Timestamp              *Time           `json:"timestamp"`
 }
 
+//UnmarshalJSON unpacking the JSON parameter in the OperationObject type.
 func (op *OperationObject) UnmarshalJSON(p []byte) error {
 	var raw rawOperationObject
 	if err := json.Unmarshal(p, &raw); err != nil {
@@ -42,9 +44,10 @@ func (op *OperationObject) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
+//MarshalJSON function for packing the OperationObject type in JSON.
 func (op *OperationObject) MarshalJSON() ([]byte, error) {
 	return JSONMarshal(&rawOperationObject{
-  	BlockNumber:            op.BlockNumber,
+		BlockNumber:            op.BlockNumber,
 		TransactionID:          op.TransactionID,
 		TransactionInBlock:     op.TransactionInBlock,
 		Operation:              &operationTuple{op.Operation.Type(), op.Operation},

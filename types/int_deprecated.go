@@ -5,10 +5,12 @@ import (
 	"math/big"
 )
 
+//Int type from parameter JSON
 type Int struct {
 	*big.Int
 }
 
+//UnmarshalJSON unpacking the JSON parameter in the Int type.
 func (num *Int) UnmarshalJSON(data []byte) error {
 	if data[0] == '"' {
 		data = data[1:]
