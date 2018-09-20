@@ -74,3 +74,34 @@ func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, 
 
 	return &bresp, nil
 }
+
+func (client *Client) GetTrx(strx []types.Operation) (*types.Transaction, error) {
+	// Getting the necessary parameters
+	props, err := client.Database.GetDynamicGlobalProperties()
+	if err != nil {
+		return nil, err
+	}
+
+	// Creating a Transaction
+	refBlockPrefix, err := transactions.RefBlockPrefix(props.HeadBlockID)
+	if err != nil {
+		return nil, err
+	}
+	tx := &types.Transaction{
+		RefBlockNum:    transactions.RefBlockNum(props.HeadBlockNumber),
+		RefBlockPrefix: refBlockPrefix,
+	}
+
+	// Adding Operations to a Transaction
+	for _, val := range strx {
+		tx.PushOperation(val)
+	}
+
+	expTime := time.Now().Add(59 * time.Minute).UTC()
+	tm := types.Time{
+		Time: &expTime,
+	}
+	tx.Expiration = &tm
+
+	return tx, nil
+}

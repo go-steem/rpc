@@ -1,128 +1,104 @@
 package market_history
 
 import (
-	"encoding/json"
+	"fmt"
 
 	"github.com/asuleymanov/steem-go/transports"
-	"github.com/pkg/errors"
 )
 
 const apiID = "market_history_api"
 
+//API plug-in structure
 type API struct {
 	caller transports.Caller
 }
 
+//NewAPI plug-in initialization
 func NewAPI(caller transports.Caller) *API {
 	return &API{caller}
 }
 
 var emptyParams = struct{}{}
 
-func (api *API) raw(method string, params interface{}) (*json.RawMessage, error) {
-	var resp json.RawMessage
-	if err := api.caller.Call("call", []interface{}{apiID, method, params}, &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to call %v\n", apiID, method)
+func (api *API) call(method string, params, resp interface{}) error {
+	return api.caller.Call("call", []interface{}{apiID, method, params}, resp)
+}
+
+//GetTicker api request get_ticker
+func (api *API) GetTicker() (*Ticker, error) {
+	var resp Ticker
+	err := api.call("get_ticker", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_ticker
-func (api *API) GetTicker() (*Ticker, error) {
-	raw, err := api.raw("get_ticker", emptyParams)
-	if err != nil {
-		return nil, err
-	}
-	var resp *Ticker
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_ticker response")
-	}
-	return resp, nil
-}
-
-//get_volume
+//GetVolume api request get_volume
 func (api *API) GetVolume() (*Volume, error) {
-	raw, err := api.raw("get_volume", emptyParams)
+	var resp Volume
+	err := api.call("get_volume", emptyParams, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp *Volume
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_volume response")
-	}
-	return resp, nil
+	return &resp, nil
 }
 
-//get_order_book
+//GetOrderBook api request get_order_book
 func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 	if limit > 1000 {
-		return nil, errors.New("steem-go: market_history_api: get_order_book -> limit must not exceed 1000")
+		return nil, fmt.Errorf("%v: get_order_book -> limit must not exceed 1000", apiID)
 	}
-	raw, err := api.raw("get_order_book", []interface{}{limit})
+	var resp OrderBook
+	err := api.call("get_order_book", []interface{}{limit}, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp *OrderBook
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_order_book response")
-	}
-	return resp, nil
+	return &resp, nil
 }
 
-//get_trade_history
+//GetTradeHistory api request get_trade_history
 func (api *API) GetTradeHistory(start, end string, limit uint32) ([]*Trades, error) {
 	if limit > 1000 {
-		return nil, errors.New("steem-go: market_history_api: get_order_book -> limit must not exceed 1000")
-	}
-	raw, err := api.raw("get_trade_history", []interface{}{start, end, limit})
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%v: get_order_book -> limit must not exceed 1000", apiID)
 	}
 	var resp []*Trades
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_trade_history response")
+	err := api.call("get_trade_history", []interface{}{start, end, limit}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_recent_trades
+//GetRecentTrades api request get_recent_trades
 func (api *API) GetRecentTrades(limit uint32) ([]*Trades, error) {
 	if limit > 1000 {
-		return nil, errors.New("steem-go: market_history_api: get_order_book -> limit must not exceed 1000")
-	}
-	raw, err := api.raw("get_recent_trades", []interface{}{limit})
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%v: get_order_book -> limit must not exceed 1000", apiID)
 	}
 	var resp []*Trades
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_recent_trades response")
+	err := api.call("get_recent_trades", []interface{}{limit}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_market_history
-func (api *API) GetMarketHistory(b_sec uint32, start, end string) ([]*MarketHistory, error) {
-	raw, err := api.raw("get_market_history", []interface{}{b_sec, start, end})
-	if err != nil {
-		return nil, err
-	}
+//GetMarketHistory api request get_market_history
+func (api *API) GetMarketHistory(bSec uint32, start, end string) ([]*MarketHistory, error) {
 	var resp []*MarketHistory
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_market_history response")
+	err := api.call("get_market_history", []interface{}{bSec, start, end}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_market_history_buckets
-func (api *API) GetMarketHistoryBuckets() ([]uint32, error) {
-	raw, err := api.raw("get_market_history_buckets", emptyParams)
+//GetMarketHistoryBuckets api request get_market_history_buckets
+func (api *API) GetMarketHistoryBuckets() ([]*uint32, error) {
+	var resp []*uint32
+	err := api.call("get_market_history_buckets", emptyParams, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []uint32
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrap(err, "steem-go: market_history_api: failed to unmarshal get_market_history_buckets response")
 	}
 	return resp, nil
 }

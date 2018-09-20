@@ -10,4 +10,4 @@ This package adds support for `network_broadcast_api`.
 | `broadcast_transaction_with_callback` |             |              |
 | `broadcast_transaction_synchronous`   | DONE        | DONE         |
 | `broadcast_block`                     |             |              |
-| `set_bcd_trigger`                     |             |              |
+| `set_max_block_age`                   |             |              |
