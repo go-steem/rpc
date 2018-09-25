@@ -31,8 +31,8 @@ const (
 	TypeCommentOptions              OpType = "comment_options"
 	TypeSetWithdrawVestingRoute     OpType = "set_withdraw_vesting_route"
 	TypeLimitOrderCreate2           OpType = "limit_order_create2"
-	TypeChallengeAuthority          OpType = "challenge_authority"
-	TypeProveAuthority              OpType = "prove_authority"
+	TypeClaimAccount                OpType = "claim_account"
+	TypeCreateClaimedAccount        OpType = "create_claimed_account"
 	TypeRequestAccountRecovery      OpType = "request_account_recovery"
 	TypeRecoverAccount              OpType = "recover_account"
 	TypeChangeRecoveryAccount       OpType = "change_recovery_account"
@@ -90,8 +90,8 @@ var opTypes = [...]OpType{
 	TypeCommentOptions,
 	TypeSetWithdrawVestingRoute,
 	TypeLimitOrderCreate2,
-	TypeChallengeAuthority,
-	TypeProveAuthority,
+	TypeClaimAccount,
+	TypeCreateClaimedAccount,
 	TypeRequestAccountRecovery,
 	TypeRecoverAccount,
 	TypeChangeRecoveryAccount,

@@ -8,7 +8,7 @@ import (
 	"github.com/asuleymanov/steem-go/types"
 )
 
-//SendTrx generates and sends an array of transactions to GOLOS.
+//SendTrx generates and sends an array of transactions to STEEM.
 func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, error) {
 	var bresp BResp
 

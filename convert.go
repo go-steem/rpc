@@ -4,7 +4,7 @@ import (
 	"strconv"
 )
 
-//SbdMedianPrice returns the average cost of GBG when converting GOLOS.
+//SbdMedianPrice returns the average cost of SBD when converting STEEM.
 func (client *Client) SbdMedianPrice() (float64, error) {
 	smpreq, errsmp := client.Database.GetFeedHistory()
 	if errsmp != nil {

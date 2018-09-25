@@ -51,7 +51,7 @@ func (client *Client) VerifyVotes(author, permlink string) (bool, error) {
 	return false, nil
 }
 
-//ExistComments check whether the entry in GOLOS is a comment.
+//ExistComments check whether the entry in STEEM is a comment.
 func (client *Client) ExistComments(author, permlink string) (bool, error) {
 	ans, err := client.Database.GetContentReplies(author, permlink)
 
@@ -64,7 +64,7 @@ func (client *Client) ExistComments(author, permlink string) (bool, error) {
 	return false, nil
 }
 
-//VerifyReblogs сheck if the user made a repost entry in GOLOS
+//VerifyReblogs сheck if the user made a repost entry in STEEM
 func (client *Client) VerifyReblogs(author, permlink, rebloger string) (bool, error) {
 	ans, err := client.Follow.GetRebloggedBy(author, permlink)
 	if err != nil {
@@ -78,7 +78,7 @@ func (client *Client) VerifyReblogs(author, permlink, rebloger string) (bool, er
 	return false, nil
 }
 
-//VerifyFollow сheck if one user is signed for the second in GOLOS
+//VerifyFollow сheck if one user is signed for the second in STEEM
 func (client *Client) VerifyFollow(follower, following string) (bool, error) {
 	ans, err := client.Follow.GetFollowing(follower, following, "blog", 1)
 	if err != nil {
@@ -92,7 +92,7 @@ func (client *Client) VerifyFollow(follower, following string) (bool, error) {
 	return false, nil
 }
 
-//VerifyPost сheck if there is an entry in GOLOS
+//VerifyPost сheck if there is an entry in STEEM
 func (client *Client) VerifyPost(author, permlink string) (bool, error) {
 	ans, err := client.Database.GetContent(author, permlink)
 
@@ -125,7 +125,7 @@ func (client *Client) VerifyDelegatePostingKeySign(fromUser, toUser string) (boo
 	return false, nil
 }
 
-//VerifyFirstPost сheck whether the post of the user is his first post in GOLOS
+//VerifyFirstPost сheck whether the post of the user is his first post in STEEM
 func (client *Client) VerifyFirstPost(username string) (bool, error) {
 	d := time.Now()
 	cont, err := client.Database.GetDiscussionsByAuthorBeforeDate(username, "", d.Format("2006-01-02T00:00:00"), 100)
@@ -136,7 +136,7 @@ func (client *Client) VerifyFirstPost(username string) (bool, error) {
 	return len(cont) <= 1, nil
 }
 
-//VerifyUser сheck if the user exists in GOLOS
+//VerifyUser сheck if the user exists in STEEM
 func (client *Client) VerifyUser(username string) (bool, error) {
 	acc, err := client.Database.GetAccounts([]string{username})
 	if err != nil {

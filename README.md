@@ -1,17 +1,14 @@
 # asuleymanov/steem-go
 
 [![GoDoc](https://godoc.org/github.com/asuleymanov/steem-go?status.svg)](https://godoc.org/github.com/asuleymanov/steem-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/asuleymanov/steem-go)](https://goreportcard.com/report/github.com/asuleymanov/steem-go)
 
 Golang RPC client library for [Steem](https://steemit.com).
-
-## Compatibility
-
-`steemd 0.18.0`
 
 ## Usage
 
 ```go
-import "github.com/asuleymanov/steem-go/client"
+import "github.com/asuleymanov/steem-go"
 ```
 
 
@@ -21,18 +18,18 @@ This is just a code snippet. Please check the `examples` directory
 for more complete and ready to use examples.
 
 ```go
-	cls := client.NewApi([]string{"ws://localhost:8090"},"steem")
-	defer cls.Rpc.Close()
+	cls,_ := client.NewClient([]string{"ws://localhost:8090"},"steem")
+	defer cls.Close()
 	
 	// Get config.
 	log.Println("---> GetConfig()")
-	config, err := cls.Rpc.Database.GetConfig()
+	config, err := cls.Database.GetConfig()
 	if err != nil {
 		return err
 	}
 
 	// Use the last irreversible block number as the initial last block number.
-	props, err := cls.Rpc.Database.GetDynamicGlobalProperties()
+	props, err := cls.Database.GetDynamicGlobalProperties()
 	if err != nil {
 		return err
 	}
@@ -42,14 +39,14 @@ for more complete and ready to use examples.
 	log.Printf("---> Entering the block processing loop (last block = %v)\n", lastBlock)
 	for {
 		// Get current properties.
-		props, err := cls.Rpc.Database.GetDynamicGlobalProperties()
+		props, err := cls.Database.GetDynamicGlobalProperties()
 		if err != nil {
 			return err
 		}
 
 		// Process new blocks.
 		for props.LastIrreversibleBlockNum-lastBlock > 0 {
-			block, err := cls.Rpc.Database.GetBlock(lastBlock)
+			block, err := cls.Database.GetBlock(lastBlock)
 			if err != nil {
 				return err
 			}
@@ -71,7 +68,7 @@ for more complete and ready to use examples.
 		}
 
 		// Sleep for STEEMIT_BLOCK_INTERVAL seconds before the next iteration.
-		time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
+		time.Sleep(time.Duration(config.BlockInterval) * time.Second)
 	}
 ```
 
@@ -79,17 +76,17 @@ for more complete and ready to use examples.
 
 
 You need to create a `Client` object to be able to do anything.
-Then you just need to call `NewApi()`.
+Then you just need to call `NewClient()`.
 
 Once you create a `Client` object, you can start calling the methods exported
 via `steemd`'s RPC endpoint by invoking associated methods on the client object.
 There are multiple APIs that can be exported, e.g. `database_api` and `login_api`,
 so the methods on the Client object are also namespaced accoding to these APIs.
 For example, to call `get_block` from `database_api`, you need to use
-`Client.Rpc.Database.GetBlock` method.
+`Client.Database.GetBlock` method.
 
 When looking for a method to call, all you need is to turn the method name into
-CamelCase, e.g. `get_config` becomes `Client.Rpc.Database.GetConfig`.
+CamelCase, e.g. `get_config` becomes `Client.Database.GetConfig`.
 
 ## Status
 

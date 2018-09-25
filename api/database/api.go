@@ -2,480 +2,450 @@ package database
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/asuleymanov/steem-go/transports"
 	"github.com/asuleymanov/steem-go/types"
-	"github.com/pkg/errors"
 )
 
 const apiID = "database_api"
 
+//API plug-in structure
 type API struct {
 	caller transports.Caller
 }
 
+//NewAPI plug-in initialization
 func NewAPI(caller transports.Caller) *API {
 	return &API{caller}
 }
 
-var emptyParams = []string{}
+var emptyParams = struct{}{}
 
-func (api *API) raw(method string, params interface{}) (*json.RawMessage, error) {
-	var resp json.RawMessage
-	if err := api.caller.Call("call", []interface{}{apiID, method, params}, &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to call %v\n", apiID, method)
-	}
-	return &resp, nil
+func (api *API) call(method string, params, resp interface{}) error {
+	return api.caller.Call("call", []interface{}{apiID, method, params}, resp)
 }
 
-//set_subscribe_callback                 | *NONE* | *NONE* |
-
-//set_pending_transaction_callback       | *NONE* | *NONE* |
-
-//set_block_applied_callback             | *NONE* | *NONE* |
-
-//cancel_all_subscriptions               | *NONE* | *NONE* |
-
-//get_trending_tags
+//GetTrendingTags api request get_trending_tags
 func (api *API) GetTrendingTags(afterTag string, limit uint32) ([]*TrendingTags, error) {
-	raw, err := api.raw("get_trending_tags", []interface{}{afterTag, limit})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*TrendingTags
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_trending_tags response", apiID)
+	err := api.call("get_trending_tags", []interface{}{afterTag, limit}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_tags_used_by_author
+//GetTagsUsedByAuthor api request get_tags_used_by_author
 func (api *API) GetTagsUsedByAuthor(accountName string) (*json.RawMessage, error) {
-	return api.raw("get_tags_used_by_author", []interface{}{accountName})
+	var resp json.RawMessage
+	err := api.call("get_tags_used_by_author", []interface{}{accountName}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_discussions_by_trending
+//GetPostDiscussionsByPayout api request get_post_discussions_by_payout
+func (api *API) GetPostDiscussionsByPayout(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	err := api.call("get_post_discussions_by_payout", query, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//GetCommentDiscussionsByPayout api request get_comment_discussions_by_payout
+func (api *API) GetCommentDiscussionsByPayout(query *DiscussionQuery) ([]*Content, error) {
+	var resp []*Content
+	err := api.call("get_comment_discussions_by_payout", query, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+//GetDiscussionsByTrending api request get_discussions_by_trending
 func (api *API) GetDiscussionsByTrending(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_trending", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_trending", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_trending response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_trending30
+//GetDiscussionsByTrending30 api request get_discussions_by_trending30
 func (api *API) GetDiscussionsByTrending30(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_trending30", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_trending30", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_trending30 response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_created
+//GetDiscussionsByCreated api request get_discussions_by_created
 func (api *API) GetDiscussionsByCreated(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_created", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_created", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_created response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_active
+//GetDiscussionsByActive api request get_discussions_by_active
 func (api *API) GetDiscussionsByActive(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_active", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_active", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_active response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_cashout
+//GetDiscussionsByCashout api request get_discussions_by_cashout
 func (api *API) GetDiscussionsByCashout(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_cashout", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_cashout", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_cashout response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_payout
+//GetDiscussionsByPayout api request get_discussions_by_payout
 func (api *API) GetDiscussionsByPayout(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_payout", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_payout", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_payout response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_votes
+//GetDiscussionsByVotes api request get_discussions_by_votes
 func (api *API) GetDiscussionsByVotes(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_votes", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_votes", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_votes response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_children
+//GetDiscussionsByChildren api request get_discussions_by_children
 func (api *API) GetDiscussionsByChildren(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_children", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_children", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_children response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_hot
+//GetDiscussionsByHot api request get_discussions_by_hot
 func (api *API) GetDiscussionsByHot(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_hot", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_hot", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_hot response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_feed
+//GetDiscussionsByFeed api request get_discussions_by_feed
 func (api *API) GetDiscussionsByFeed(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_feed", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_feed", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_feed response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_blog
+//GetDiscussionsByBlog api request get_discussions_by_blog
 func (api *API) GetDiscussionsByBlog(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_blog", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_blog", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_blog response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_comments
+//GetDiscussionsByComments api request get_discussions_by_comments
 func (api *API) GetDiscussionsByComments(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_comments", query)
+	var resp []*Content
+	err := api.call("get_discussions_by_comments", query, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_comments response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_promoted
+//GetDiscussionsByPromoted api request get_discussions_by_promoted
 func (api *API) GetDiscussionsByPromoted(query *DiscussionQuery) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_promoted", query)
-	if err != nil {
-		return nil, err
-	}
 	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_promoted response", apiID)
+	err := api.call("get_discussions_by_promoted", query, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_block_header
+//GetBlockHeader api request get_block_header
 func (api *API) GetBlockHeader(blockNum uint32) (*BlockHeader, error) {
-	raw, err := api.raw("get_block_header", []uint32{blockNum})
-	if err != nil {
-		return nil, err
-	}
 	var resp BlockHeader
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_block_header response", apiID)
+	err := api.call("get_block_header", []uint32{blockNum}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	resp.Number = blockNum
 	return &resp, nil
 }
 
-//get_block
+//GetBlock api request get_block
 func (api *API) GetBlock(blockNum uint32) (*Block, error) {
-	raw, err := api.raw("get_block", []uint32{blockNum})
+	var resp Block
+	err := api.call("get_block", []uint32{blockNum}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp Block
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_block response", apiID)
 	}
 	resp.Number = blockNum
 	return &resp, nil
 }
 
-//get_ops_in_block
-func (api *API) GetOpsInBlock(blockNum uint32, only_virtual bool) ([]*types.OperationObject, error) {
-	raw, err := api.raw("get_ops_in_block", []interface{}{blockNum, only_virtual})
-	if err != nil {
-		return nil, err
-	}
+//GetOpsInBlock api request get_ops_in_block
+func (api *API) GetOpsInBlock(blockNum uint32, onlyVirtual bool) ([]*types.OperationObject, error) {
 	var resp []*types.OperationObject
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_ops_in_block response", apiID)
+	err := api.call("get_ops_in_block", []interface{}{blockNum, onlyVirtual}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_state
+//GetState api request get_state
 func (api *API) GetState(path string) (*json.RawMessage, error) {
-	return api.raw("get_state", []string{path})
+	var resp json.RawMessage
+	err := api.call("get_state", []string{path}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_trending_categories
+//GetTrendingCategories api request get_trending_categories
 func (api *API) GetTrendingCategories(after string, limit uint32) ([]*Categories, error) {
-	raw, err := api.raw("get_trending_categories", []interface{}{after, limit})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*Categories
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_trending_categories response", apiID)
+	err := api.call("get_trending_categories", []interface{}{after, limit}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_best_categories
+//GetBestCategories api request get_best_categories
 func (api *API) GetBestCategories(after string, limit uint32) (*json.RawMessage, error) {
-	return api.raw("get_best_categories", []interface{}{after, limit})
+	var resp json.RawMessage
+	err := api.call("get_best_categories", []interface{}{after, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_active_categories
+//GetActiveCategories api request get_active_categories
 func (api *API) GetActiveCategories(after string, limit uint32) (*json.RawMessage, error) {
-	return api.raw("get_active_categories", []interface{}{after, limit})
+	var resp json.RawMessage
+	err := api.call("get_active_categories", []interface{}{after, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_recent_categories
+//GetRecentCategories api request get_recent_categories
 func (api *API) GetRecentCategories(after string, limit uint32) (*json.RawMessage, error) {
-	return api.raw("get_recent_categories", []interface{}{after, limit})
+	var resp json.RawMessage
+	err := api.call("get_recent_categories", []interface{}{after, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_config
+//GetConfig api request get_config
 func (api *API) GetConfig() (*Config, error) {
-	raw, err := api.raw("get_config", emptyParams)
-	if err != nil {
-		return nil, err
-	}
 	var resp Config
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_config response", apiID)
+	err := api.call("get_config", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_dynamic_global_properties
+//GetDynamicGlobalProperties api request get_dynamic_global_properties
 func (api *API) GetDynamicGlobalProperties() (*DynamicGlobalProperties, error) {
-	raw, err := api.raw("get_dynamic_global_properties", emptyParams)
-	if err != nil {
-		return nil, err
-	}
 	var resp DynamicGlobalProperties
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_dynamic_global_properties response", apiID)
-	}
-	return &resp, nil
-}
-
-//get_chain_properties
-func (api *API) GetChainProperties() (*ChainProperties, error) {
-	raw, err := api.raw("get_chain_properties", emptyParams)
+	err := api.call("get_dynamic_global_properties", emptyParams, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp ChainProperties
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_chain_properties response", apiID)
+	return &resp, nil
+}
+
+//GetChainProperties api request get_chain_properties
+func (api *API) GetChainProperties() (*types.ChainProperties, error) {
+	var resp types.ChainProperties
+	err := api.call("get_chain_properties", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_feed_history
+//GetFeedHistory api request get_feed_history
 func (api *API) GetFeedHistory() (*FeedHistory, error) {
-	raw, err := api.raw("get_feed_history", emptyParams)
-	if err != nil {
-		return nil, err
-	}
 	var resp FeedHistory
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_feed_history response", apiID)
+	err := api.call("get_feed_history", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_current_median_history_price
+//GetCurrentMedianHistoryPrice api request get_current_median_history_price
 func (api *API) GetCurrentMedianHistoryPrice() (*CurrentMedianHistoryPrice, error) {
-	raw, err := api.raw("get_current_median_history_price", emptyParams)
-	if err != nil {
-		return nil, err
-	}
 	var resp CurrentMedianHistoryPrice
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_current_median_history_price response", apiID)
+	err := api.call("get_current_median_history_price", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_witness_schedule
+//GetWitnessSchedule api request get_witness_schedule
 func (api *API) GetWitnessSchedule() (*WitnessSchedule, error) {
-	raw, err := api.raw("get_witness_schedule", emptyParams)
-	if err != nil {
-		return nil, err
-	}
 	var resp WitnessSchedule
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witness_schedule response", apiID)
+	err := api.call("get_witness_schedule", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_hardfork_version
-func (api *API) GetHardforkVersion() (string, error) {
-	raw, err := api.raw("get_hardfork_version", emptyParams)
-	if err != nil {
-		return "", err
-	}
+//GetHardforkVersion api request get_hardfork_version
+func (api *API) GetHardforkVersion() (*string, error) {
 	var resp string
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return "", errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_hardfork_version response", apiID)
-	}
-	return resp, nil
-}
-
-//get_next_scheduled_hardfork
-func (api *API) GetNextScheduledHardfork() (*NextScheduledHardfork, error) {
-	raw, err := api.raw("get_next_scheduled_hardfork", emptyParams)
+	err := api.call("get_hardfork_version", emptyParams, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp NextScheduledHardfork
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_next_scheduled_hardfork response", apiID)
 	}
 	return &resp, nil
 }
 
-//get_key_references
-//Unfortunately to say what this command does is not possible. (Any call to it leads to an error).
+//GetNextScheduledHardfork api request get_next_scheduled_hardfork
+func (api *API) GetNextScheduledHardfork() (*NextScheduledHardfork, error) {
+	var resp NextScheduledHardfork
+	err := api.call("get_next_scheduled_hardfork", emptyParams, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
 
-//get_accounts
+//GetKeyReferences api request get_key_references
+func (api *API) GetKeyReferences(pubkey string) (*json.RawMessage, error) {
+	var resp json.RawMessage
+	err := api.call("get_key_references", []interface{}{pubkey}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+//GetAccounts api request get_accounts
 func (api *API) GetAccounts(accountNames []string) ([]*Account, error) {
-	raw, err := api.raw("get_accounts", [][]string{accountNames})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*Account
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_accounts response", apiID)
-	}
-	return resp, nil
-}
-
-//get_account_references
-//Unfortunately to say what this command does is not possible. (Any call to it leads to an error).
-
-//lookup_account_names
-func (api *API) LookupAccountNames(accountNames []string) (*json.RawMessage, error) {
-	return api.raw("lookup_account_names", [][]string{accountNames})
-}
-
-//lookup_accounts
-func (api *API) LookupAccounts(lowerBoundName string, limit uint32) ([]string, error) {
-	raw, err := api.raw("lookup_accounts", []interface{}{lowerBoundName, limit})
+	err := api.call("get_accounts", [][]string{accountNames}, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp []string
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal lookup_accounts response", apiID)
+	return resp, nil
+}
+
+//GetAccountReferences api request get_account_references
+func (api *API) GetAccountReferences(accountID uint32) (*json.RawMessage, error) {
+	var resp json.RawMessage
+	err := api.call("get_account_references", []interface{}{accountID}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+//LookupAccountNames api request lookup_account_names
+func (api *API) LookupAccountNames(accountNames []string) ([]*Account, error) {
+	var resp []*Account
+	err := api.call("lookup_account_names", [][]string{accountNames}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_account_count
-func (api *API) GetAccountCount() (uint32, error) {
-	raw, err := api.raw("get_account_count", emptyParams)
+//LookupAccounts api request lookup_accounts
+func (api *API) LookupAccounts(lowerBoundName string, limit uint32) ([]*string, error) {
+	var resp []*string
+	err := api.call("lookup_accounts", []interface{}{lowerBoundName, limit}, &resp)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
+	return resp, nil
+}
+
+//GetAccountCount api request get_account_count
+func (api *API) GetAccountCount() (*uint32, error) {
 	var resp uint32
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return 0, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_account_count response", apiID)
-	}
-	return resp, nil
-}
-
-//get_conversion_requests
-func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests, error) {
-	raw, err := api.raw("get_conversion_requests", []string{accountName})
+	err := api.call("get_account_count", emptyParams, &resp)
 	if err != nil {
 		return nil, err
 	}
+	return &resp, nil
+}
+
+//GetConversionRequests api request get_conversion_requests
+func (api *API) GetConversionRequests(accountName string) ([]*ConversionRequests, error) {
 	var resp []*ConversionRequests
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_conversion_requests response", apiID)
+	err := api.call("get_conversion_requests", []string{accountName}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_account_history
-/*func (api *API) GetAccountHistory(account string, from uint64, limit uint32) (*json.RawMessage, error) {
-	return api.raw("get_account_history", []interface{}{account, from, limit})
-}*/
-
+//GetAccountHistory api request get_account_history
 func (api *API) GetAccountHistory(account string, from int64, limit uint32) ([]*types.OperationObject, error) {
-	raw, err := api.raw("get_account_history", []interface{}{account, from, limit})
+	if limit > 10000 {
+		return nil, fmt.Errorf("%v: get_account_history -> limit must not exceed 10000", apiID)
+	}
+	if from == 0 {
+		return nil, fmt.Errorf("%v: get_account_history -> from can not have the value 0", apiID)
+	}
+	if from < int64(limit) && !(from < 0) {
+		return nil, fmt.Errorf("%v: get_account_history -> from must be greater than or equal to the limit", apiID)
+	}
+	var raw json.RawMessage
+	err := api.call("get_account_history", []interface{}{account, from, limit}, &raw)
 	if err != nil {
 		return nil, err
 	}
 	var tmp1 [][]interface{}
-	if err := json.Unmarshal([]byte(*raw), &tmp1); err != nil {
+	if err := json.Unmarshal([]byte(raw), &tmp1); err != nil {
 		return nil, err
 	}
 	var resp []*types.OperationObject
@@ -493,325 +463,321 @@ func (api *API) GetAccountHistory(account string, from int64, limit uint32) ([]*
 	return resp, nil
 }
 
-//get_owner_history
+//GetOwnerHistory api request get_owner_history
 func (api *API) GetOwnerHistory(accountName string) (*json.RawMessage, error) {
-	return api.raw("get_owner_history", []interface{}{accountName})
+	var resp json.RawMessage
+	err := api.call("get_owner_history", []interface{}{accountName}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_recovery_request
+//GetRecoveryRequest api request get_recovery_request
 func (api *API) GetRecoveryRequest(accountName string) (*json.RawMessage, error) {
-	return api.raw("get_recovery_request", []interface{}{accountName})
+	var resp json.RawMessage
+	err := api.call("get_recovery_request", []interface{}{accountName}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_escrow
+//GetEscrow api request get_escrow
 func (api *API) GetEscrow(from string, escrow_id uint32) (*json.RawMessage, error) {
-	return api.raw("get_escrow", []interface{}{from, escrow_id})
+	var resp json.RawMessage
+	err := api.call("get_escrow", []interface{}{from, escrow_id}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_withdraw_routes
+//GetWithdrawRoutes api request get_withdraw_routes
 func (api *API) GetWithdrawRoutes(accountName string, withdraw_route_type string) (*json.RawMessage, error) {
-	return api.raw("get_withdraw_routes", []interface{}{accountName, withdraw_route_type})
+	var resp json.RawMessage
+	err := api.call("get_withdraw_routes", []interface{}{accountName, withdraw_route_type}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_account_bandwidth
+//GetAccountBandwidth api request get_account_bandwidth
 func (api *API) GetAccountBandwidth(accountName string, bandwidth_type uint32) (*json.RawMessage, error) {
-	return api.raw("get_account_bandwidth", []interface{}{accountName, bandwidth_type})
+	var resp json.RawMessage
+	err := api.call("get_account_bandwidth", []interface{}{accountName, bandwidth_type}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_savings_withdraw_from
+//GetSavingsWithdrawFrom api request get_savings_withdraw_from
 func (api *API) GetSavingsWithdrawFrom(accountName string) ([]*SavingsWithdraw, error) {
-	raw, err := api.raw("get_savings_withdraw_from", []interface{}{accountName})
+	var resp []*SavingsWithdraw
+	err := api.call("get_savings_withdraw_from", []interface{}{accountName}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*SavingsWithdraw
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_savings_withdraw_from response", apiID)
 	}
 	return resp, nil
 }
 
-//get_savings_withdraw_to
+//GetSavingsWithdrawTo api request get_savings_withdraw_to
 func (api *API) GetSavingsWithdrawTo(accountName string) ([]*SavingsWithdraw, error) {
-	raw, err := api.raw("get_savings_withdraw_to", []interface{}{accountName})
+	var resp []*SavingsWithdraw
+	err := api.call("get_savings_withdraw_to", []interface{}{accountName}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*SavingsWithdraw
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_savings_withdraw_to response", apiID)
 	}
 	return resp, nil
 }
 
-//get_order_book
+//GetOrderBook api request get_order_book
 func (api *API) GetOrderBook(limit uint32) (*OrderBook, error) {
 	if limit > 1000 {
-		return nil, errors.New("GetOrderBook: limit must not exceed 1000")
+		return nil, fmt.Errorf("%v: get_order_book -> limit must not exceed 1000", apiID)
 	}
-	raw, err := api.raw("get_order_book", []interface{}{limit})
+	var resp OrderBook
+	err := api.call("get_order_book", []interface{}{limit}, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp *OrderBook
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_order_book response", apiID)
-	}
-	return resp, nil
+	return &resp, nil
 }
 
-//get_open_orders
+//GetOpenOrders api request get_open_orders
 func (api *API) GetOpenOrders(accountName string) ([]*OpenOrders, error) {
-	raw, err := api.raw("get_open_orders", []string{accountName})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*OpenOrders
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_open_orders response", apiID)
+	err := api.call("get_open_orders", []string{accountName}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_liquidity_queue
+//GetLiquidityQueue api request get_liquidity_queue
 func (api *API) GetLiquidityQueue(startAccount string, limit uint32) (*json.RawMessage, error) {
-	return api.raw("get_liquidity_queue", []interface{}{startAccount, limit})
+	var resp json.RawMessage
+	err := api.call("get_liquidity_queue", []interface{}{startAccount, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_transaction_hex
-func (api *API) GetTransactionHex(trx *types.Transaction) (*json.RawMessage, error) {
-	return api.raw("get_transaction_hex", []interface{}{&trx})
+//GetTransactionHex api request get_transaction_hex
+func (api *API) GetTransactionHex(trx *types.Transaction) (*string, error) {
+	var resp string
+	err := api.call("get_transaction_hex", []interface{}{&trx}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
-//get_transaction
+//GetTransaction api request get_transaction
 func (api *API) GetTransaction(id string) (*types.Transaction, error) {
-	raw, err := api.raw("get_transaction", []string{id})
-	if err != nil {
-		return nil, err
-	}
 	var resp types.Transaction
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_transaction response", apiID)
+	err := api.call("get_transaction", []string{id}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_required_signatures                | *NONE* | *NONE* |
-
-//get_potential_signatures
-func (api *API) GetPotentialSignatures(trx *types.Transaction) ([]string, error) {
-	raw, err := api.raw("get_potential_signatures", []interface{}{&trx})
+//GetRequiredSignatures api request get_required_signatures
+func (api *API) GetRequiredSignatures(trx *types.Transaction, keys []string) ([]*string, error) {
+	var resp []*string
+	err := api.call("get_required_signatures", []interface{}{trx, keys}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []string
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_potential_signatures response", apiID)
 	}
 	return resp, nil
 }
 
-//verify_authority
-func (api *API) GetVerifyAuthoruty(trx *types.Transaction) (bool, error) {
-	raw, err := api.raw("verify_authority", []interface{}{&trx})
+//GetPotentialSignatures api request get_potential_signatures
+func (api *API) GetPotentialSignatures(trx *types.Transaction) ([]*string, error) {
+	var resp []*string
+	err := api.call("get_potential_signatures", []interface{}{&trx}, &resp)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
+	return resp, nil
+}
+
+//GetVerifyAuthority api request verify_authority
+func (api *API) GetVerifyAuthority(trx *types.Transaction) (*bool, error) {
 	var resp bool
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return false, errors.Wrapf(err, "steem-go: %v: failed to unmarshal verify_authority response", apiID)
+	err := api.call("verify_authority", []interface{}{&trx}, &resp)
+	if err != nil {
+		return nil, err
 	}
-	return resp, nil
+	return &resp, nil
 }
 
-//verify_account_authority               | *NONE* | *NONE* |
+//GetVerifyAccountAuthority api request verify_account_authority
+func (api *API) GetVerifyAccountAuthority(accountName string, keys []string) (*json.RawMessage, error) {
+	var resp json.RawMessage
+	err := api.call("verify_account_authority", []interface{}{accountName, keys}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
 
-//get_active_votes
+//GetActiveVotes api request get_active_votes
 func (api *API) GetActiveVotes(author, permlink string) ([]*VoteState, error) {
-	raw, err := api.raw("get_active_votes", []string{author, permlink})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*VoteState
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_active_votes response", apiID)
+	err := api.call("get_active_votes", []interface{}{author, permlink}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_account_votes
+//GetAccountVotes api request get_account_votes
 func (api *API) GetAccountVotes(author string) ([]*Votes, error) {
-	raw, err := api.raw("get_account_votes", []string{author})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*Votes
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_account_votes response", apiID)
+	err := api.call("get_account_votes", []interface{}{author}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_content
+//GetContent api request get_content
 func (api *API) GetContent(author, permlink string) (*Content, error) {
-	raw, err := api.raw("get_content", []string{author, permlink})
-	if err != nil {
-		return nil, err
-	}
 	var resp Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_content response", apiID)
+	err := api.call("get_content", []interface{}{author, permlink}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return &resp, nil
 }
 
-//get_content_replies
-func (api *API) GetContentReplies(parentAuthor, parentPermlink string) ([]*Content, error) {
-	raw, err := api.raw("get_content_replies", []string{parentAuthor, parentPermlink})
+//GetContentReplies api request get_content_replies
+func (api *API) GetContentReplies(parentAuthor, parentPermlink string, opts ...interface{}) ([]*Content, error) {
+	var resp []*Content
+	err := api.call("get_content_replies", []interface{}{parentAuthor, parentPermlink}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_content_replies response", apiID)
 	}
 	return resp, nil
 }
 
-//get_discussions_by_author_before_date
-func (api *API) GetDiscussionsByAuthorBeforeDate(Author, Permlink, Date string, limit uint32) ([]*Content, error) {
-	raw, err := api.raw("get_discussions_by_author_before_date", []interface{}{Author, Permlink, Date, limit})
+//GetDiscussionsByAuthorBeforeDate api request get_discussions_by_author_before_date
+func (api *API) GetDiscussionsByAuthorBeforeDate(author, permlink, date string, limit uint32) ([]*Content, error) {
+	var resp []*Content
+	err := api.call("get_discussions_by_author_before_date", []interface{}{author, permlink, date, limit}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_discussions_by_author_before_date response", apiID)
 	}
 	return resp, nil
 }
 
-//get_replies_by_last_update
+//GetRepliesByLastUpdate api request get_replies_by_last_update
 func (api *API) GetRepliesByLastUpdate(startAuthor, startPermlink string, limit uint32) ([]*Content, error) {
-	raw, err := api.raw("get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit})
-	if err != nil {
-		return nil, err
-	}
 	var resp []*Content
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_replies_by_last_update response", apiID)
+	err := api.call("get_replies_by_last_update", []interface{}{startAuthor, startPermlink, limit}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//get_witnesses
+//GetWitnesses api request get_witnesses
 func (api *API) GetWitnesses(id []uint32) ([]*Witness, error) {
-	raw, err := api.raw("get_witnesses", [][]uint32{id})
+	var resp []*Witness
+	err := api.call("get_witnesses", [][]uint32{id}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []*Witness
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witnesses response", apiID)
 	}
 	return resp, nil
 }
 
-//get_witness_by_account
+//GetWitnessByAccount api request get_witness_by_account
 func (api *API) GetWitnessByAccount(author string) (*Witness, error) {
-	raw, err := api.raw("get_witness_by_account", []string{author})
+	var resp Witness
+	err := api.call("get_witness_by_account", []string{author}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp Witness
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witness_by_account response", apiID)
 	}
 	return &resp, nil
 }
 
-//get_witnesses_by_vote
+//GetWitnessByVote api request get_witnesses_by_vote
 func (api *API) GetWitnessByVote(author string, limit uint) ([]*Witness, error) {
 	if limit > 1000 {
-		return nil, errors.New("GetWitnessByVote: limit must not exceed 1000")
-	}
-	raw, err := api.raw("get_witnesses_by_vote", []interface{}{author, limit})
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%v: get_witnesses_by_vote -> limit must not exceed 1000", apiID)
 	}
 	var resp []*Witness
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witnesses_by_vote response", apiID)
+	err := api.call("get_witnesses_by_vote", []interface{}{author, limit}, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-//lookup_witness_accounts
-func (api *API) LookupWitnessAccounts(author string, limit uint) ([]string, error) {
+//LookupWitnessAccounts api request lookup_witness_accounts
+func (api *API) LookupWitnessAccounts(author string, limit uint) ([]*string, error) {
 	if limit > 1000 {
-		return nil, errors.New("LookupWitnessAccounts: limit must not exceed 1000")
+		return nil, fmt.Errorf("%v: lookup_witness_accounts -> limit must not exceed 1000", apiID)
 	}
-	raw, err := api.raw("lookup_witness_accounts", []interface{}{author, limit})
+	var resp []*string
+	err := api.call("lookup_witness_accounts", []interface{}{author, limit}, &resp)
 	if err != nil {
 		return nil, err
-	}
-	var resp []string
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal lookup_witness_accounts response", apiID)
 	}
 	return resp, nil
 }
 
-//get_witness_count
-func (api *API) GetWitnessCount() (uint32, error) {
-	raw, err := api.raw("get_witness_count", emptyParams)
-	if err != nil {
-		return 0, err
-	}
+//GetWitnessCount api request get_witness_count
+func (api *API) GetWitnessCount() (*uint32, error) {
 	var resp uint32
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return 0, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_witness_count response", apiID)
-	}
-	return resp, nil
-}
-
-//get_active_witnesses
-func (api *API) GetActiveWitnesses() ([]string, error) {
-	raw, err := api.raw("get_active_witnesses", emptyParams)
+	err := api.call("get_witness_count", emptyParams, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp []string
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_active_witnesses response", apiID)
-	}
-	return resp, nil
+	return &resp, nil
 }
 
-//get_miner_queue
-func (api *API) GetMinerQueue() ([]string, error) {
-	raw, err := api.raw("get_miner_queue", emptyParams)
+//GetActiveWitnesses api request get_active_witnesses
+func (api *API) GetActiveWitnesses() ([]*string, error) {
+	var resp []*string
+	err := api.call("get_active_witnesses", emptyParams, &resp)
 	if err != nil {
 		return nil, err
 	}
-	var resp []string
-	if err := json.Unmarshal([]byte(*raw), &resp); err != nil {
-		return nil, errors.Wrapf(err, "steem-go: %v: failed to unmarshal get_miner_queue response", apiID)
+	return resp, nil
+}
+
+//GetMinerQueue api request get_miner_queue
+func (api *API) GetMinerQueue() ([]*string, error) {
+	var resp []*string
+	err := api.call("get_miner_queue", emptyParams, &resp)
+	if err != nil {
+		return nil, err
 	}
 	return resp, nil
 }
 
-/*
-   // Witnesses
-   (get_witnesses)
-   (get_witness_by_account)
-   (get_witnesses_by_vote)
-   (lookup_witness_accounts)
-   (get_witness_count)
-   (get_active_witnesses)
-   (get_miner_queue)
-*/
+//GetRewardFund api request get_reward_fund
+func (api *API) GetRewardFund(name string) (*json.RawMessage, error) {
+	var resp json.RawMessage
+	err := api.call("get_reward_fund", []interface{}{name}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
 
-//
-// Some randomly added functions.
-//
+//GetVestingDelegations api request get_vesting_delegations
+func (api *API) GetVestingDelegations(account, from string, limit uint32) (*json.RawMessage, error) {
+	var resp json.RawMessage
+	err := api.call("get_vesting_delegations", []interface{}{account, from, limit}, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}

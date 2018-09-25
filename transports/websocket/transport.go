@@ -26,7 +26,7 @@ const (
 
 var netDialer net.Dialer
 
-// Transport implements a CallCloser accessing the Golos RPC endpoint over WebSocket.
+// Transport implements a CallCloser accessing the Steem RPC endpoint over WebSocket.
 type Transport struct {
 	// URLs as passed into the constructor.
 	urls         []string

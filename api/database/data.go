@@ -93,7 +93,7 @@ type Config struct {
 	MinFeeds                       *types.Int `json:"STEEMIT_MIN_FEEDS"`
 	MiningReward                   string     `json:"STEEMIT_MINING_REWARD"`
 	MiningTime                     string     `json:"STEEMIT_MINING_TIME"`
-	steemitMinLiquidityReward      string     `json:"STEEMIT_MIN_LIQUIDITY_REWARD"`
+	MinLiquidityReward             string     `json:"STEEMIT_MIN_LIQUIDITY_REWARD"`
 	MinLiquidityRewardPeriodSec    *types.Int `json:"STEEMIT_MIN_LIQUIDITY_REWARD_PERIOD_SEC"`
 	MinPayoutSbd                   string     `json:"STEEMIT_MIN_PAYOUT_SBD"`
 	MinPowReward                   string     `json:"STEEMIT_MIN_POW_REWARD"`
@@ -222,12 +222,6 @@ type VoteState struct {
 	Rshares *types.Int64 `json:"rshares"`
 	Percent int          `json:"percent"`
 	Time    *types.Time  `json:"time"`
-}
-
-type ChainProperties struct {
-	AccountCreationFee *types.Asset `json:"account_creation_fee"`
-	MaximumBlockSize   uint32       `json:"maximum_block_size"`
-	SBDInterestRate    uint16       `json:"sbd_interest_rate"`
 }
 
 type NextScheduledHardfork struct {
@@ -366,17 +360,17 @@ type Account struct {
 }
 
 type WitnessSchedule struct {
-	ID                            *types.Int       `json:"id"`
-	CurrentVirtualTime            string           `json:"current_virtual_time"`
-	NextShuffleBlockNum           *types.Int       `json:"next_shuffle_block_num"`
-	CurrentShuffledWitnesses      string           `json:"current_shuffled_witnesses"`
-	NumScheduledWitnesses         *types.Int       `json:"num_scheduled_witnesses"`
-	Top19Weight                   *types.Int       `json:"top19_weight"`
-	TimeshareWeight               *types.Int       `json:"timeshare_weight"`
-	MinerWeight                   *types.Int       `json:"miner_weight"`
-	WitnessPayNormalizationFactor *types.Int       `json:"witness_pay_normalization_factor"`
-	MedianProps                   *ChainProperties `json:"median_props"`
-	MajorityVersion               string           `json:"majority_version"`
+	ID                            *types.Int             `json:"id"`
+	CurrentVirtualTime            string                 `json:"current_virtual_time"`
+	NextShuffleBlockNum           *types.Int             `json:"next_shuffle_block_num"`
+	CurrentShuffledWitnesses      string                 `json:"current_shuffled_witnesses"`
+	NumScheduledWitnesses         *types.Int             `json:"num_scheduled_witnesses"`
+	Top19Weight                   *types.Int             `json:"top19_weight"`
+	TimeshareWeight               *types.Int             `json:"timeshare_weight"`
+	MinerWeight                   *types.Int             `json:"miner_weight"`
+	WitnessPayNormalizationFactor *types.Int             `json:"witness_pay_normalization_factor"`
+	MedianProps                   *types.ChainProperties `json:"median_props"`
+	MajorityVersion               string                 `json:"majority_version"`
 }
 
 type FeedHistory struct {
@@ -399,7 +393,7 @@ type Witness struct {
 	LastConfirmedBlockNum *types.Int                 `json:"last_confirmed_block_num"`
 	PowWorker             *types.Int                 `json:"pow_worker"`
 	SigningKey            string                     `json:"signing_key"`
-	Props                 *ChainProperties           `json:"props"`
+	Props                 *types.ChainProperties     `json:"props"`
 	SbdExchangeRate       *CurrentMedianHistoryPrice `json:"sbd_exchange_rate"`
 	LastSbdExchangeUpdate *types.Time                `json:"last_sbd_exchange_update"`
 	LastWork              string                     `json:"last_work"`

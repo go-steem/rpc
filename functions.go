@@ -319,7 +319,7 @@ func (client *Client) MultiTransfer(username string, arrtrans []ArrTransfer) (*O
 	return &OperResp{NameOper: "MultiTransfer", Bresp: resp}, err
 }
 
-//Login checking the user's posting key for the possibility of operations in GOLOS.
+//Login checking the user's posting key for the possibility of operations in STEEM.
 func (client *Client) Login(username string) (bool, error) {
 	js := types.LoginOperation{
 		Account: username,
@@ -544,23 +544,24 @@ func (client *Client) FeedPublish(publisher string, base, quote *types.Asset) (*
 }
 
 //WitnessUpdate updating delegate data
-func (client *Client) WitnessUpdate(owner, url, blocksigningkey string, accountcreationfee *types.Asset, maxblocksize uint32, sbdinterestrate uint16) (*OperResp, error) {
+func (client *Client) WitnessUpdate(owner, url, blocksigningkey string) (*OperResp, error) {
 	var trx []types.Operation
 
 	if url == "" {
 		url = " "
 	}
 
+	ans, erra := client.Database.GetWitnessByAccount(owner)
+	if erra != nil {
+		return nil, erra
+	}
+
 	tx := &types.WitnessUpdateOperation{
 		Owner:           owner,
 		URL:             url,
 		BlockSigningKey: blocksigningkey,
-		Props: &types.ChainProperties{
-			AccountCreationFee: accountcreationfee,
-			MaximumBlockSize:   maxblocksize,
-			SBDInterestRate:    sbdinterestrate,
-		},
-		Fee: SetAsset(0.000, "STEEM"),
+		Props:           ans.Props,
+		Fee:             SetAsset(0.000, "STEEM"),
 	}
 
 	trx = append(trx, tx)

@@ -151,7 +151,7 @@ func GetCommentOptionsOperation(username, permlink string, options PCOptions) *t
 	var av, acr bool
 	var vMap *types.Asset
 	var percentSD uint16
-	symbol := "GBG"
+	symbol := "SBD"
 	vMap = SetAsset(1000000.000, symbol)
 	extens := []interface{}{}
 

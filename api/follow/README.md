@@ -4,15 +4,19 @@ This package adds support for `follow_api`.
 
 ## State
 
-| Method Name               | Raw Version | Full Version |
-| ------------------------- |:-----------:|:------------:|
-| `get_followers`           | DONE        | DONE         |
-| `get_following`           | DONE        | DONE         |
-| `get_follow_count`        | DONE        | DONE         |
-| `get_feed_entries`        | DONE        | DONE         |
-| `get_feed`                | DONE        | DONE         |
-| `get_blog_entries`        | DONE        | DONE         |
-| `get_blog`                | DONE        | DONE         |
-| `get_account_reputations` | DONE        | DONE         |
-| `get_reblogged_by`        | DONE        | DONE         |
-| `get_blog_authors`        | DONE        | DONE         |
+| **ID** | **Command Name** | **Version** |
+| :-: | :-: | :-: |
+| 1 | get_followers | **DONE** |
+| 2 | get_following | **DONE** |
+| 3 | get_follow_count | **DONE** |
+| 4 | get_feed_entries | **DONE** |
+| 5 | get_feed | **DONE** |
+| 6 | get_blog_entries | **DONE** |
+| 7 | get_blog | **DONE** |
+| 8 | get_account_reputations | **DONE** |
+| 9 | get_reblogged_by | **DONE** |
+| 10 | get_blog_authors | **DONE** |
+
+## License
+
+MIT, see the `LICENSE` file.
