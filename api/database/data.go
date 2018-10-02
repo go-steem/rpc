@@ -384,10 +384,10 @@ type Witness struct {
 	Owner                 string                     `json:"owner"`
 	Created               *types.Time                `json:"created"`
 	URL                   string                     `json:"url"`
-	Votes                 string                     `json:"votes"`
-	VirtualLastUpdate     string                     `json:"virtual_last_update"`
-	VirtualPosition       string                     `json:"virtual_position"`
-	VirtualScheduledTime  string                     `json:"virtual_scheduled_time"`
+	Votes                 *types.Int                 `json:"votes"`
+	VirtualLastUpdate     *types.Int                 `json:"virtual_last_update"`
+	VirtualPosition       *types.Int                 `json:"virtual_position"`
+	VirtualScheduledTime  *types.Int                 `json:"virtual_scheduled_time"`
 	TotalMissed           *types.Int                 `json:"total_missed"`
 	LastAslot             *types.Int                 `json:"last_aslot"`
 	LastConfirmedBlockNum *types.Int                 `json:"last_confirmed_block_num"`
