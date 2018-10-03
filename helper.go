@@ -79,7 +79,7 @@ func (client *Client) GetVotingPower(username string) (int, error) {
 		return 0, errc
 	}
 
-	acc, erra := client.Database.GetAccounts([]string{username})
+	acc, erra := client.Database.GetAccounts(username)
 	if erra != nil {
 		return 0, erra
 	}
@@ -202,7 +202,7 @@ func GetCommentOptionsOperation(username, permlink string, options PCOptions) *t
 func (client *Client) GetPostBandwidth(username string) (int64, error) {
 	minutesPerDay := float64(1440)
 
-	resp, err := client.Database.GetAccounts([]string{username})
+	resp, err := client.Database.GetAccounts(username)
 	if err != nil {
 		return 0, err
 	}

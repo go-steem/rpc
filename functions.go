@@ -753,7 +753,7 @@ func (client *Client) AddKeys(username string, keytype int, keys []string) (*Ope
 	var active *types.Authority
 	var posting *types.Authority
 
-	r, e := client.Database.GetAccounts([]string{username})
+	r, e := client.Database.GetAccounts(username)
 	if e != nil {
 		return nil, e
 	}
@@ -833,7 +833,7 @@ func (client *Client) RemoveKeys(username string, keytype int, keys []string) (*
 	var active *types.Authority
 	var posting *types.Authority
 
-	r, e := client.Database.GetAccounts([]string{username})
+	r, e := client.Database.GetAccounts(username)
 	if e != nil {
 		return nil, e
 	}

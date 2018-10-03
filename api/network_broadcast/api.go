@@ -30,8 +30,5 @@ func (api *API) BroadcastTransaction(tx *types.Transaction) error {
 func (api *API) BroadcastTransactionSynchronous(tx *types.Transaction) (*BroadcastResponse, error) {
 	var resp BroadcastResponse
 	err := api.call("broadcast_transaction_synchronous", []interface{}{tx}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return &resp, nil
+	return &resp, err
 }

@@ -4,11 +4,13 @@ import (
 	"io"
 	// Stdlib
 	"context"
+	"encoding/json"
 	"net"
 	"time"
 
 	// Vendor
 	"github.com/asuleymanov/jsonrpc2"
+	"github.com/asuleymanov/steem-go/transports"
 	"github.com/asuleymanov/websocket"
 	"github.com/pkg/errors"
 	"gopkg.in/tomb.v2"
@@ -188,7 +190,7 @@ Loop:
 
 		// In case auto-reconnect is disabled, fail immediately.
 		if !t.autoReconnectEnabled {
-			return errors.Wrap(err, "call failed")
+			return parseError(err)
 		}
 
 		// In case this is a connection error, request a new connection.
@@ -203,8 +205,22 @@ Loop:
 		}
 
 		// Some other error occurred, return it immediately.
-		return errors.Wrap(err, "call failed")
+		return parseError(err)
 	}
+}
+
+func parseError(err error) error {
+	if v, ok := err.(*jsonrpc2.Error); ok {
+		var derr transports.RPCErrData
+		json.Unmarshal([]byte(*v.Data), &derr)
+		strERR := &transports.RPCError{
+			Code:    v.Code,
+			Message: v.Message,
+			Datas:   derr,
+		}
+		return strERR
+	}
+	return errors.Wrap(err, "call failed")
 }
 
 func (t *Transport) dialer() error {

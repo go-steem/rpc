@@ -23,13 +23,10 @@ func (api *API) call(method string, params, resp interface{}) error {
 }
 
 //GetAccountReputations api request get_account_reputations
-func (api *API) GetAccountReputations(accounts []string) ([]*uint32, error) {
+func (api *API) GetAccountReputations(accounts ...string) ([]*uint32, error) {
 	var resp []*uint32
 	err := api.call("get_account_reputations", []interface{}{accounts}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetBlog api request get_blog
@@ -39,20 +36,14 @@ func (api *API) GetBlog(accountName string, entryID uint32, limit uint16) ([]*Bl
 	}
 	var resp []*Blogs
 	err := api.call("get_blog", []interface{}{accountName, entryID, limit}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetBlogAuthors api request get_blog_authors
 func (api *API) GetBlogAuthors(author string) (*BlogAuthors, error) {
 	var resp BlogAuthors
 	err := api.call("get_blog_authors", []interface{}{author}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return &resp, nil
+	return &resp, err
 }
 
 //GetBlogEntries api request get_blog_entries
@@ -62,10 +53,7 @@ func (api *API) GetBlogEntries(accountName string, entryID uint32, limit uint16)
 	}
 	var resp []*BlogEntries
 	err := api.call("get_blog_entries", []interface{}{accountName, entryID, limit}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetFeed api request get_feed
@@ -75,10 +63,7 @@ func (api *API) GetFeed(accountName string, entryID uint32, limit uint16) ([]*Fe
 	}
 	var resp []*Feeds
 	err := api.call("get_feed", []interface{}{accountName, entryID, limit}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetFeedEntries api request get_feed_entries
@@ -88,20 +73,14 @@ func (api *API) GetFeedEntries(accountName string, entryID uint32, limit uint16)
 	}
 	var resp []*FeedEntry
 	err := api.call("get_feed_entries", []interface{}{accountName, entryID, limit}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetFollowCount api request get_follow_count
 func (api *API) GetFollowCount(accountName string) (*FollowCount, error) {
 	var resp FollowCount
 	err := api.call("get_follow_count", []interface{}{accountName}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return &resp, nil
+	return &resp, err
 }
 
 //GetFollowers api request get_followers
@@ -120,10 +99,7 @@ func (api *API) GetFollowers(accountName, start, kind string, limit uint16) ([]*
 	}
 	var resp []*FollowObject
 	err := api.call("get_followers", []interface{}{accountName, start, kind, limit}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetFollowing api request get_following
@@ -142,18 +118,12 @@ func (api *API) GetFollowing(accountName, start, kind string, limit uint16) ([]*
 	}
 	var resp []*FollowObject
 	err := api.call("get_following", []interface{}{accountName, start, kind, limit}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }
 
 //GetRebloggedBy api request get_reblogged_by
 func (api *API) GetRebloggedBy(author, permlink string) ([]*string, error) {
 	var resp []*string
 	err := api.call("get_reblogged_by", []interface{}{author, permlink}, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return resp, err
 }

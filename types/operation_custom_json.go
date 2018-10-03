@@ -68,7 +68,7 @@ func (op *CustomJSONOperation) UnmarshalData() (interface{}, error) {
 		if err := json.NewDecoder(strings.NewReader(op.JSON)).Decode(&rawTuple); err != nil {
 			return nil, errors.Wrapf(err, "failed to unmarshal CustomJSONOperation.JSON: \n%v", op.JSON)
 		}
-		if len(rawTuple) < 2 || rawTuple[1] == nil {
+		if rawTuple[1] == nil {
 			return nil, errors.Errorf("invalid CustomJSONOperation.JSON: \n%v", op.JSON)
 		}
 		bodyReader = bytes.NewReader([]byte(rawTuple[1]))

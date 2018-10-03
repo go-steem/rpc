@@ -107,7 +107,7 @@ func (client *Client) VerifyPost(author, permlink string) (bool, error) {
 
 //VerifyDelegatePostingKeySign check whether the user has delegated the opportunity to use his post by using operations from a given user.
 func (client *Client) VerifyDelegatePostingKeySign(fromUser, toUser string) (bool, error) {
-	acc, err := client.Database.GetAccounts([]string{fromUser})
+	acc, err := client.Database.GetAccounts(fromUser)
 	if err != nil {
 		return false, errors.Wrapf(err, "Error Verify Delegate Vote Sign: ")
 	}
@@ -138,7 +138,7 @@ func (client *Client) VerifyFirstPost(username string) (bool, error) {
 
 //VerifyUser сheck if the user exists in STEEM
 func (client *Client) VerifyUser(username string) (bool, error) {
-	acc, err := client.Database.GetAccounts([]string{username})
+	acc, err := client.Database.GetAccounts(username)
 	if err != nil {
 		return false, errors.Wrapf(err, "Error Verify User: ")
 	}
