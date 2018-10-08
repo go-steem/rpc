@@ -142,6 +142,12 @@ func (client *Client) VerifyUser(username string) (bool, error) {
 	if err != nil {
 		return false, errors.Wrapf(err, "Error Verify User: ")
 	}
-
-	return len(acc) == 1, nil
+	
+	for _,v:=range acc{
+		if v.Name==username{
+			return true,nil
+		}
+	}
+	
+	return false, nil
 }
