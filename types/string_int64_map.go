@@ -46,7 +46,6 @@ func (m *StringInt64Map) UnmarshalJSON(data []byte) error {
 			v = t
 		default:
 			invalid = true
-			break
 		}
 
 		mp[k] = v
