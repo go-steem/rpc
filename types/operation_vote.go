@@ -9,7 +9,7 @@ type VoteOperation struct {
 	Voter    string `json:"voter"`
 	Author   string `json:"author"`
 	Permlink string `json:"permlink"`
-	Weight   Int16  `json:"weight"`
+	Weight   int16  `json:"weight"`
 }
 
 //Type function that defines the type of operation VoteOperation.

@@ -6,12 +6,12 @@ import (
 
 //AccountUpdateOperation represents account_update operation data.
 type AccountUpdateOperation struct {
-	Account      string           `json:"account"`
-	Owner        *Authority       `json:"owner,omitempty"`
-	Active       *Authority       `json:"active,omitempty"`
-	Posting      *Authority       `json:"posting,omitempty"`
-	MemoKey      string           `json:"memo_key"`
-	JSONMetadata *AccountMetadata `json:"json_metadata"`
+	Account      string     `json:"account"`
+	Owner        *Authority `json:"owner,omitempty"`
+	Active       *Authority `json:"active,omitempty"`
+	Posting      *Authority `json:"posting,omitempty"`
+	MemoKey      string     `json:"memo_key"`
+	JSONMetadata string     `json:"json_metadata"`
 }
 
 //Type function that defines the type of operation AccountUpdateOperation.

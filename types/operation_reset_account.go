@@ -7,7 +7,7 @@ import (
 //ResetAccountOperation represents reset_account operation data.
 type ResetAccountOperation struct {
 	ResetAccount      string     `json:"reset_account"`
-	AccountToReset    string     `json:"Account_to_reset"`
+	AccountToReset    string     `json:"account_to_reset"`
 	NewOwnerAuthority *Authority `json:"new_owner_authority"`
 }
 

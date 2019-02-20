@@ -8,7 +8,7 @@ import (
 	//"log"
 	"math/big"
 
-	"github.com/asuleymanov/steem-go/rfc6979"
+	"github.com/asuleymanov/steem-go/transactions/rfc6979"
 	secp256k1 "github.com/btcsuite/btcd/btcec"
 	"github.com/pkg/errors"
 )

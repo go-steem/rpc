@@ -3,17 +3,26 @@ package client
 import (
 	"time"
 
-	"github.com/asuleymanov/steem-go/api/network_broadcast"
+	"github.com/asuleymanov/steem-go/api"
 	"github.com/asuleymanov/steem-go/transactions"
 	"github.com/asuleymanov/steem-go/types"
 )
+
+//BResp of response when sending a transaction.
+type BResp struct {
+	ID       string
+	BlockNum int32
+	TrxNum   int32
+	Expired  bool
+	JSONTrx  string
+}
 
 //SendTrx generates and sends an array of transactions to STEEM.
 func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, error) {
 	var bresp BResp
 
 	// Getting the necessary parameters
-	props, err := client.Database.GetDynamicGlobalProperties()
+	props, err := client.API.GetDynamicGlobalProperties()
 	if err != nil {
 		return nil, err
 	}
@@ -51,11 +60,11 @@ func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, 
 	}
 
 	// Sending a transaction
-	var resp *network_broadcast.BroadcastResponse
+	var resp *api.BroadcastResponse
 	if client.AsyncProtocol {
-		err = client.NetworkBroadcast.BroadcastTransaction(tx.Transaction)
+		err = client.API.BroadcastTransaction(tx.Transaction)
 	} else {
-		resp, err = client.NetworkBroadcast.BroadcastTransactionSynchronous(tx.Transaction)
+		resp, err = client.API.BroadcastTransactionSynchronous(tx.Transaction)
 	}
 
 	bresp.JSONTrx, _ = JSONTrxString(tx)
@@ -77,7 +86,7 @@ func (client *Client) SendTrx(username string, strx []types.Operation) (*BResp, 
 
 func (client *Client) GetTrx(strx []types.Operation) (*types.Transaction, error) {
 	// Getting the necessary parameters
-	props, err := client.Database.GetDynamicGlobalProperties()
+	props, err := client.API.GetDynamicGlobalProperties()
 	if err != nil {
 		return nil, err
 	}

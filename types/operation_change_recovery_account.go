@@ -27,6 +27,7 @@ func (op *ChangeRecoveryAccountOperation) MarshalTransaction(encoder *transactio
 	enc.EncodeUVarint(uint64(TypeChangeRecoveryAccount.Code()))
 	enc.Encode(op.AccountToRecover)
 	enc.Encode(op.NewRecoveryAccount)
+	//enc.Encode(op.Extensions)
 	enc.Encode(byte(0))
 	return enc.Err()
 }

@@ -25,54 +25,6 @@ import (
 	"math/rand"
 )
 
-// mac returns an HMAC of the given key and message.
-func mac(alg func() hash.Hash, k, m, buf []byte) []byte {
-	h := hmac.New(alg, k)
-	h.Write(m)
-	return h.Sum(buf[:0])
-}
-
-// https://tools.ietf.org/html/rfc6979#section-2.3.2
-func bits2int(in []byte, qlen int) *big.Int {
-	vlen := len(in) * 8
-	v := new(big.Int).SetBytes(in)
-	if vlen > qlen {
-		v = new(big.Int).Rsh(v, uint(vlen-qlen))
-	}
-	return v
-}
-
-// https://tools.ietf.org/html/rfc6979#section-2.3.3
-func int2octets(v *big.Int, rolen int) []byte {
-	out := v.Bytes()
-
-	// pad with zeros if it's too short
-	if len(out) < rolen {
-		out2 := make([]byte, rolen)
-		copy(out2[rolen-len(out):], out)
-		return out2
-	}
-
-	// drop most significant bytes if it's too long
-	if len(out) > rolen {
-		out2 := make([]byte, rolen)
-		copy(out2, out[len(out)-rolen:])
-		return out2
-	}
-
-	return out
-}
-
-// https://tools.ietf.org/html/rfc6979#section-2.3.4
-func bits2octets(in []byte, q *big.Int, qlen, rolen int) []byte {
-	z1 := bits2int(in, qlen)
-	z2 := new(big.Int).Sub(z1, q)
-	if z2.Sign() < 0 {
-		return int2octets(z1, rolen)
-	}
-	return int2octets(z2, rolen)
-}
-
 //var one = big.NewInt(1)
 var oneInitializer = []byte{0x01}
 
@@ -87,8 +39,9 @@ func RandStringBytes(n int) string {
 }
 
 // https://tools.ietf.org/html/rfc6979#section-3.2
-func generateSecret(priv *ecdsa.PrivateKey, alg func() hash.Hash, hash []byte, test func(*big.Int) bool, nonce int) {
+func generateSecret(priv *ecdsa.PrivateKey, alg func() hash.Hash, hash []byte, test func(*big.Int) bool, nonce int) error {
 	var hashClone = make([]byte, len(hash))
+	var err error
 	copy(hashClone, hash)
 
 	if nonce > 0 {
@@ -96,7 +49,10 @@ func generateSecret(priv *ecdsa.PrivateKey, alg func() hash.Hash, hash []byte, t
 		binary.BigEndian.PutUint32(nonceA, uint32(nonce))
 		hashClone = append(hashClone, nonceA...)
 		hs := sha256.New()
-		hs.Write(hashClone)
+		_, err = hs.Write(hashClone)
+		if err != nil {
+			return err
+		}
 		hashClone = hs.Sum(nil)
 	}
 
@@ -114,41 +70,72 @@ func generateSecret(priv *ecdsa.PrivateKey, alg func() hash.Hash, hash []byte, t
 
 	m := append(append(append(v, 0x00), x...), hashClone...)
 
-	k = HmacSHA256(m, k)
+	k, err = HmacSHA256(m, k)
+	if err != nil {
+		return err
+	}
 
 	// Step E
-	v = HmacSHA256(v, k)
+	v, err = HmacSHA256(v, k)
+	if err != nil {
+		return err
+	}
 
 	// Step F
-	k = HmacSHA256(append(append(append(v, 0x01), x...), hashClone...), k)
+	k, err = HmacSHA256(append(append(append(v, 0x01), x...), hashClone...), k)
+	if err != nil {
+		return err
+	}
 
 	// Step G
-	v = HmacSHA256(v, k)
+	v, err = HmacSHA256(v, k)
+	if err != nil {
+		return err
+	}
 
 	// Step H1/H2a, ignored as tlen === qlen (256 bit)
 	// Step H2b
-	v = HmacSHA256(v, k)
+	v, err = HmacSHA256(v, k)
+	if err != nil {
+		return err
+	}
 
 	var t = hashToInt(v, c)
+	if err != nil {
+		return err
+	}
 
 	// Step H3, repeat until T is within the interval [1, n - 1]
 	for t.Sign() <= 0 || t.Cmp(q) >= 0 || !test(t) {
 
-		k = HmacSHA256(append(v, 0x00), k)
+		k, err = HmacSHA256(append(v, 0x00), k)
+		if err != nil {
+			return err
+		}
 
-		v = HmacSHA256(v, k)
+		v, err = HmacSHA256(v, k)
+		if err != nil {
+			return err
+		}
 
 		// Step H1/H2a, again, ignored as tlen === qlen (256 bit)
 		// Step H2b again
-		v = HmacSHA256(v, k)
+		v, err = HmacSHA256(v, k)
+		if err != nil {
+			return err
+		}
 
 		t = hashToInt(v, c)
 	}
+	return nil
 }
 
-func HmacSHA256(m, k []byte) []byte {
+func HmacSHA256(m, k []byte) ([]byte, error) {
 	mac := hmac.New(sha256.New, k)
-	mac.Write(m)
+	_, err := mac.Write(m)
+	if err != nil {
+		return []byte{}, err
+	}
 	expectedMAC := mac.Sum(nil)
-	return expectedMAC
+	return expectedMAC, nil
 }

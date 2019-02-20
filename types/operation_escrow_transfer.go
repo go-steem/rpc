@@ -8,14 +8,14 @@ import (
 type EscrowTransferOperation struct {
 	From                 string `json:"from"`
 	To                   string `json:"to"`
+	Agent                string `json:"agent"`
+	EscrowID             uint32 `json:"escrow_id"`
 	SbdAmount            *Asset `json:"sbd_amount"`
 	SteemAmount          *Asset `json:"steem_amount"`
-	EscrowID             uint32 `json:"escrow_id"`
-	Agent                string `json:"agent"`
 	Fee                  *Asset `json:"fee"`
-	JSONMeta             string `json:"json_meta"`
 	RatificationDeadline *Time  `json:"ratification_deadline"`
 	EscrowExpiration     *Time  `json:"escrow_expiration"`
+	JSONMeta             string `json:"json_meta"`
 }
 
 //Type function that defines the type of operation EscrowTransferOperation.
@@ -34,13 +34,13 @@ func (op *EscrowTransferOperation) MarshalTransaction(encoder *transaction.Encod
 	enc.EncodeUVarint(uint64(TypeEscrowTransfer.Code()))
 	enc.Encode(op.From)
 	enc.Encode(op.To)
+	enc.Encode(op.Agent)
+	enc.Encode(op.EscrowID)
 	enc.Encode(op.SbdAmount)
 	enc.Encode(op.SteemAmount)
-	enc.Encode(op.EscrowID)
-	enc.Encode(op.Agent)
 	enc.Encode(op.Fee)
-	enc.Encode(op.JSONMeta)
 	enc.Encode(op.RatificationDeadline)
 	enc.Encode(op.EscrowExpiration)
+	enc.Encode(op.JSONMeta)
 	return enc.Err()
 }

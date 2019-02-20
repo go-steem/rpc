@@ -139,7 +139,7 @@ func (encoder *Encoder) EncodeBool(b bool) error {
 
 //EncodeMoney converting Asset to byte
 func (encoder *Encoder) EncodeMoney(s string) error {
-	r, _ := regexp.Compile("^[0-9]+\\.?[0-9]* [A-Za-z0-9]+$")
+	r, _ := regexp.Compile(`^[0-9]+\.?[0-9]* [A-Za-z0-9]+$`)
 	if r.MatchString(s) {
 		asset := strings.Split(s, " ")
 		amm, errParsInt := strconv.ParseInt(strings.Replace(asset[0], ".", "", -1), 10, 64)

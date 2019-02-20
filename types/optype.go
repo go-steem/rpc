@@ -1,6 +1,6 @@
 package types
 
-// OpType represents a Steem operation type, i.e. vote, comment, pow and so on.
+// OpType represents a Golos operation type, i.e. vote, comment, pow and so on.
 type OpType string
 
 // Code returns the operation code associated with the given operation type.
@@ -51,20 +51,20 @@ const (
 	TypeClaimRewardBalance          OpType = "claim_reward_balance"
 	TypeDelegateVestingShares       OpType = "delegate_vesting_shares"
 	TypeAccountCreateWithDelegation OpType = "account_create_with_delegation"
-	TypeFillConvertRequest          OpType = "fill_convert_request"
-	TypeAuthorReward                OpType = "author_reward"
-	TypeCurationReward              OpType = "curation_reward"
-	TypeCommentReward               OpType = "comment_reward"
-	TypeLiquidityReward             OpType = "liquidity_reward"
-	TypeInterest                    OpType = "interest"
-	TypeFillVestingWithdraw         OpType = "fill_vesting_withdraw"
-	TypeFillOrder                   OpType = "fill_order"
-	TypeShutdownWitness             OpType = "shutdown_witness"
-	TypeFillTransferFromSavings     OpType = "fill_transfer_from_savings"
-	TypeHardfork                    OpType = "hardfork"
-	TypeCommentPayoutUpdate         OpType = "comment_payout_update"
-	TypeReturnVestingDelegation     OpType = "return_vesting_delegation"
-	TypeCommentBenefactorReward     OpType = "comment_benefactor_reward"
+	TypeFillConvertRequest          OpType = "fill_convert_request"       //Virtual Operation
+	TypeAuthorReward                OpType = "author_reward"              //Virtual Operation
+	TypeCurationReward              OpType = "curation_reward"            //Virtual Operation
+	TypeCommentReward               OpType = "comment_reward"             //Virtual Operation
+	TypeLiquidityReward             OpType = "liquidity_reward"           //Virtual Operation
+	TypeInterest                    OpType = "interest"                   //Virtual Operation
+	TypeFillVestingWithdraw         OpType = "fill_vesting_withdraw"      //Virtual Operation
+	TypeFillOrder                   OpType = "fill_order"                 //Virtual Operation
+	TypeShutdownWitness             OpType = "shutdown_witness"           //Virtual Operation
+	TypeFillTransferFromSavings     OpType = "fill_transfer_from_savings" //Virtual Operation
+	TypeHardfork                    OpType = "hardfork"                   //Virtual Operation
+	TypeCommentPayoutUpdate         OpType = "comment_payout_update"      //Virtual Operation
+	TypeReturnVestingDelegation     OpType = "return_vesting_delegation"  //Virtual Operation
+	TypeCommentBenefactorReward     OpType = "comment_benefactor_reward"  //Virtual Operation
 )
 
 var opTypes = [...]OpType{
@@ -110,20 +110,20 @@ var opTypes = [...]OpType{
 	TypeClaimRewardBalance,
 	TypeDelegateVestingShares,
 	TypeAccountCreateWithDelegation,
-	TypeFillConvertRequest,
-	TypeAuthorReward,
-	TypeCurationReward,
-	TypeCommentReward,
-	TypeLiquidityReward,
-	TypeInterest,
-	TypeFillVestingWithdraw,
-	TypeFillOrder,
-	TypeShutdownWitness,
-	TypeFillTransferFromSavings,
-	TypeHardfork,
-	TypeCommentPayoutUpdate,
-	TypeReturnVestingDelegation,
-	TypeCommentBenefactorReward,
+	TypeFillConvertRequest,      //Virtual Operation
+	TypeAuthorReward,            //Virtual Operation
+	TypeCurationReward,          //Virtual Operation
+	TypeCommentReward,           //Virtual Operation
+	TypeLiquidityReward,         //Virtual Operation
+	TypeInterest,                //Virtual Operation
+	TypeFillVestingWithdraw,     //Virtual Operation
+	TypeFillOrder,               //Virtual Operation
+	TypeShutdownWitness,         //Virtual Operation
+	TypeFillTransferFromSavings, //Virtual Operation
+	TypeHardfork,                //Virtual Operation
+	TypeCommentPayoutUpdate,     //Virtual Operation
+	TypeReturnVestingDelegation, //Virtual Operation
+	TypeCommentBenefactorReward, //Virtual Operation
 }
 
 // opCodes keeps mapping operation type -> operation code.

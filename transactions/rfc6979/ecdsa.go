@@ -5,8 +5,6 @@ import (
 	"crypto/elliptic"
 	"hash"
 	"math/big"
-	//"log"
-	//"encoding/hex"
 )
 
 // SignECDSA signs an arbitrary length hash (which should be the result of
@@ -20,20 +18,15 @@ func SignECDSA(priv *ecdsa.PrivateKey, hash []byte, alg func() hash.Hash, nonce 
 	c := priv.PublicKey.Curve
 	n := c.Params().N
 
-	//log.Println("e=", hex.EncodeToString(hash)) 		 // OK
-	//log.Println("N=", hex.EncodeToString(N.Bytes()))	 // OK
-
 	var hashClone = make([]byte, len(hash))
 	copy(hashClone, hash)
 
-	//log.Println("generateSecret- nonce=", nonce)
-	generateSecret(priv /* N, priv.D, */, alg, hashClone, func(k *big.Int) bool {
+	err = generateSecret(priv /* N, priv.D, */, alg, hashClone, func(k *big.Int) bool {
 		inv := new(big.Int).ModInverse(k, n)
 		r, _ = priv.Curve.ScalarBaseMult(k.Bytes())
 		r.Mod(r, n)
 
 		if r.Sign() == 0 {
-			//log.Println("r.Sign() == 0")
 			return false
 		}
 
@@ -43,16 +36,9 @@ func SignECDSA(priv *ecdsa.PrivateKey, hash []byte, alg func() hash.Hash, nonce 
 		s.Mul(s, inv)
 		s.Mod(s, n)
 
-		if s.Sign() == 0 {
-			//log.Println("s.Sign() == 0")
-			return false
-		}
-
-		return true
+		return s.Sign() == 0
 	}, nonce)
 
-	//log.Println("enforce low S values, see bip62: 'low s values in signatures'");
-	// enforce low S values, see bip62: 'low s values in signatures'
 	nOverTwo := new(big.Int).Div(n, big.NewInt(2))
 	if s.Cmp(nOverTwo) > 0 {
 		s = new(big.Int).Sub(n, s)

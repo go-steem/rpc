@@ -6,13 +6,13 @@ import (
 
 //CommentOperation represents comment operation data.
 type CommentOperation struct {
-	ParentAuthor   string           `json:"parent_author"`
-	ParentPermlink string           `json:"parent_permlink"`
-	Author         string           `json:"author"`
-	Permlink       string           `json:"permlink"`
-	Title          string           `json:"title"`
-	Body           string           `json:"body"`
-	JSONMetadata   *ContentMetadata `json:"json_metadata"`
+	ParentAuthor   string `json:"parent_author"`
+	ParentPermlink string `json:"parent_permlink"`
+	Author         string `json:"author"`
+	Permlink       string `json:"permlink"`
+	Title          string `json:"title"`
+	Body           string `json:"body"`
+	JSONMetadata   string `json:"json_metadata"`
 }
 
 //Type function that defines the type of operation CommentOperation.

@@ -3,13 +3,17 @@
 package transactions
 
 import (
+	// Stdlib
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"time"
 
+	// RPC
 	"github.com/asuleymanov/steem-go/encoding/transaction"
 	"github.com/asuleymanov/steem-go/types"
+
+	// Vendor
 	"github.com/pkg/errors"
 )
 

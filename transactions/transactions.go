@@ -1,11 +1,15 @@
 package transactions
 
 import (
+	// Stdlib
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 
+	// RPC
 	"github.com/asuleymanov/steem-go/types"
+
+	// Vendor
 	"github.com/pkg/errors"
 )
 

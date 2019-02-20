@@ -6,14 +6,14 @@ import (
 
 //CreateClaimedAccountOperation represents create_claimed_account operation data.
 type CreateClaimedAccountOperation struct {
-	Creator        string           `json:"creator"`
-	NewAccountName string           `json:"new_account_name"`
-	Owner          *Authority       `json:"owner"`
-	Active         *Authority       `json:"active"`
-	Posting        *Authority       `json:"posting"`
-	MemoKey        string           `json:"memo_key"`
-	JSONMetadata   *AccountMetadata `json:"json_metadata"`
-	Extensions     []interface{}    `json:"extensions"`
+	Creator        string        `json:"creator"`
+	NewAccountName string        `json:"new_account_name"`
+	Owner          *Authority    `json:"owner"`
+	Active         *Authority    `json:"active"`
+	Posting        *Authority    `json:"posting"`
+	MemoKey        string        `json:"memo_key"`
+	JsonMetadata   string        `json:"json_metadata"`
+	Extensions     []interface{} `json:"extensions"`
 }
 
 //Type function that defines the type of operation CreateClaimedAccountOperation.
@@ -35,8 +35,8 @@ func (op *CreateClaimedAccountOperation) MarshalTransaction(encoder *transaction
 	enc.Encode(op.Owner)
 	enc.Encode(op.Active)
 	enc.Encode(op.Posting)
-	enc.EncodePubKey(op.MemoKey)
-	enc.Encode(op.JSONMetadata)
+	enc.Encode(op.MemoKey)
+	enc.Encode(op.JsonMetadata)
 	//enc.Encode(op.Extensions)
 	enc.Encode(byte(0))
 	return enc.Err()

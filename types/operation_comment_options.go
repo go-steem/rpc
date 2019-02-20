@@ -7,6 +7,11 @@ import (
 )
 
 //CommentOptionsOperation represents comment_options operation data.
+/*
+Extensions:
+CommentPayoutBeneficiaries
+AllowedVoteAssets
+*/
 type CommentOptionsOperation struct {
 	Author               string        `json:"author"`
 	Permlink             string        `json:"permlink"`
@@ -47,12 +52,7 @@ func (op *CommentOptionsOperation) MarshalTransaction(encoder *transaction.Encod
 		_ = json.Unmarshal(z1, &d)
 
 		enc.Encode(byte(1))
-		enc.Encode(byte(0))
-		enc.EncodeUVarint(uint64(len(d.Beneficiaries)))
-		for _, val := range d.Beneficiaries {
-			enc.Encode(val.Account)
-			enc.Encode(val.Weight)
-		}
+		enc.Encode(d)
 	} else {
 		enc.Encode(byte(0))
 	}

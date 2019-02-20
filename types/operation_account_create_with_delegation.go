@@ -6,16 +6,16 @@ import (
 
 //AccountCreateWithDelegationOperation represents account_create_with_delegation operation data.
 type AccountCreateWithDelegationOperation struct {
-	Fee            *Asset           `json:"fee"`
-	Delegation     *Asset           `json:"delegation"`
-	Creator        string           `json:"creator"`
-	NewAccountName string           `json:"new_account_name"`
-	Owner          *Authority       `json:"owner"`
-	Active         *Authority       `json:"active"`
-	Posting        *Authority       `json:"posting"`
-	MemoKey        string           `json:"memo_key"`
-	JSONMetadata   *AccountMetadata `json:"json_metadata"`
-	Extensions     []interface{}    `json:"extensions"`
+	Fee            *Asset        `json:"fee"`
+	Delegation     *Asset        `json:"delegation"`
+	Creator        string        `json:"creator"`
+	NewAccountName string        `json:"new_account_name"`
+	Owner          *Authority    `json:"owner"`
+	Active         *Authority    `json:"active"`
+	Posting        *Authority    `json:"posting"`
+	MemoKey        string        `json:"memo_key"`
+	JSONMetadata   string        `json:"json_metadata"`
+	Extensions     []interface{} `json:"extensions"`
 }
 
 //Type function that defines the type of operation AccountCreateWithDelegationOperation.

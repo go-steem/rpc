@@ -9,8 +9,8 @@ type LimitOrderCreate2Operation struct {
 	Owner        string    `json:"owner"`
 	OrderID      uint32    `json:"orderid"`
 	AmountToSell *Asset    `json:"amount_to_sell"`
-	ExchangeRate *ExchRate `json:"exchange_rate"`
 	FillOrKill   bool      `json:"fill_or_kill"`
+	ExchangeRate *ExchRate `json:"exchange_rate"`
 	Expiration   *Time     `json:"expiration"`
 }
 
@@ -31,8 +31,8 @@ func (op *LimitOrderCreate2Operation) MarshalTransaction(encoder *transaction.En
 	enc.Encode(op.Owner)
 	enc.Encode(op.OrderID)
 	enc.Encode(op.AmountToSell)
-	enc.Encode(op.ExchangeRate)
 	enc.EncodeBool(op.FillOrKill)
+	enc.Encode(op.ExchangeRate)
 	enc.Encode(op.Expiration)
 	return enc.Err()
 }

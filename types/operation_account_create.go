@@ -6,14 +6,14 @@ import (
 
 //AccountCreateOperation represents account_create operation data.
 type AccountCreateOperation struct {
-	Fee            *Asset           `json:"fee"`
-	Creator        string           `json:"creator"`
-	NewAccountName string           `json:"new_account_name"`
-	Owner          *Authority       `json:"owner"`
-	Active         *Authority       `json:"active"`
-	Posting        *Authority       `json:"posting"`
-	MemoKey        string           `json:"memo_key"`
-	JSONMetadata   *AccountMetadata `json:"json_metadata"`
+	Fee            *Asset     `json:"fee"`
+	Creator        string     `json:"creator"`
+	NewAccountName string     `json:"new_account_name"`
+	Owner          *Authority `json:"owner"`
+	Active         *Authority `json:"active"`
+	Posting        *Authority `json:"posting"`
+	MemoKey        string     `json:"memo_key"`
+	JSONMetadata   string     `json:"json_metadata"`
 }
 
 //Type function that defines the type of operation AccountCreateOperation.

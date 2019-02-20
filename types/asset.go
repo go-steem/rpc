@@ -55,7 +55,7 @@ func (op *Asset) MarshalTransaction(encoder *transaction.Encoder) error {
 //String function convert type Asset to string.
 func (op *Asset) String() string {
 	var ammf string
-	if op.Symbol != "GESTS" {
+	if op.Symbol != "SHARES" {
 		ammf = strconv.FormatFloat(op.Amount, 'f', 3, 64)
 	} else {
 		ammf = strconv.FormatFloat(op.Amount, 'f', 6, 64)

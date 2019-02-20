@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/asuleymanov/steem-go/encoding/transaction"
+
 	"github.com/pkg/errors"
 )
 

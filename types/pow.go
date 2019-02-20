@@ -16,14 +16,3 @@ type POW2Input struct {
 	PrevBlock     []byte `json:"prev_block"`
 	Nonce         uint64 `json:"nonce"`
 }
-
-//Beneficiary is an additional structure used by other structures.
-type Beneficiary struct {
-	Account string `json:"account"`
-	Weight  uint16 `json:"weight"`
-}
-
-//CommentPayoutBeneficiaries is an additional structure used by other structures.
-type CommentPayoutBeneficiaries struct {
-	Beneficiaries []Beneficiary `json:"beneficiaries"`
-}
