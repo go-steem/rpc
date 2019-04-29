@@ -36,7 +36,7 @@ func SignECDSA(priv *ecdsa.PrivateKey, hash []byte, alg func() hash.Hash, nonce 
 		s.Mul(s, inv)
 		s.Mod(s, n)
 
-		return s.Sign() == 0
+		return s.Sign() != 0
 	}, nonce)
 
 	nOverTwo := new(big.Int).Div(n, big.NewInt(2))
