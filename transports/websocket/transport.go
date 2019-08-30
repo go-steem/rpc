@@ -1,306 +1,241 @@
 package websocket
 
 import (
-	"io"
-	// Stdlib
-	"context"
-	"net"
+	"encoding/json"
+	"fmt"
+	"log"
+	"math"
+	"sync"
 	"time"
 
-	// Vendor
+	"github.com/asuleymanov/steem-go/types"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
-	"github.com/sourcegraph/jsonrpc2"
-	tomb "gopkg.in/tomb.v2"
 )
 
-const (
-	DefaultHandshakeTimeout      = 30 * time.Second
-	DefaultWriteTimeout          = 10 * time.Second
-	DefaultReadTimeout           = 20 * time.Second
-	DefaultAutoReconnectMaxDelay = 1 * time.Minute
-
-	InitialAutoReconnectDelay       = 1 * time.Second
-	AutoReconnectBackoffCoefficient = 1.5
+var (
+	ErrShutdown = errors.New("connection is shut down")
+	writeWait   = 10 * time.Second
+	pongWait    = 60 * time.Second
+	pingPeriod  = (pongWait * 9) / 10
 )
 
-var netDialer net.Dialer
-
-// Transport implements a CallCloser accessing the Steem RPC endpoint over WebSocket.
 type Transport struct {
-	// URLs as passed into the constructor.
-	urls         []string
-	nextURLIndex int
-	currentURL   string
+	conn *websocket.Conn
 
-	// Options.
-	handshakeTimeout time.Duration
-	readTimeout      time.Duration
-	writeTimeout     time.Duration
+	reqMutex  sync.Mutex
+	requestID uint64
+	pending   map[uint64]*callRequest
 
-	autoReconnectEnabled  bool
-	autoReconnectMaxDelay time.Duration
+	callbackMutex sync.Mutex
+	callbackID    uint64
+	callbacks     map[uint64]func(args json.RawMessage)
 
-	monitorChan chan<- interface{}
+	closing  bool // user has called Close
+	shutdown bool // server has told us to stop
 
-	// The underlying JSON-RPC connection.
-	connCh chan chan *jsonrpc2.Conn
-	errCh  chan error
-
-	t *tomb.Tomb
+	mutex sync.Mutex
 }
 
-// Option represents an option that can be passed into the transport constructor.
-type Option func(*Transport)
-
-// SetDialTimeout can be used to set the timeout when establishing a new connection.
-//
-// This function is deprecated, please use SetHandshakeTimeout.
-func SetDialTimeout(timeout time.Duration) Option {
-	return SetHandshakeTimeout(timeout)
+// Represent an async call
+type callRequest struct {
+	Error error            // after completion, the error status.
+	Done  chan bool        // strobes when call is complete.
+	Reply *json.RawMessage // reply message
 }
 
-// SetHandshakeTimeout can be used to set the timeout for WebSocket handshake.
-func SetHandshakeTimeout(timeout time.Duration) Option {
-	return func(t *Transport) {
-		t.handshakeTimeout = timeout
-	}
-}
-
-// SetReadTimeout sets the connection read timeout.
-// The timeout is implemented using net.Conn.SetReadDeadline.
-func SetReadTimeout(timeout time.Duration) Option {
-	return func(t *Transport) {
-		t.readTimeout = timeout
-	}
-}
-
-// SetWriteTimeout sets the connection read timeout.
-// The timeout is implemented using net.Conn.SetWriteDeadline.
-func SetWriteTimeout(timeout time.Duration) Option {
-	return func(t *Transport) {
-		t.writeTimeout = timeout
-	}
-}
-
-// SetReadWriteTimeout sets the connection read and write timeout.
-// The timeout is implemented using net.Conn.SetDeadline.
-func SetReadWriteTimeout(timeout time.Duration) Option {
-	return func(t *Transport) {
-		t.readTimeout = timeout
-		t.writeTimeout = timeout
-	}
-}
-
-// SetAutoReconnectEnabled can be used to enable automatic reconnection to the RPC endpoint.
-// Exponential backoff is used when the connection cannot be established repetitively.
-//
-// See SetAutoReconnectMaxDelay to set the maximum delay between the reconnection attempts.
-func SetAutoReconnectEnabled(enabled bool) Option {
-	return func(t *Transport) {
-		t.autoReconnectEnabled = enabled
-	}
-}
-
-// SetAutoReconnectMaxDelay can be used to set the maximum delay between the reconnection attempts.
-//
-// This option only takes effect when the auto-reconnect mode is enabled.
-//
-// The default value is 5 minutes.
-func SetAutoReconnectMaxDelay(delay time.Duration) Option {
-	return func(t *Transport) {
-		t.autoReconnectMaxDelay = delay
-	}
-}
-
-// SetMonitor can be used to set the monitoring channel that can be used to watch
-// connection-related state changes.
-//
-// All channel send operations are happening synchronously, so not receiving messages
-// from the channel will lead to the whole thing getting stuck completely.
-//
-// This option only takes effect when the auto-reconnect mode is enabled.
-//
-// The channel is closed when the transport is closed.
-func SetMonitor(monitorChan chan<- interface{}) Option {
-	return func(t *Transport) {
-		t.monitorChan = monitorChan
-	}
-}
-
-// NewTransport creates a new transport that connects to the given WebSocket URLs.
-//
-// It is possible to specify multiple WebSocket endpoint URLs.
-// In case the transport is configured to reconnect automatically,
-// the URL to connect to is rotated on every connect attempt using round-robin.
-func NewTransport(urls []string, options ...Option) (*Transport, error) {
-	// Prepare a transport instance.
-	t := &Transport{
-		urls:                  urls,
-		handshakeTimeout:      DefaultHandshakeTimeout,
-		readTimeout:           DefaultReadTimeout,
-		writeTimeout:          DefaultWriteTimeout,
-		autoReconnectMaxDelay: DefaultAutoReconnectMaxDelay,
-		connCh:                make(chan chan *jsonrpc2.Conn),
-		errCh:                 make(chan error),
-		t:                     &tomb.Tomb{},
-	}
-
-	// Apply the options.
-	for _, opt := range options {
-		opt(t)
-	}
-
-	t.t.Go(t.dialer)
-
-	// Return the new transport.
-	return t, nil
-}
-
-// Call implements interfaces.CallCloser.
-func (t *Transport) Call(method string, params, result interface{}) error {
-	// Limit the request context with the tomb context.
-	ctx := t.t.Context(nil)
-
-Loop:
-	for {
-		// Request a connection.
-		connCh := make(chan *jsonrpc2.Conn, 1)
-		select {
-		case t.connCh <- connCh:
-		case <-ctx.Done():
-			return errors.Wrap(ctx.Err(), "context closed")
-		}
-
-		// Receive the connection.
-		conn := <-connCh
-
-		// Perform the call.
-		err := conn.Call(ctx, method, params, result)
-		if err == nil {
-			return nil
-		}
-
-		// In case this is a context error, return immediately.
-		if err := ctx.Err(); err != nil {
-			return errors.Wrap(err, "context closed")
-		}
-
-		// In case auto-reconnect is disabled, fail immediately.
-		if !t.autoReconnectEnabled {
-			return errors.Wrap(err, "call failed")
-		}
-
-		// In case this is a connection error, request a new connection.
-		err = errors.Cause(err)
-		if _, ok := err.(*websocket.CloseError); ok || err == io.ErrUnexpectedEOF {
-			select {
-			case t.errCh <- errors.Wrap(err, "WebSocket closed"):
-				continue Loop
-			case <-ctx.Done():
-				return errors.Wrap(ctx.Err(), "context closed")
-			}
-		}
-
-		// Some other error occurred, return it immediately.
-		return errors.Wrap(err, "call failed")
-	}
-}
-
-func (t *Transport) dialer() error {
-	ctx := t.t.Context(nil)
-
-	var conn *jsonrpc2.Conn
-	defer func() {
-		if conn != nil {
-			conn.Close()
-			err := errors.Wrap(ctx.Err(), "context closed")
-			t.emit(&DisconnectedEvent{t.currentURL, err})
-		}
-	}()
-
-	connect := func() {
-		delay := InitialAutoReconnectDelay
-
-		for {
-			var err error
-			conn, err = t.dial(ctx)
-			if err == nil {
-				break
-			}
-
-			select {
-			case <-time.After(delay):
-				delay = time.Duration(float64(delay) * AutoReconnectBackoffCoefficient)
-				if delay > t.autoReconnectMaxDelay {
-					delay = t.autoReconnectMaxDelay
-				}
-
-			case <-ctx.Done():
-				return
-			}
-		}
-	}
-
-	// Establish the initial connection.
-	connect()
-
-	for {
-		select {
-		case connCh := <-t.connCh:
-			connCh <- conn
-
-		case err := <-t.errCh:
-			conn.Close()
-			t.emit(&DisconnectedEvent{t.currentURL, err})
-			connect()
-
-		case <-ctx.Done():
-			return nil
-		}
-	}
-}
-
-func (t *Transport) dial(ctx context.Context) (*jsonrpc2.Conn, error) {
-	// Set up a dialer.
-	dialer := websocket.Dialer{
-		NetDial: func(network, addr string) (net.Conn, error) {
-			return netDialer.DialContext(ctx, network, addr)
-		},
-		HandshakeTimeout: t.handshakeTimeout,
-	}
-
-	// Get the next URL to try.
-	u := t.urls[t.nextURLIndex]
-	t.nextURLIndex = (t.nextURLIndex + 1) % len(t.urls)
-	t.currentURL = u
-
-	// Connect the WebSocket.
-	t.emit(&ConnectingEvent{u})
-	ws, _, err := dialer.Dial(u, nil)
+func NewTransport(url string) (*Transport, error) {
+	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		err = errors.Wrapf(err, "failed to dial %v", u)
-		t.emit(&DisconnectedEvent{u, err})
 		return nil, err
 	}
-	t.emit(&ConnectedEvent{u})
 
-	// Wrap the WebSocket with JSON-RPC2.
-	stream := NewObjectStream(ws, t.writeTimeout, t.readTimeout)
-	return jsonrpc2.NewConn(ctx, stream, nil), nil
+	client := &Transport{
+		conn:      ws,
+		pending:   make(map[uint64]*callRequest),
+		callbacks: make(map[uint64]func(args json.RawMessage)),
+	}
+
+	go ping(ws)
+	go client.input()
+	return client, nil
 }
 
-func (t *Transport) emit(v interface{}) {
-	if t.monitorChan != nil {
-		select {
-		case t.monitorChan <- v:
-		default:
+func (caller *Transport) Call(method string, args []interface{}, reply interface{}) error {
+	caller.reqMutex.Lock()
+	defer caller.reqMutex.Unlock()
+
+	caller.mutex.Lock()
+	if caller.closing || caller.shutdown {
+		caller.mutex.Unlock()
+		return ErrShutdown
+	}
+
+	// increase request id
+	if caller.requestID == math.MaxUint64 {
+		caller.requestID = 0
+	}
+	caller.requestID++
+	seq := caller.requestID
+
+	c := &callRequest{
+		Done: make(chan bool, 1),
+	}
+	caller.pending[seq] = c
+	caller.mutex.Unlock()
+
+	request := types.RPCRequest{
+		Method: method,
+		JSON:   "2.0",
+		ID:     caller.requestID,
+		Params: args,
+	}
+
+	// send Json Rcp request
+	if err := caller.WriteJSON(request); err != nil {
+		caller.mutex.Lock()
+		delete(caller.pending, seq)
+		caller.mutex.Unlock()
+		return err
+	}
+
+	// wait for the call to complete
+	<-c.Done
+	if c.Error != nil {
+		return c.Error
+	}
+
+	if c.Reply != nil {
+		if err := json.Unmarshal(*c.Reply, reply); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (caller *Transport) SetCallback(api string, method string, notice func(args json.RawMessage)) error {
+	var ans map[string]interface{}
+	// increase callback id
+	caller.callbackMutex.Lock()
+	if caller.callbackID == math.MaxUint64 {
+		caller.callbackID = 0
+	}
+	//caller.callbackID++
+	caller.callbackID = caller.requestID + 1
+	caller.callbacks[caller.callbackID] = notice
+	caller.callbackMutex.Unlock()
+
+	return caller.Call("call", []interface{}{api, method, []interface{}{caller.callbackID}}, ans)
+}
+
+func (caller *Transport) input() {
+	caller.conn.SetPongHandler(func(string) error { _ = caller.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	for {
+		_, message, err := caller.conn.ReadMessage()
+		if err != nil {
+			caller.stop(err)
+			return
+		}
+
+		var response types.RPCResponse
+		if err := json.Unmarshal(message, &response); err != nil {
+			caller.stop(err)
+			return
+		} else {
+			if call, ok := caller.pending[response.ID]; ok {
+				caller.onCallResponse(response, call)
+			} else {
+				//the message is not a pending call, but probably a callback notice
+				var incoming types.RPCIncoming
+				if err := json.Unmarshal(message, &incoming); err != nil {
+					caller.stop(err)
+					return
+				}
+				if _, ok := caller.callbacks[incoming.ID]; ok {
+					if err := caller.onNotice(incoming); err != nil {
+						caller.stop(err)
+						return
+					}
+				} else {
+					log.Printf("protocol error: unknown message received: %+v\n", incoming)
+					log.Printf("Answer: %+v\n", string(message))
+				}
+			}
 		}
 	}
 }
 
-// Close implements interfaces.CallCloser.
-func (t *Transport) Close() error {
-	t.t.Kill(nil)
-	return t.t.Wait()
+// Return pending clients and shutdown the client
+func (caller *Transport) stop(err error) {
+	caller.reqMutex.Lock()
+	caller.shutdown = true
+	for _, call := range caller.pending {
+		call.Error = err
+		call.Done <- true
+	}
+	caller.reqMutex.Unlock()
+}
+
+// Call response handler
+func (caller *Transport) onCallResponse(response types.RPCResponse, call *callRequest) {
+	caller.mutex.Lock()
+	delete(caller.pending, response.ID)
+	if response.Error != nil {
+		call.Error = response.Error
+	}
+	call.Reply = response.Result
+	call.Done <- true
+	caller.mutex.Unlock()
+}
+
+// Incoming notice handler
+func (caller *Transport) onNotice(incoming types.RPCIncoming) error {
+	notice := caller.callbacks[incoming.ID]
+	if notice == nil {
+		return fmt.Errorf("callback %d is not registered", incoming.ID)
+	}
+
+	// invoke callback
+	notice(incoming.Result)
+
+	return nil
+}
+
+// Close calls the underlying web socket Close method. If the connection is already
+// shutting down, ErrShutdown is returned.
+func (caller *Transport) Close() error {
+	caller.mutex.Lock()
+	if caller.closing {
+		caller.mutex.Unlock()
+		return ErrShutdown
+	}
+	caller.closing = true
+	caller.mutex.Unlock()
+	return caller.conn.Close()
+}
+
+func ping(ws *websocket.Conn) {
+	ticker := time.NewTicker(pingPeriod)
+	defer ticker.Stop()
+	for {
+		<-ticker.C
+		if err := ws.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(writeWait)); err != nil {
+			log.Println("ping:", err)
+		}
+	}
+}
+
+func (caller *Transport) WriteJSON(v interface{}) error {
+	w, err := caller.conn.NextWriter(1)
+	if err != nil {
+		return err
+	}
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(false)
+	err1 := enc.Encode(v)
+	err2 := w.Close()
+	if err1 != nil {
+		return err1
+	}
+	return err2
 }

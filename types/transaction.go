@@ -1,11 +1,9 @@
 package types
 
 import (
-	// RPC
-	"github.com/go-steem/rpc/encoding/transaction"
+	"errors"
 
-	// Vendor
-	"github.com/pkg/errors"
+	"github.com/asuleymanov/steem-go/encoding/transaction"
 )
 
 // Transaction represents a blockchain transaction.

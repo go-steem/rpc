@@ -1,51 +1,72 @@
-package rpc
+package client
 
 import (
-	// RPC
-	"github.com/go-steem/rpc/apis/database"
-	"github.com/go-steem/rpc/apis/follow"
-	"github.com/go-steem/rpc/apis/login"
-	"github.com/go-steem/rpc/apis/networkbroadcast"
-	"github.com/go-steem/rpc/interfaces"
+	"net/url"
+
+	"github.com/asuleymanov/steem-go/api"
+	"github.com/asuleymanov/steem-go/transports"
+	"github.com/asuleymanov/steem-go/transports/http"
+	"github.com/asuleymanov/steem-go/transports/websocket"
+	"github.com/pkg/errors"
 )
 
-// Client can be used to access Steem remote APIs.
-//
-// There is a public field for every Steem API available,
+var (
+	ErrInitializeTransport = errors.New("Failed to initialize transport.")
+)
+
+// Client can be used to access STEEM remote APIs.
+// There is a public field for every STEEM API available,
 // e.g. Client.Database corresponds to database_api.
 type Client struct {
-	cc interfaces.CallCloser
+	cc transports.CallCloser
 
-	// Login represents login_api.
-	Login *login.API
+	chainID string
+
+	AsyncProtocol bool
 
 	// Database represents database_api.
-	Database *database.API
+	API *api.API
 
-	// Follow represents follow_api.
-	Follow *follow.API
-
-	// NetworkBroadcast represents network_broadcast_api.
-	NetworkBroadcast *networkbroadcast.API
+	// Current keys for operations
+	CurrentKeys *Keys
 }
 
 // NewClient creates a new RPC client that use the given CallCloser internally.
-func NewClient(cc interfaces.CallCloser) (*Client, error) {
-	client := &Client{cc: cc}
-	client.Login = login.NewAPI(client.cc)
-	client.Database = database.NewAPI(client.cc)
-
-	followAPI, err := follow.NewAPI(client.cc)
+// Initialize only server present API. Absent API initialized as nil value.
+func NewClient(s string) (*Client, error) {
+	// Parse URL
+	u, err := url.Parse(s)
 	if err != nil {
 		return nil, err
 	}
-	client.Follow = followAPI
 
-	networkBroadcastAPI, err := networkbroadcast.NewAPI(client.cc)
+	// Initializing Transport
+	var call transports.CallCloser
+	switch u.Scheme {
+	case "wss", "ws":
+		call, err = websocket.NewTransport(s)
+		if err != nil {
+			return nil, err
+		}
+	case "https", "http":
+		call, err = http.NewTransport(s)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, ErrInitializeTransport
+	}
+	client := &Client{cc: call}
+
+	client.AsyncProtocol = false
+
+	client.API = api.NewAPI(client.cc)
+
+	chainID, err := client.API.GetConfig()
 	if err != nil {
 		return nil, err
 	}
-	client.NetworkBroadcast = networkBroadcastAPI
+	client.chainID = chainID.ChainID
 
 	return client, nil
 }
